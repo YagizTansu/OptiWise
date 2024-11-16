@@ -1,0 +1,77 @@
+[
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/basic_csv_parser.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/basic_csv_parser.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/basic_csv_parser.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/col_names.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/col_names.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/col_names.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/csv_format.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_format.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_format.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/csv_reader.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_reader.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_reader.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/csv_reader_iterator.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_reader_iterator.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_reader_iterator.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/csv_row.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_row.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_row.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/csv_row_json.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_row_json.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_row_json.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/csv_stat.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_stat.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_stat.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/include/internal",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include   -Wno-unknown-pragmas -g --coverage -Og   -pthread -std=gnu++17 -o CMakeFiles/csv.dir/csv_utility.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_utility.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/csv_utility.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/programs",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/..   -Wno-unknown-pragmas -g --coverage -Og   -std=gnu++17 -o CMakeFiles/csv_stats.dir/csv_stats.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/programs/csv_stats.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/programs/csv_stats.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/ext/csv-parser/programs",
+  "command": "/usr/bin/g++  -DCMAKE_CXX_STANDARD=17 -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/..   -Wno-unknown-pragmas -g --coverage -Og   -std=gnu++17 -o CMakeFiles/csv_info.dir/csv_info.cpp.o -c /home/yagiz/Desktop/OptiWise/ext/csv-parser/programs/csv_info.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/ext/csv-parser/programs/csv_info.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/src",
+  "command": "/usr/bin/g++   -I/home/yagiz/Desktop/OptiWise/src/../include -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/..  -g   -std=gnu++17 -o CMakeFiles/csv_operations.dir/CSVReaderWriter.cpp.o -c /home/yagiz/Desktop/OptiWise/src/CSVReaderWriter.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/src/CSVReaderWriter.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/tests",
+  "command": "/usr/bin/g++   -I/home/yagiz/Desktop/OptiWise/tests/../ext  -g   -o CMakeFiles/tests.dir/tests.cpp.o -c /home/yagiz/Desktop/OptiWise/tests/tests.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/tests/tests.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/tests",
+  "command": "/usr/bin/g++   -I/home/yagiz/Desktop/OptiWise/tests/../ext  -g   -o CMakeFiles/tests.dir/adder_t.cpp.o -c /home/yagiz/Desktop/OptiWise/tests/adder_t.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/tests/adder_t.cpp"
+},
+{
+  "directory": "/home/yagiz/Desktop/OptiWise/build/app",
+  "command": "/usr/bin/g++   -I/home/yagiz/Desktop/OptiWise/src/../include -I/home/yagiz/Desktop/OptiWise/ext/csv-parser/include/internal/..  -g   -std=gnu++17 -o CMakeFiles/main.dir/main.cpp.o -c /home/yagiz/Desktop/OptiWise/app/main.cpp",
+  "file": "/home/yagiz/Desktop/OptiWise/app/main.cpp"
+}
+]
