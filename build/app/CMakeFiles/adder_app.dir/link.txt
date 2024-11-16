@@ -1,1 +1,0 @@
-/usr/bin/g++     CMakeFiles/adder_app.dir/adder_app.cpp.o  -o adder_app  ../src/libcsv_operations.a ../ext/csv-parser/include/internal/libcsv.a -pthread 

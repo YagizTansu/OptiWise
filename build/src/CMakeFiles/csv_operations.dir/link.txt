@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcsv_operations.a  CMakeFiles/csv_operations.dir/CSVReaderWriter.cpp.o
-/usr/bin/ranlib libcsv_operations.a
