@@ -4,7 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/include/csvOperations",
+                "${workspaceFolder}/include/csv_operations",
                 "${workspaceFolder}/ext/csv-parser/include",
                 "${workspaceFolder}/ext/csv-parser/single_include"
             ],
