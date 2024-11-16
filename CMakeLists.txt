@@ -17,6 +17,7 @@ add_subdirectory(tests)
 # compile the application
 add_subdirectory(app)
 
+
 # optionally add doxygen target to generate documentation
 # option(BUILD_DOCS "Enable building of documentation (requires Doxygen)" OFF)
 # if(BUILD_DOCS)
