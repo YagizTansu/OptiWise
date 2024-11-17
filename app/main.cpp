@@ -1,18 +1,17 @@
 #include "AssetDataProvider/AlphaVantageAdapter/AlphaVantageAdapter.hpp"
 #include "csv_operations/CSVReaderWriter.hpp"
-#include <iostream>
 #include "Asset/Asset.hpp"
 #include "Asset/Stock.hpp"
+#include <iostream>
 
 int main()
 {
     std::cout << "Financial Adviser Project" << std::endl;
 
-    std::string name{};
-    Stock stock(name,name);
+    Stock stock("IBM","IBM");
 
     AlphaVantageAdapter alphaVantageAdapter;
-    double data = alphaVantageAdapter.getHistoricalData(stock);
-
+    std::string data = alphaVantageAdapter.getHistoricalData(stock);
+    std::cout << data << std::endl;
     return 0;
 }

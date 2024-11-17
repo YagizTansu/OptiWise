@@ -1,21 +1,16 @@
 #ifndef STOCK_HPP
 #define STOCK_HPP
 
-#include "Asset/Asset.hpp"
-
+#include "Asset.hpp"
 
 class Stock : public Asset
 {
-private:
-
 public:
-    Stock(const std::string &name, const std::string &tickerSymbol)
-        : Asset(name, tickerSymbol) {}
+    // Constructor that initializes the base class (Asset) with name and ticker symbol
+    Stock(const std::string &name, const std::string &tickerSymbol);
 
-    void display() const override
-    {
-        std::cout << "Stock: " << this->getName() << " (" << this->getSymbol() << ")" << std::endl;
-    }
+    // Override the display function to provide specific behavior for Stock
+    void display() const override;
 };
 
 #endif

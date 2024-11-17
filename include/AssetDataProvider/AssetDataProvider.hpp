@@ -5,7 +5,7 @@
 
 class AssetDataProvider {
 public:
-    virtual double getHistoricalData(Asset& asset) = 0;
+    virtual std::string getHistoricalData(Asset& asset) = 0;
 
     virtual ~AssetDataProvider() {}
 };

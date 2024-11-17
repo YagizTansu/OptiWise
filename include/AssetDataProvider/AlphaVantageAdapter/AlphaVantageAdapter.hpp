@@ -10,8 +10,7 @@ private:
     AlphaVantageAPI alphaVantageAPI;
 
 public:
-    double getHistoricalData(Asset& asset) override {
-        // AlphaVantageAPI'nin fonksiyonunu çağırıp uyumlu veri tipine dönüştürürüz.
+    std::string getHistoricalData(Asset& asset) override {
         return alphaVantageAPI.fetchHistoricalDataFromAlphaVantage(asset);
     }
 };

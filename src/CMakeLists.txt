@@ -5,9 +5,15 @@ target_link_libraries(csv_operations csv)
 
 find_package(CURL REQUIRED)
 
-# add_library(stock_data_downloads stock_data_download.cpp)
-# target_include_directories(stock_data_downloads PUBLIC ../include)
-# target_link_libraries(stock_data_downloads CURL::libcurl)
+add_library(asset Asset/Asset.cpp)
+target_include_directories(asset PUBLIC ../include)
+
+add_library(stock Asset/Stock.cpp)
+target_include_directories(stock PUBLIC ../include)
+
+add_library(AlphaVantageAPI AlphaVantageAdapter/AlphaVantageAPI.cpp)
+target_include_directories(AlphaVantageAPI PUBLIC ../include)
+target_link_libraries(AlphaVantageAPI CURL::libcurl asset stock)
 
 
 # require at least c++17

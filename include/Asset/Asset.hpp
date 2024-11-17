@@ -7,31 +7,22 @@
 class Asset
 {
 protected:
-    /* data */
     std::string name;
     std::string symbol;
 
 public:
-    Asset(const std::string &name, const std::string &symbol) : name(name), symbol(symbol) {}
-    ~Asset()
-    {
-    }
+    // Constructor
+    Asset(const std::string &name, const std::string &symbol);
 
-    std::string getName() const
-    {
-        return name;
-    }
+    // Destructor
+    virtual ~Asset();
 
-    std::string getSymbol() const
-    {
-        return name;
-    }
+    // Getters
+    std::string getName() const;
+    std::string getSymbol() const;
 
-    // Virtual function to display asset information (can be overridden)
-    virtual void display() const
-    {
-        std::cout << "Asset: " << name << ", Price: " << symbol << std::endl;
-    }
+    // Virtual function to display asset information
+    virtual void display() const;
 };
 
 #endif
