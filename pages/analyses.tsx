@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
-import Layout from '../components/Layout';
+import Layout from '../components/Layout'
 import styles from '../styles/Analyses.module.css';
-import homeStyles from '../styles/Home.module.css';
 import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaArrowUp, FaArrowDown, FaSearch, FaBars, 
   FaCircle, FaEye, FaInfoCircle, FaDownload, FaExpand, FaQuestion, FaExchangeAlt, FaHistory } from 'react-icons/fa';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
@@ -329,18 +328,6 @@ export default function Analyses() {
   return (
     <Layout>
       {/* Navigation bar - Same as in index.tsx */}
-      <nav className={homeStyles.navbar}>
-        <div className={homeStyles.navLogo}>OptiWise</div>
-        <div className={homeStyles.navLinks}>
-          <a href="/" className={homeStyles.navLink}>Dashboard</a>
-          <a href="#" className={homeStyles.navLink}>Features</a>
-          <a href="#" className={homeStyles.navLink}>Pricing</a>
-          <a href="/about" className={homeStyles.navLink}>About</a>
-        </div>
-        <button className={homeStyles.menuButton}>
-          <FaBars className={homeStyles.menuIcon} />
-        </button>
-      </nav>
 
       <div className={styles.analysesContainer}>
         {/* Header with Asset Name and AI Button */}
@@ -1474,46 +1461,6 @@ export default function Analyses() {
 
         </div>
       </div>
-
-      {/* Footer - Same as in index.tsx */}
-      <footer className={homeStyles.footer}>
-        <div className={homeStyles.footerSection}>
-          <h3>EXPLORE</h3>
-          <ul>
-            <li><a href="#">Landing</a></li>
-            <li><a href="#">Terminal</a></li>
-            <li><a href="#">Pricing</a></li>
-            <li><a href="#">Affiliate Program</a></li>
-            <li><a href="#">What's New</a></li>
-          </ul>
-        </div>
-        
-        <div className={homeStyles.footerSection}>
-          <h3>PERSONAL DATA</h3>
-          <ul>
-            <li><a href="#">Disclaimer</a></li>
-            <li><a href="#">Risk disclosure statement</a></li>
-            <li><a href="#">Personal data processing</a></li>
-          </ul>
-        </div>
-        
-        <div className={homeStyles.footerSection}>
-          <h3>POLICY</h3>
-          <ul>
-            <li><a href="#">Terms and conditions</a></li>
-            <li><a href="#">Privacy policy</a></li>
-            <li><a href="#">Cookie policy</a></li>
-          </ul>
-        </div>
-        
-        <div className={homeStyles.footerSection}>
-          <h3>CONTACT US</h3>
-          <p>ELP SA</p>
-          <p>Chiasso, Switzerland</p>
-          <p>Phone: [Phone Number]</p>
-          <p>Email: [Email Address]</p>
-        </div>
-      </footer>
     </Layout>
   );
 }

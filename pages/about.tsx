@@ -1,181 +1,136 @@
 import Layout from '../components/Layout'
-import styles from '../styles/Home.module.css'
-import { 
-  FaBars, 
-  FaBullseye, 
-  FaCalendarAlt, 
-  FaUsers, 
-  FaGlobeAmericas,
-  FaLinkedin,
-  FaTwitter,
-  FaLightbulb,
-  FaHandshake,
-  FaUserFriends,
-  FaTrophy
-} from 'react-icons/fa'
+import styles from '../styles/About.module.css'
+import { FaUsers, FaChartLine, FaLightbulb, FaGlobe, FaBullseye, FaRocket, FaShieldAlt, FaHandshake } from 'react-icons/fa'
+import Image from 'next/image'
 
 export default function About() {
+  const team = [
+    {
+      name: 'Sarah Johnson',
+      role: 'CEO & Founder',
+      bio: 'Former hedge fund manager with 15+ years experience in quantitative analysis and algorithmic trading.',
+      image: '/team/sarah.jpg',
+    },
+    {
+      name: 'Michael Chen',
+      role: 'CTO',
+      bio: 'AI researcher and software architect with experience building high-frequency trading systems.',
+      image: '/team/michael.jpg',
+    },
+    {
+      name: 'Elena Rodriguez',
+      role: 'Head of Data Science',
+      bio: 'PhD in Statistical Learning with expertise in predictive modeling for financial markets.',
+      image: '/team/elena.jpg',
+    },
+    {
+      name: 'David Kim',
+      role: 'Chief Market Strategist',
+      bio: 'Former investment banker with deep knowledge of global markets and macroeconomic trends.',
+      image: '/team/david.jpg',
+    },
+  ];
+  
   return (
-    <Layout>
-      {/* Modern navigation bar */}
-      <nav className={styles.navbar}>
-        <div className={styles.navLogo}>OptiWise</div>
-        <div className={styles.navLinks}>
-          <a href="/" className={styles.navLink}>Dashboard</a>
-          <a href="#" className={styles.navLink}>Features</a>
-          <a href="#" className={styles.navLink}>Pricing</a>
-          <a href="/about" className={`${styles.navLink} ${styles.active}`}>About</a>
-        </div>
-        <button className={styles.menuButton}>
-          <FaBars className={styles.menuIcon} />
-        </button>
-      </nav>
-
-      <main className={styles.main}>
-        <div className={styles.aboutHero}>
-          <h1 className={styles.title}>About OptiWise</h1>
-          <p className={styles.subtitle}>Driving innovation through smart optimization</p>
-        </div>
-        
-        <section className={styles.aboutSection}>
-          <div className={styles.sectionHeader}>
-            <FaBullseye className={styles.sectionIcon} />
-            <h2>Our Mission</h2>
-          </div>
-          <p className={styles.missionText}>OptiWise is dedicated to helping businesses make better decisions through advanced analytics and optimization technologies. We believe that with the right insights and tools, every organization can achieve optimal results.</p>
-          
-          <div className={styles.statsContainer}>
-            <div className={styles.statItem}>
-              <div className={styles.statIconWrapper}>
-                <FaCalendarAlt className={styles.statIcon} />
-              </div>
-              <h3>2015</h3>
-              <p>Founded</p>
-            </div>
-            <div className={styles.statItem}>
-              <div className={styles.statIconWrapper}>
-                <FaUsers className={styles.statIcon} />
-              </div>
-              <h3>500+</h3>
-              <p>Clients</p>
-            </div>
-            <div className={styles.statItem}>
-              <div className={styles.statIconWrapper}>
-                <FaGlobeAmericas className={styles.statIcon} />
-              </div>
-              <h3>30+</h3>
-              <p>Countries</p>
-            </div>
-          </div>
-        </section>
-        
-        <section className={styles.aboutSection}>
-          <div className={styles.sectionHeader}>
-            <FaUsers className={styles.sectionIcon} />
-            <h2>Our Team</h2>
-          </div>
-          <p>We're a diverse group of innovators, analysts, and problem solvers committed to excellence.</p>
-          
-          <div className={styles.teamContainer}>
-            <div className={styles.teamMember}>
-              <div className={styles.memberPhoto}></div>
-              <h4>Jane Smith</h4>
-              <p>CEO & Founder</p>
-              <div className={styles.socialLinks}>
-                <a href="#" className={styles.socialIcon}><FaLinkedin /></a>
-                <a href="#" className={styles.socialIcon}><FaTwitter /></a>
-              </div>
-            </div>
-            <div className={styles.teamMember}>
-              <div className={styles.memberPhoto}></div>
-              <h4>John Davis</h4>
-              <p>CTO</p>
-              <div className={styles.socialLinks}>
-                <a href="#" className={styles.socialIcon}><FaLinkedin /></a>
-                <a href="#" className={styles.socialIcon}><FaTwitter /></a>
-              </div>
-            </div>
-            <div className={styles.teamMember}>
-              <div className={styles.memberPhoto}></div>
-              <h4>Sarah Williams</h4>
-              <p>Head of Product</p>
-              <div className={styles.socialLinks}>
-                <a href="#" className={styles.socialIcon}><FaLinkedin /></a>
-                <a href="#" className={styles.socialIcon}><FaTwitter /></a>
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        <section className={styles.aboutSection}>
-          <div className={styles.sectionHeader}>
-            <FaTrophy className={styles.sectionIcon} />
-            <h2>Our Values</h2>
-          </div>
-          
+    <Layout title="About Us - OptiWise">
+      <div className={styles.aboutContainer}>
+        <section className={styles.valuesSection}>
+          <h2>Our Mission</h2>
           <div className={styles.valuesGrid}>
-            <div className={styles.valueItem}>
-              <FaLightbulb className={styles.valueIcon} />
-              <h3>Innovation</h3>
-              <p>We constantly push boundaries to create cutting-edge solutions.</p>
+            <div className={styles.valueCard}>
+              <div className={styles.valueIcon}><FaBullseye /></div>
+              <h3>Democratize Finance</h3>
+              <p>Make sophisticated financial analysis tools accessible to individual investors worldwide.</p>
             </div>
-            <div className={styles.valueItem}>
-              <FaHandshake className={styles.valueIcon} />
-              <h3>Integrity</h3>
-              <p>We operate with transparency and honesty in all we do.</p>
+            <div className={styles.valueCard}>
+              <div className={styles.valueIcon}><FaRocket /></div>
+              <h3>Empower Investors</h3>
+              <p>Enable smarter, data-driven decisions through cutting-edge AI and intuitive design.</p>
             </div>
-            <div className={styles.valueItem}>
-              <FaUserFriends className={styles.valueIcon} />
-              <h3>Customer Focus</h3>
-              <p>Our clients' success drives every decision we make.</p>
+            <div className={styles.valueCard}>
+              <div className={styles.valueIcon}><FaShieldAlt /></div>
+              <h3>Build Trust</h3>
+              <p>Provide transparent, reliable insights investors can depend on for their financial future.</p>
             </div>
-            <div className={styles.valueItem}>
-              <FaTrophy className={styles.valueIcon} />
-              <h3>Excellence</h3>
-              <p>We strive for the highest quality in our products and services.</p>
+            <div className={styles.valueCard}>
+              <div className={styles.valueIcon}><FaHandshake /></div>
+              <h3>Level the Playing Field</h3>
+              <p>Bridge the gap between institutional capabilities and individual investor resources.</p>
             </div>
           </div>
         </section>
-      </main>
-
-      <footer className={styles.footer}>
-        <div className={styles.footerSection}>
-          <h3>EXPLORE</h3>
-          <ul>
-            <li><a href="#">Landing</a></li>
-            <li><a href="#">Terminal</a></li>
-            <li><a href="#">Pricing</a></li>
-            <li><a href="#">Affiliate Program</a></li>
-            <li><a href="#">What's New</a></li>
-          </ul>
-        </div>
         
-        <div className={styles.footerSection}>
-          <h3>PERSONAL DATA</h3>
-          <ul>
-            <li><a href="#">Disclaimer</a></li>
-            <li><a href="#">Risk disclosure statement</a></li>
-            <li><a href="#">Personal data processing</a></li>
-          </ul>
-        </div>
+        <section className={styles.valuesSection}>
+          <h2>Our Values</h2>
+          <div className={styles.valuesGrid}>
+            <div className={styles.valueCard}>
+              <div className={styles.valueIcon}><FaUsers /></div>
+              <h3>Investor First</h3>
+              <p>We build everything with our users' success in mind, focusing on tools that create real value.</p>
+            </div>
+            <div className={styles.valueCard}>
+              <div className={styles.valueIcon}><FaChartLine /></div>
+              <h3>Data Integrity</h3>
+              <p>We're committed to providing accurate, reliable data and transparent analysis methodologies.</p>
+            </div>
+            <div className={styles.valueCard}>
+              <div className={styles.valueIcon}><FaLightbulb /></div>
+              <h3>Continuous Innovation</h3>
+              <p>We constantly improve our AI models and features to stay ahead of evolving market dynamics.</p>
+            </div>
+            <div className={styles.valueCard}>
+              <div className={styles.valueIcon}><FaGlobe /></div>
+              <h3>Global Perspective</h3>
+              <p>We analyze markets worldwide to provide comprehensive insights for diverse investment strategies.</p>
+            </div>
+          </div>
+        </section>
         
-        <div className={styles.footerSection}>
-          <h3>POLICY</h3>
-          <ul>
-            <li><a href="#">Terms and conditions</a></li>
-            <li><a href="#">Privacy policy</a></li>
-            <li><a href="#">Cookie policy</a></li>
-          </ul>
-        </div>
+        <section className={styles.storySection}>
+          <div className={styles.storyContent}>
+            <h2>Our Story</h2>
+            <p>
+              OptiWise was founded in 2020 when Sarah Johnson, a seasoned hedge fund manager, 
+              recognized that individual investors lacked access to the sophisticated tools 
+              used by institutional traders. She assembled a team of AI experts, data scientists, 
+              and market strategists with the goal of building a platform that could level the 
+              playing field.
+            </p>
+            <p>
+              What began as a prototype for algorithmic market analysis quickly evolved into a 
+              comprehensive investment intelligence platform. After two years of development and 
+              testing with early adopters, OptiWise launched publicly in 2022 and now serves 
+              thousands of investors across 40 countries.
+            </p>
+          </div>
+        </section>
         
-        <div className={styles.footerSection}>
-          <h3>CONTACT US</h3>
-          <p>ELP SA</p>
-          <p>Chiasso, Switzerland</p>
-          <p>Phone: [Phone Number]</p>
-          <p>Email: [Email Address]</p>
-        </div>
-      </footer>
+        <section className={styles.teamSection}>
+          <h2>Meet Our Team</h2>
+          <div className={styles.teamGrid}>
+            {team.map((member, index) => (
+              <div key={index} className={styles.teamMember}>
+                <div className={styles.memberImage}>
+                  {/* Placeholder for team member images */}
+                  <div className={styles.imagePlaceholder}></div>
+                </div>
+                <h3>{member.name}</h3>
+                <p className={styles.memberRole}>{member.role}</p>
+                <p className={styles.memberBio}>{member.bio}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+        
+        <section className={styles.ctaSection}>
+          <h2>Join Us on Our Mission</h2>
+          <p>Ready to transform how you make investment decisions?</p>
+          <div className={styles.ctaButtons}>
+            <button className={styles.primaryBtn}>Get Started</button>
+            <button className={styles.secondaryBtn}>View Careers</button>
+          </div>
+        </section>
+      </div>
     </Layout>
   )
 }

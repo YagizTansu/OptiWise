@@ -1,0 +1,224 @@
+.aboutContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.heroSection {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+.heroContent {
+  flex: 1;
+}
+
+.heroContent h1 {
+  font-size: 3rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.heroContent p {
+  font-size: 1.2rem;
+  color: #555;
+  line-height: 1.7;
+}
+
+.heroImage {
+  flex: 1;
+  min-height: 400px;
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+}
+
+.valuesSection {
+  margin-bottom: 4rem;
+}
+
+.valuesSection h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.valueCard {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.valueIcon {
+  font-size: 2.5rem;
+  color: #4a90e2;
+  margin-bottom: 1rem;
+}
+
+.valueCard h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.valueCard p {
+  color: #555;
+  line-height: 1.6;
+}
+
+.storySection {
+  margin-bottom: 4rem;
+  padding: 2rem;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.storyContent h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.storyContent p {
+  color: #555;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+.teamSection {
+  margin-bottom: 4rem;
+}
+
+.teamSection h2 {
+  text-align: center;
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
+}
+
+.teamMember {
+  text-align: center;
+}
+
+.memberImage {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 1.5rem;
+}
+
+.teamMember h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.memberRole {
+  color: #4a90e2;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.memberBio {
+  color: #555;
+  line-height: 1.6;
+}
+
+.ctaSection {
+  text-align: center;
+  padding: 3rem;
+  background-color: #f5f9ff;
+  border-radius: 10px;
+}
+
+.ctaSection h2 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.ctaSection p {
+  color: #555;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+.ctaButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.primaryBtn {
+  padding: 0.8rem 2rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondaryBtn {
+  padding: 0.8rem 2rem;
+  background-color: transparent;
+  color: #4a90e2;
+  border: 1px solid #4a90e2;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryBtn:hover {
+  background-color: #3a7bca;
+}
+
+.secondaryBtn:hover {
+  background-color: rgba(74, 144, 226, 0.1);
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .heroContent h1 {
+    font-size: 2.2rem;
+  }
+  
+  .heroImage {
+    min-height: 250px;
+  }
+  
+  .ctaButtons {
+    flex-direction: column;
+    max-width: 250px;
+    margin: 0 auto;
+    gap: 1rem;
+  }
+}

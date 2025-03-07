@@ -1,20 +1,31 @@
 import React, { ReactNode } from 'react';
 import Head from 'next/head';
+import Navbar from './Navbar';
+import Footer from './Footer';
+import styles from '../styles/Layout.module.css';
 
 type LayoutProps = {
   children: ReactNode;
+  title?: string;
 };
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, title = 'OptiWise - Smart Investment Platform' }: LayoutProps) => {
   return (
-    <div className="layout-container">
+    <div className={styles.container}>
       <Head>
-        <title>OptiWise - Smart decisions, optimal results</title>
-        <meta name="description" content="OptiWise platform for optimal business decisions" />
+        <title>{title}</title>
+        <meta name="description" content="OptiWise - AI-powered investment platform for smart decisions" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      {children}
+
+      <Navbar />
+      
+      <main className={styles.main}>
+        {children}
+      </main>
+      
+      <Footer />
     </div>
   );
 };

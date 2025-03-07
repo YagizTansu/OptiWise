@@ -390,7 +390,7 @@
 }
 
 /* For larger screens */
-@media (min-width: 1440px) {
+@media (min-width: 140px) {
   .main {
     padding: 6rem 2rem;
   }

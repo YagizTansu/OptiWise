@@ -37,3 +37,8 @@
   align-items: center;
   margin-top: auto;
 }
+
+.main {
+  flex: 1;
+  width: 100%;
+}
