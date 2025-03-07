@@ -1,0 +1,1163 @@
+.analysesContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.assetName {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.aiButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.aiButton:hover {
+  background-color: #4f46e5;
+}
+
+/* Tab Navigation */
+.tabNavigation {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.tabButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tabButton:hover {
+  color: #4f46e5;
+}
+
+.activeTab {
+  color: #4f46e5;
+  border-bottom: 2px solid #4f46e5;
+}
+
+/* Tab Content */
+.tabContent {
+  margin-top: 16px;
+}
+
+.overviewTab, .seasonalityTab, .cotTab {
+  animation: fadeIn 0.3s;
+}
+
+/* Overview Tab Improvements */
+.overviewTab {
+  animation: fadeIn 0.3s;
+}
+
+.periodSelectionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.periodSelectionBar h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.overviewSection {
+  margin-bottom: 24px;
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.activeBadge {
+  font-size: 0.75rem;
+  background-color: #e3f2fd;
+  color: #0288d1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.metricFooter {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #666;
+  text-align: center;
+}
+
+.metricCard {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metricCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.metricCard.selectedPeriod {
+  border: 2px solid #2196f3;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+.chartSummary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px;
+}
+
+.summaryLabel {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.summaryValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.statCard {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s ease;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: #e3f2fd;
+  color: #2196f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.statContent {
+  flex: 1;
+}
+
+.statValue {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Responsive adjustments for overview tab */
+@media (max-width: 768px) {
+  .periodSelectionBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .periodToggle {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Chart Container - Modern Styling */
+.chartContainer {
+  background: rgb(248, 246, 246);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  margin-bottom: 32px;
+  width: 100%;
+  overflow-x: auto;
+  transition: all 0.3s ease;
+}
+
+.chartContainer:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+.chartContainer h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.25rem;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trendChart {
+  height: 300px;
+  width: 100%;
+  min-width: 500px;
+  position: relative;
+}
+
+/* Chart Controls */
+.chartControls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.controlButton {
+  padding: 6px 12px;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.controlButton:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.controlButton.active {
+  background: #6366f1;
+  color: white;
+}
+
+/* Chart Tooltip */
+.chartTooltip {
+  position: absolute;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  pointer-events: none;
+  z-index: 10;
+  max-width: 300px;
+  transition: opacity 0.2s;
+}
+
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.tooltipLabel {
+  font-weight: 500;
+  color: #4b5563;
+  margin-right: 12px;
+}
+
+.tooltipValue {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Zoom Controls */
+.zoomControls {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zoomButton {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.zoomButton:hover {
+  background: #f9fafb;
+  color: #4f46e5;
+}
+
+/* Legend Styling */
+.chartLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.legendColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.legendItem.inactive {
+  opacity: 0.5;
+}
+
+/* Performance Metrics */
+.performanceMetrics {
+  margin-bottom: 24px;
+}
+
+.performanceMetrics h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.25rem;
+  color: #374151;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.metricCard {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metricCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.metricCard.active {
+  box-shadow: 0 0 0 2px #6366f1;
+}
+
+.metricCard.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: #6366f1;
+}
+
+.periodLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.returnValue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.positive .returnValue {
+  color: #10b981;
+}
+
+.negative .returnValue {
+  color: #ef4444;
+}
+
+.upIcon {
+  color: #10b981;
+}
+
+.downIcon {
+  color: #ef4444;
+}
+
+/* Annual Performance */
+.annualPerformance {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.annualPerformance h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.25rem;
+  color: #374151;
+}
+
+.annualChart {
+  height: 300px;
+  width: 100%;
+}
+
+/* Placeholder for tabs that aren't fully implemented */
+.placeholderChart {
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .tabNavigation {
+    overflow-x: auto;
+    width: 100%;
+  }
+}
+
+/* Modern Button Styles */
+.modernButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  color: #333;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.modernButton:hover {
+  background-color: #eeeeee;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.modernButton.activeMod {
+  background-color: #e1f5fe;
+  border-color: #29b6f6;
+  color: #0277bd;
+  box-shadow: 0 1px 3px rgba(41,182,246,0.2);
+}
+
+.buttonIcon {
+  font-size: 16px;
+}
+
+.modernTabButton {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernTabButton:hover {
+  color: #333;
+}
+
+.modernTabButton.activeTab {
+  background-color: #e3f2fd;
+  border-bottom: 2px solid #2196f3;
+  color: #2196f3;
+}
+
+.modernActionButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f0f9ff;
+  color: #0288d1;
+  border: 1px solid #bbdefb;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernActionButton:hover {
+  background-color: #e1f5fe;
+  box-shadow: 0 2px 5px rgba(2,136,209,0.15);
+}
+
+.modernIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernIconButton:hover {
+  background-color: #eeeeee;
+  color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.modernPrimaryButton {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(33,150,243,0.3);
+}
+
+.modernPrimaryButton:hover {
+  background-color: #1976d2;
+  box-shadow: 0 3px 8px rgba(25,118,210,0.4);
+  transform: translateY(-1px);
+}
+
+/* Compact Correlation Cards */
+.compactCorrelationCard {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.correlationVisual {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.smallDonutContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.correlationValueCompact {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+}
+
+.correlationDescription {
+  flex: 1;
+}
+
+.correlationDescription p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Seasonality Controls */
+.seasonalityControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  background-color: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.viewControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.seasonalityTimeframeSelector {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Chart Card and Header */
+.chartCard {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chartHeader h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #333;
+}
+
+.chartControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Enhanced Correlation Section */
+.correlationSection {
+  margin-bottom: 24px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.correlationMetrics {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.compactCorrelationCard {
+  flex: 1;
+  min-width: 300px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.compactCorrelationCard h3 {
+  font-size: 1rem;
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.correlationVisual {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.smallDonutContainer {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+}
+
+.correlationValueCompact {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Time Analysis Section Improvements */
+.timeAnalysisSection {
+  margin-bottom: 24px;
+}
+
+.periodToggle {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.analysisCards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.analysisCard {
+  flex: 1;
+  min-width: 600px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 16px;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.cardHeader h3 {
+  font-size: 1rem;
+  margin: 0;
+  color: #333;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Strategy Suggestions Improvements */
+.strategySuggestions {
+  margin-bottom: 24px;
+}
+
+.strategyCards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.strategyCard {
+  flex: 1;
+  min-width: 250px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.strategyCard h3 {
+  font-size: 1.1rem;
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.strategyCard p {
+  flex-grow: 1;
+  margin-bottom: 16px;
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.modernPrimaryButton {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(33,150,243,0.3);
+  text-align: center;
+  width: 100%;
+}
+
+/* Comparison Selector Improvements */
+.comparisonSelector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.periodSelectorWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.periodSelectorWrapper label {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+}
+
+.periodSelect {
+  padding: 6px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #f9fafb;
+  color: #333;
+  cursor: pointer;
+}
+
+.vsIndicator {
+  padding: 0 8px;
+  font-weight: 500;
+  color: #666;
+}
+
+/* Best/Worst Days Styles */
+.bestWorstDays {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.bestDay, .worstDay {
+  font-size: 14px;
+  color: #666;
+}
+
+.bestDay span, .worstDay span {
+  font-weight: 500;
+  color: #333;
+}
+
+.bestDay {
+  color: #10b981;
+}
+
+.worstDay {
+  color: #ef4444;
+}
+
+/* Seasonality Header */
+.seasonalityHeader {
+  margin-bottom: 24px;
+}
+
+.seasonalityHeader h1 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.seasonalityDescription {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.infoIcon {
+  color: #2196f3;
+  flex-shrink: 0;
+}
+
+/* COT Report Table Styles */
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dataTable thead th {
+  background-color: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.dataTable tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.2s;
+}
+
+.dataTable tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.dataTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.dataTable tbody td {
+  padding: 12px 16px;
+  color: #475569;
+}
+
+.dataTable .positive {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.dataTable .negative {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.dataTable .neutral {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Position Extremes Table */
+.extremesTable {
+  width: 100%;
+  overflow-x: auto;
+  padding: 4px;
+}
+
+/* Sentiment Analysis Table */
+.sentimentTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sentimentTable thead th {
+  background-color: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.sentimentTable tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.sentimentTable tbody tr:last-child {
+  border-bottom: none;
+}
+
+.sentimentTable tbody td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.sentimentBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.bullishBadge {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.bearishBadge {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.neutralBadge {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.badgeIcon {
+  font-size: 12px;
+}
+
+/* Table Row Icons */
+.trendIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.upTrend {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.downTrend {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.neutralTrend {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #6b7280;
+}
