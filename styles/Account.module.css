@@ -1,0 +1,402 @@
+/* Account page styles */
+.page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.sidePanel {
+  width: 280px;
+  background-color: #fff;
+  border-right: 1px solid #e5e7eb;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+}
+
+.userAvatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #f0f4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+  margin-right: 1rem;
+}
+
+.userName {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0;
+  color: #1f2937;
+}
+
+.userEmail {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+.menuItems {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  margin-bottom: 2rem;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.menuItem:hover {
+  background-color: #f3f4f6;
+  color: #3b82f6;
+}
+
+.menuItem.active {
+  background-color: #f0f4ff;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.menuIcon {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+}
+
+.signOutButton {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  color: #ef4444;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.signOutButton:hover {
+  background-color: #fee2e2;
+}
+
+.signOutIcon {
+  margin-right: 0.75rem;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 2rem;
+}
+
+.contentHeader {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.contentTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.success {
+  background-color: #ecfdf5;
+  color: #059669;
+  border-left: 4px solid #10b981;
+}
+
+.error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-left: 4px solid #ef4444;
+}
+
+.formSection {
+  max-width: 600px;
+}
+
+.inputGroup {
+  margin-bottom: 1.5rem;
+}
+
+.inputLabel {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  color: #9ca3af;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  padding-left: 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.inputHelp {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: auto;
+}
+
+.button:hover {
+  background-color: #2563eb;
+}
+
+.button:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+.buttonText {
+  display: flex;
+  align-items: center;
+}
+
+.buttonIcon {
+  margin-right: 0.5rem;
+}
+
+.secondaryButton {
+  display: flex;
+  align-items: center;
+  padding: 0.65rem 1.25rem;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.secondaryButton:hover {
+  background-color: #e5e7eb;
+}
+
+.securityCard {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.securityCardHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.securityIcon {
+  margin-right: 0.75rem;
+  color: #3b82f6;
+}
+
+.securityText {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.settingsCard {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.settingsTitle {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.checkboxGroup {
+  margin-bottom: 0.75rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox {
+  margin-right: 0.75rem;
+  width: 16px;
+  height: 16px;
+  accent-color: #3b82f6;
+}
+
+.checkboxText {
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+.dangerZone {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background-color: #fff1f2;
+}
+
+.dangerTitle {
+  color: #b91c1c;
+  margin-top: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.dangerText {
+  color: #ef4444;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.dangerButton {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dangerButton:hover {
+  background-color: #fecaca;
+}
+
+.spinner {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 2px solid #ffffff;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.5rem;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: #6b7280;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidePanel {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1.5rem;
+  }
+
+  .mainContent {
+    padding: 1.5rem;
+  }
+}
