@@ -27,7 +27,7 @@ const annualData = {
   datasets: [{
     label: 'Annual Return (%)',
     data: [12, -5, 18, 7, 22, -8, 14, -3, 25, 10, 5],
-    backgroundColor: (context) => {
+    backgroundColor: (context: { dataset: { data: { [x: string]: any; }; }; dataIndex: string | number; }) => {
       const value = context.dataset.data[context.dataIndex];
       return value >= 0 ? 'rgba(75, 192, 192, 0.7)' : 'rgba(255, 99, 132, 0.7)';
     }
@@ -261,7 +261,7 @@ export default function Analyses() {
           text: 'Percent Change (%)',
           font: {
             size: 14,
-            weight: 'bold'
+            weight: 'bold' as const
           }
         },
         grid: {
@@ -280,7 +280,7 @@ export default function Analyses() {
         padding: 12,
         titleFont: {
           size: 14,
-          weight: 'bold'
+          weight: 700
         },
         bodyFont: {
           size: 13
@@ -290,7 +290,7 @@ export default function Analyses() {
       },
       legend: {
         position: 'top' as const,
-        align: 'end',
+        align: 'end' as const,
         labels: {
           boxWidth: 15,
           usePointStyle: true,
