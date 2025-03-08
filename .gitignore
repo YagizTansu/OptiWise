@@ -1,4 +1,6 @@
 # dependencies
+/Frontend/node_modules
+/Backend/node_modules
 /node_modules
 /.pnp
 .pnp.js
@@ -7,11 +9,15 @@
 /coverage
 
 # next.js
+Frontend/.next/
 /.next/
 /out/
 
 # production
 /build
+/dist
+/Frontend/build
+/Backend/build
 
 # misc
 .DS_Store
@@ -21,9 +27,15 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
+*.log
 
 # local env files
 .env*.local
+.env
+.env.development
+.env.test
+.env.production
 
 # vercel
 .vercel
@@ -31,3 +43,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
