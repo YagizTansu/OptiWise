@@ -75,6 +75,41 @@ export class QuoteFieldsValidationPipe implements PipeTransform {
   }
 }
 
+/**
+ * Valid modules for the quoteSummary endpoint
+ * Note: Removed "symbol" which is causing type errors
+ */
+const VALID_QUOTE_SUMMARY_MODULES = [
+  'assetProfile', 'balanceSheetHistory', 'balanceSheetHistoryQuarterly',
+  'calendarEvents', 'cashflowStatementHistory', 'cashflowStatementHistoryQuarterly',
+  'defaultKeyStatistics', 'earnings', 'earningsHistory', 'earningsTrend',
+  'financialData', 'fundOwnership', 'fundPerformance', 'fundProfile',
+  'incomeStatementHistory', 'incomeStatementHistoryQuarterly', 'indexTrend',
+  'industryTrend', 'insiderHolders', 'insiderTransactions', 'institutionOwnership',
+  'majorDirectHolders', 'majorHoldersBreakdown', 'netSharePurchaseActivity',
+  'price', 'quoteType', 'recommendationTrend', 'secFilings', 'sectorTrend',
+  'summaryDetail', 'summaryProfile', 'topHoldings', 'upgradeDowngradeHistory'
+];
+
+/**
+ * Validates modules for quoteSummary endpoint
+ */
+@Injectable()
+export class QuoteSummaryModulesValidationPipe implements PipeTransform {
+  transform(values: string[]): string[] {
+    if (!values || values.length === 0) {
+      return ['price', 'summaryDetail']; // Default modules
+    }
+    
+    const invalidModules = values.filter(module => !VALID_QUOTE_SUMMARY_MODULES.includes(module));
+    if (invalidModules.length > 0) {
+      throw new BadRequestException(`Invalid modules: ${invalidModules.join(', ')}. Available modules are: ${VALID_QUOTE_SUMMARY_MODULES.join(', ')}`);
+    }
+    
+    return values;
+  }
+}
+
 @Controller('finance')
 export class FinanceController {
   constructor(private readonly financeService: FinanceService) {}
@@ -189,6 +224,29 @@ export class FinanceController {
   ) {
     return this.financeService.getTrending(region);
   }
+
+  /**
+   * Get detailed quote summary data for a symbol
+   */
+  @Get('quoteSummary')
+  async getQuoteSummary(
+    @Query('symbol', new DefaultValuePipe('AAPL')) symbol: string,
+    @Query('modules', new ParseArrayPipe(), new QuoteSummaryModulesValidationPipe()) modules: string[]
+  ): Promise<any> {
+    return this.financeService.getQuoteSummary(symbol, { modules });
+  }
+
+  /**
+   * Get daily gainers - stocks with biggest percentage gains
+   */
+  @Get('daily-gainers')
+  async getDailyGainers(
+    @Query('count', new DefaultValuePipe(5), ParseIntPipe) count: number,
+    @Query('lang', new DefaultValuePipe('en-US')) lang: string,
+    @Query('region', new DefaultValuePipe('US')) region: string,
+  ) {
+    return this.financeService.getDailyGainers({ count, lang, region });
+  }
 }
 
 /* 
@@ -225,4 +283,26 @@ Example test URLs:
 5. Get chart data (more flexible with intervals and includes events):
    http://localhost:3001/api/finance/chart              (uses all defaults - last 30 days of AAPL)
    http://localhost:3001/api/finance/chart?symbol=AAPL&period1=2023-01-01&period2=2023-12-31&interval=15m&return=object
+
+6. Get quote summary:
+   http://localhost:3001/api/finance/quoteSummary?symbol=AAPL
+   
+   Get specific modules:
+   http://localhost:3001/api/finance/quoteSummary?symbol=AAPL&modules=assetProfile,financialData,earnings
+   
+   Common module combinations:
+   - Company overview: summaryProfile,assetProfile
+   - Financial data: financialData,earnings,balanceSheetHistory,cashflowStatementHistory
+   - Stock analysis: recommendationTrend,upgradeDowngradeHistory,earningsTrend
+   - Ownership info: majorHoldersBreakdown,institutionOwnership,insiderHolders
+
+7. Get daily losers, gainers, and most active stocks:
+   http://localhost:3001/api/finance/daily-losers
+   http://localhost:3001/api/finance/daily-losers?count=10
+   
+   http://localhost:3001/api/finance/daily-gainers
+   http://localhost:3001/api/finance/daily-gainers?count=10
+   
+   http://localhost:3001/api/finance/most-actives
+   http://localhost:3001/api/finance/most-actives?count=10
 */
