@@ -27,6 +27,35 @@ if (typeof global.TextEncoder === 'undefined') {
   }
 }
 
+// Polyfill for Yahoo Finance library compatibility issues
+import yahooFinance from 'yahoo-finance2';
+
+// Suppress Yahoo Finance notices
+yahooFinance.suppressNotices(['yahooSurvey']);
+
+// Patch the Headers prototype with getSetCookie if it doesn't exist
+if (global.Headers && !global.Headers.prototype.getSetCookie) {
+  global.Headers.prototype.getSetCookie = function() {
+    return this.get('set-cookie') ? [this.get('set-cookie')] : [];
+  };
+}
+
+// Patch fetch to ensure Response objects have getSetCookie
+const originalFetch = global.fetch;
+if (originalFetch) {
+  global.fetch = async function(...args) {
+    const response = await originalFetch.apply(this, args);
+    
+    if (response.headers && !response.headers.getSetCookie) {
+      response.headers.getSetCookie = function() {
+        return this.get('set-cookie') ? [this.get('set-cookie')] : [];
+      };
+    }
+    
+    return response;
+  };
+}
+
 // You can add additional polyfills as needed
 
 export {}; // Export empty object to make this a proper module
