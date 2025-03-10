@@ -2,6 +2,7 @@ import Layout from '../components/Layout'
 import styles from '../styles/Home.module.css'
 import { FaSearch } from 'react-icons/fa'
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/router' // Add this import for navigation
 
 // Define interface for search results
 interface SearchResult {
@@ -16,6 +17,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const searchSectionRef = useRef<HTMLDivElement>(null);
+  const router = useRouter(); // Initialize router
 
   // Debounce search input
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -29,13 +31,13 @@ export default function Home() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3001/api/finance/search?query=${encodeURIComponent(query)}&limit=5`);
+      const response = await fetch(`http://localhost:3001/api/finance/search?query=${encodeURIComponent(query)}&limit=100`);
       const data = await response.json();
       debugger
       if (data.length > 0) {
         setSearchResults(data.map((quote: any) => ({
           symbol: quote.symbol,
-          shortName: quote.shortName || quote.longName || '',
+          shortName: quote.shortname || '',
           exchange: quote.exchange || ''
         })));
       } else {
@@ -64,6 +66,15 @@ export default function Home() {
     debounceTimeout.current = setTimeout(() => {
       fetchSearchResults(query);
     }, 300); // 300ms debounce time
+  };
+
+  // Handle click on a search result item
+  const handleResultClick = (symbol: string) => {
+    // Navigate to the analyses page with the selected symbol as a parameter
+    router.push({
+      pathname: '/analyses',
+      query: { symbol: symbol }
+    });
   };
 
   // Dropdown'un dışına tıklanınca kapanmasını sağla
@@ -113,7 +124,19 @@ export default function Home() {
               ) : searchResults.length > 0 ? (
                 <ul className={styles.resultsList}>
                   {searchResults.map((result) => (
-                    <li key={result.symbol} className={styles.resultItem}>
+                    <li 
+                      key={result.symbol} 
+                      className={styles.resultItem}
+                      onClick={() => handleResultClick(result.symbol)}
+                      title={`View analysis for ${result.symbol}`}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          handleResultClick(result.symbol);
+                        }
+                      }}
+                    >
                       <span className={styles.resultSymbol}>{result.symbol}</span>
                       <span className={styles.resultName}>{result.shortName}</span>
                       {result.exchange && (
