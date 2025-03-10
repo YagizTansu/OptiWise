@@ -156,6 +156,7 @@
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
 }
 
 .searchSection:hover {
@@ -824,4 +825,142 @@
   .missionText {
     text-align: center;
   }
+}
+
+/* Add these styles to your existing CSS file */
+
+.searchResults {
+  position: absolute;
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(37, 99, 235, 0.1);
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 10;
+  margin-top: 15px;
+  border: 1px solid rgba(37, 99, 235, 0.08);
+  /* animation: dropdownAppear 0.25s cubic-bezier(0.26, 0.54, 0.32, 1) forwards; */
+  overflow-x: hidden; /* Yatay taşmayı engelle */
+  left: 0;
+  right: 0;
+  animation: dropdownAppear 0.25s cubic-bezier(0.26, 0.54, 0.32, 1) forwards;
+  transform-origin: top center;
+  box-sizing: border-box; /* Kenar boşlukları genişliğe dahil edilsin */
+  will-change: transform, opacity; /* Tarayıcıya dönüşüm bilgisi */
+}
+
+@keyframes dropdownAppear {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98); 
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.loadingMessage, .noResults {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.loadingSpinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(37, 99, 235, 0.1);
+  border-top: 2px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.resultsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.resultItem {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(241, 245, 249, 0.7);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.resultItem:last-child {
+  border-bottom: none;
+}
+
+.resultItem:hover {
+  background-color: rgba(240, 245, 255, 0.5);
+}
+
+.resultItem:active {
+  background-color: rgba(240, 245, 255, 0.8);
+}
+
+.resultSymbol {
+  font-weight: 700;
+  color: var(--primary-dark);
+  font-size: 1.05rem;
+  min-width: 70px;
+  padding-right: 16px;
+  letter-spacing: -0.5px;
+}
+
+.resultName {
+  flex-grow: 1;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 16px;
+}
+
+.resultExchange {
+  color: var(--primary);
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  background-color: rgba(37, 99, 235, 0.08);
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* Scrollbar styling for dropdown */
+.searchResults::-webkit-scrollbar {
+  width: 6px;
+}
+
+.searchResults::-webkit-scrollbar-track {
+  background: rgba(241, 245, 249, 0.5);
+  border-radius: 0 16px 16px 0;
+}
+
+.searchResults::-webkit-scrollbar-thumb {
+  background: rgba(37, 99, 235, 0.2);
+  border-radius: 10px;
+}
+
+.searchResults::-webkit-scrollbar-thumb:hover {
+  background: rgba(37, 99, 235, 0.3);
 }
