@@ -375,6 +375,23 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
     const link = document.createElement('a');
     link.download = `${symbol}-${selectedView}-average-returns.png`;
     link.href = canvas.toDataURL('image/png');
+    
+    // Modern download animation
+    const notification = document.createElement('div');
+    notification.className = styles.downloadNotification;
+    notification.innerHTML = `<span><FaDownload /> Downloading chart...</span>`;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.classList.add(styles.show);
+      link.click();
+      
+      setTimeout(() => {
+        notification.classList.remove(styles.show);
+        setTimeout(() => document.body.removeChild(notification), 300);
+      }, 2000);
+    }, 100);
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -508,7 +525,7 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
       
       <div className={styles.seasonalityControls}>
         <div className={styles.controlGroup}>
-          <label>Analysis Period:</label>
+          <label className={styles.controlLabel}>Analysis Period:</label>
           <div className={styles.seasonalityTimeframeSelector}>
             {['1 Year', '3 Years', '5 Years', '10 Years', 'Max'].map((period) => (
               <button 
@@ -522,8 +539,8 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
           </div>
         </div>
         
-        <div className={styles.viewControls}>
-          <label>View:</label>
+        <div className={styles.controlGroup}>
+          <label className={styles.controlLabel}>View:</label>
           <div className={styles.viewSelector}>
             {['daily', 'monthly', 'yearly'].map((view) => (
               <button 
