@@ -104,7 +104,7 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
         // Calculate a start date 10 years ago from today
         const endDate = new Date();
         const startDate = new Date();
-        startDate.setFullYear(startDate.getFullYear() - 10);
+        startDate.setFullYear(startDate.getFullYear() - 30);
         
         // Format dates as ISO strings
         const fromDate = startDate.toISOString();
