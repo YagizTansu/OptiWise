@@ -1,6 +1,6 @@
-import { FaExpand, FaInfoCircle } from 'react-icons/fa';
+import { FaExpand, FaInfoCircle, FaCompress, FaTimes, FaDownload } from 'react-icons/fa';
 import { Bar } from 'react-chartjs-2';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from '../../../styles/Analyses.module.css';
 
 interface TimeAverageReturnsProps {
@@ -35,6 +35,10 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [statsData, setStatsData] = useState<ReturnData[]>([]);
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
   
   // Calculate date ranges based on selected period
   const getDateRange = () => {
@@ -328,19 +332,179 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
     }
   };
 
+  // Handle fullscreen toggle
+  const toggleFullscreen = async () => {
+    if (!chartContainerRef.current) return;
+    
+    if (!document.fullscreenElement) {
+      try {
+        if (chartContainerRef.current.requestFullscreen) {
+          await chartContainerRef.current.requestFullscreen();
+        } else if ((chartContainerRef.current as any).webkitRequestFullscreen) {
+          await (chartContainerRef.current as any).webkitRequestFullscreen();
+        } else if ((chartContainerRef.current as any).msRequestFullscreen) {
+          await (chartContainerRef.current as any).msRequestFullscreen();
+        }
+      } catch (err) {
+        console.error('Could not enter fullscreen mode:', err);
+      }
+    } else {
+      try {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if ((document as any).webkitExitFullscreen) {
+          await (document as any).webkitExitFullscreen();
+        } else if ((document as any).msExitFullscreen) {
+          await (document as any).msExitFullscreen();
+        }
+      } catch (err) {
+        console.error('Could not exit fullscreen mode:', err);
+      }
+    }
+  };
+  
+  // Handle chart download
+  const handleDownload = () => {
+    if (!chartRef.current) return;
+    
+    // Get the chart canvas
+    const canvas = chartRef.current.querySelector('canvas');
+    if (!canvas) return;
+    
+    // Create a temporary link element
+    const link = document.createElement('a');
+    link.download = `${symbol}-${selectedView}-average-returns.png`;
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
+  // Listen for fullscreen change events
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(
+        document.fullscreenElement !== null || 
+        (document as any).webkitFullscreenElement !== null ||
+        (document as any).msFullscreenElement !== null
+      );
+    };
+    
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+    
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
   return (
-    <div className={styles.analysisCard}>
-      <div className={styles.cardHeader}>
-        <h3>Average Returns by Time Period</h3>
-        <div className={styles.cardActions}>
-          <button className={styles.modernIconButton}>
-            <FaInfoCircle />
+    <div 
+      className={`${styles.analysisCard} ${isFullscreen ? styles.fullscreenCard : ''}`}
+      ref={chartContainerRef}
+    >
+      <div className={styles.chartHeader}>
+        <h2>Average Returns by Time Period</h2>
+        <div className={styles.chartControls}>
+          <button 
+            className={styles.modernActionButton} 
+            title="Download Chart"
+            onClick={handleDownload}
+          >
+            <FaDownload className={styles.buttonIcon} /> 
+            <span>Download</span>
           </button>
-          <button className={styles.modernIconButton}>
-            <FaExpand />
+          <button 
+            className={styles.modernActionButton} 
+            title={isFullscreen ? "Exit fullscreen" : "View in fullscreen"}
+            onClick={toggleFullscreen}
+          >
+            {isFullscreen ? <FaCompress className={styles.buttonIcon} /> : <FaExpand className={styles.buttonIcon} />}
+            <span>{isFullscreen ? "Exit Fullscreen" : "Fullscreen"}</span>
+          </button>
+          <button 
+            className={styles.modernIconButton} 
+            title="Learn About Seasonality"
+            onClick={() => setShowInfoModal(true)}
+          >
+            <FaInfoCircle />
           </button>
         </div>
       </div>
+      
+      {/* Info Modal */}
+      {showInfoModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Average Returns by Time Period</h3>
+              <button 
+                className={styles.closeButton} 
+                onClick={() => setShowInfoModal(false)}
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>
+                This chart shows the average returns of {symbol} broken down by different time periods.
+                You can analyze patterns in returns based on days of the month, months of the year,
+                or yearly performance.
+              </p>
+              
+              <h4>How to use this chart:</h4>
+              <ul className={styles.infoList}>
+                <li>
+                  <strong>Analysis Period</strong> - Select the historical period to analyze
+                  (1 Year, 3 Years, 5 Years, 10 Years, or Maximum available data)
+                </li>
+                <li>
+                  <strong>View Mode</strong> - Choose between Daily (day of month), Monthly, or Yearly views
+                </li>
+                <li>
+                  <strong>Daily View</strong> - Shows average returns for each day of the month (1-31)
+                </li>
+                <li>
+                  <strong>Monthly View</strong> - Shows average returns for each month of the year
+                </li>
+                <li>
+                  <strong>Yearly View</strong> - Shows average returns by year
+                </li>
+              </ul>
+              
+              <h4>Understanding the statistics:</h4>
+              <ul className={styles.infoList}>
+                <li>
+                  <strong>Avg. Return</strong> - The average percentage return for that period
+                </li>
+                <li>
+                  <strong>Std. Dev.</strong> - Standard deviation, a measure of volatility
+                </li>
+                <li>
+                  <strong>Win Rate</strong> - Percentage of time the asset has positive returns in this period
+                </li>
+                <li>
+                  <strong>Best</strong> - The best return recorded during this period
+                </li>
+                <li>
+                  <strong>Worst</strong> - The worst return recorded during this period
+                </li>
+              </ul>
+            </div>
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.modernPrimaryButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className={styles.seasonalityControls}>
         <div className={styles.controlGroup}>
@@ -374,7 +538,10 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
         </div>
       </div>
       
-      <div className={styles.chartContainer}>
+      <div 
+        className={`${styles.chartContainer} ${isFullscreen ? styles.fullscreenChart : ''}`}
+        ref={chartRef}
+      >
         {loading && (
           <div className={styles.loadingContainer}>
             <div className={styles.loadingSpinner}></div>
