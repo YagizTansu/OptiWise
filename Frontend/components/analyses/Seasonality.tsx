@@ -4,6 +4,7 @@ import styles from '../../styles/Analyses.module.css';
 import SeasonalityAnalysis from './Seasonality/SeasonalityAnalysis';
 import PatternCorrelation from './Seasonality/PatternCorrelation';
 import TimeAverageReturns from './Seasonality/TimeAverageReturns';
+import SeasonalStrategyInsights from './Seasonality/SeasonalStrategyInsights';
 
 interface SeasonalityProps {
   symbol: string;
@@ -33,27 +34,7 @@ const Seasonality: React.FC<SeasonalityProps> = ({ symbol }) => {
 
       <TimeAverageReturns symbol={symbol} />
       
-      {/* Strategy Suggestions based on seasonality */}
-      <div className={styles.strategySuggestions}>
-        <h2>Strategic Insights</h2>
-        <div className={styles.strategyCards}>
-          <div className={styles.strategyCard}>
-            <h3>Strongest Pattern</h3>
-            <p>September to December shows a consistent uptrend pattern over 3 years (+15.3% cumulative)</p>
-            <button className={styles.modernPrimaryButton}>Explore Strategy</button>
-          </div>
-          <div className={styles.strategyCard}>
-            <h3>Risk Pattern</h3>
-            <p>June historically shows consistent negative returns (-3.1% on average)</p>
-            <button className={styles.modernPrimaryButton}>Explore Strategy</button>
-          </div>
-          <div className={styles.strategyCard}>
-            <h3>AI Recommendation</h3>
-            <p>Consider stronger positions in March (+3.9%) and rebalancing in November (-2.1%)</p>
-            <button className={styles.modernPrimaryButton}>AI Analysis</button>
-          </div>
-        </div>
-      </div>
+      <SeasonalStrategyInsights symbol={symbol} />
     </div>
   );
 };

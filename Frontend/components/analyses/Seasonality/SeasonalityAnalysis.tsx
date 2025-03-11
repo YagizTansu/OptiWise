@@ -171,15 +171,19 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
       if (!current || !previous || !current.close || !previous.close) continue;
       
       const date = new Date(current.date);
-      const dayOfWeek = date.getDay() - 1; // 0 = Monday, 4 = Friday
+      // JavaScript getDay() returns 0-6 where 0 is Sunday and 6 is Saturday
+      // We adjust to 0 = Monday, 4 = Friday
+      const dayOfWeek = date.getDay();
+      // Convert Sunday(0) to Monday(0) through Saturday(6) to Friday(4)
+      const adjustedDay = dayOfWeek === 0 ? -1 : dayOfWeek - 1;
       
       // Skip weekends
-      if (dayOfWeek < 0 || dayOfWeek > 4) continue;
+      if (adjustedDay < 0 || adjustedDay > 4) continue;
       
       const percentChange = ((current.close - previous.close) / previous.close) * 100;
       
-      weekdayData[dayOfWeek].sum += percentChange;
-      weekdayData[dayOfWeek].count += 1;
+      weekdayData[adjustedDay].sum += percentChange;
+      weekdayData[adjustedDay].count += 1;
     }
     
     return weekdayNames.map((day, index) => {
@@ -195,14 +199,15 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
   // Calculate monthly seasonality (average % change by month)
   const calculateMonthlySeasonality = (historicalData: any[], periodYears: number): SeasonalityDataPoint[] => {
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthData: { [key: number]: { sum: number, count: number } } = {};
+    const monthlyReturns: { [key: number]: number[] } = {};
     
+    // Initialize the monthly returns array
     for (let i = 0; i < 12; i++) {
-      monthData[i] = { sum: 0, count: 0 };
+      monthlyReturns[i] = [];
     }
     
-    // Group data by month and calculate monthly returns
-    let prevMonthClose: { [key: number]: number } = {};
+    // Group data by year-month to calculate monthly returns
+    const monthlyData: { [key: string]: { open?: number, close?: number } } = {};
     
     historicalData.forEach(dataPoint => {
       if (!dataPoint || !dataPoint.close) return;
@@ -210,36 +215,38 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
       const date = new Date(dataPoint.date);
       const month = date.getMonth();
       const year = date.getFullYear();
-      const yearMonth = year * 100 + month;
+      const yearMonthKey = `${year}-${month}`;
       
-      // Store first value of month as reference
-      if (!prevMonthClose[yearMonth]) {
-        prevMonthClose[yearMonth] = dataPoint.close;
+      if (!monthlyData[yearMonthKey]) {
+        // First entry for this month - set open price
+        monthlyData[yearMonthKey] = {
+          open: dataPoint.close
+        };
       }
+      // Always update close price (it will be the last one for the month)
+      monthlyData[yearMonthKey].close = dataPoint.close;
+    });
+    
+    // Calculate monthly returns
+    Object.keys(monthlyData).forEach(yearMonthKey => {
+      const [year, month] = yearMonthKey.split('-').map(Number);
+      const data = monthlyData[yearMonthKey];
       
-      // Calculate return at month end
-      const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
-      if (date.getDate() === lastDayOfMonth) {
-        const monthBeginPrice = prevMonthClose[yearMonth];
-        const monthEndPrice = dataPoint.close;
-        const monthlyReturn = ((monthEndPrice - monthBeginPrice) / monthBeginPrice) * 100;
-        
-        monthData[month].sum += monthlyReturn;
-        monthData[month].count += 1;
-        
-        // Set next month's starting price
-        prevMonthClose[year * 100 + (month + 1)] = monthEndPrice;
+      if (data.open && data.close) {
+        const monthlyReturn = ((data.close - data.open) / data.open) * 100;
+        monthlyReturns[month].push(monthlyReturn);
       }
     });
     
-    // Reorder to start with September (fiscal year)
-    const fiscalMonthOrder = [8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7];
-    
-    return fiscalMonthOrder.map(monthIndex => {
-      const avgChange = monthData[monthIndex].count > 0 ? 
-        monthData[monthIndex].sum / monthData[monthIndex].count : 0;
+    // Calculate average returns for each month
+    return monthNames.map((name, month) => {
+      const returns = monthlyReturns[month];
+      const avgChange = returns.length > 0 
+        ? returns.reduce((sum, val) => sum + val, 0) / returns.length 
+        : 0;
+        
       return {
-        period: monthNames[monthIndex],
+        period: name,
         avgChange: Number(avgChange.toFixed(2))
       };
     });
@@ -247,44 +254,58 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
 
   // Calculate yearly seasonality (average % change by year)
   const calculateYearlySeasonality = (historicalData: any[], periodYears: number): SeasonalityDataPoint[] => {
-    const yearData: { [key: number]: { startPrice: number, endPrice: number } } = {};
-    const currentYear = new Date().getFullYear();
-    const startYear = currentYear - periodYears;
+    if (historicalData.length === 0) return [];
     
-    // Initialize data structure for all years in range
-    for (let year = startYear; year <= currentYear; year++) {
-      yearData[year] = { startPrice: 0, endPrice: 0 };
-    }
+    // Group data by year
+    const yearlyData: { [key: number]: { firstDate?: string, firstPrice?: number, lastDate?: string, lastPrice?: number } } = {};
     
-    // Find first and last price for each year
-    historicalData.forEach(dataPoint => {
+    // Sort data by date to ensure chronological order
+    const sortedData = [...historicalData].sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+    
+    // Process data by year
+    sortedData.forEach(dataPoint => {
       if (!dataPoint || !dataPoint.close) return;
       
       const date = new Date(dataPoint.date);
       const year = date.getFullYear();
       
-      if (year < startYear || year > currentYear) return;
-      
-      // First price of the year
-      if (yearData[year].startPrice === 0) {
-        yearData[year].startPrice = dataPoint.close;
+      if (!yearlyData[year]) {
+        yearlyData[year] = {
+          firstDate: dataPoint.date,
+          firstPrice: dataPoint.close,
+          lastDate: dataPoint.date,
+          lastPrice: dataPoint.close
+        };
+      } else {
+        // Update last price (most recent for the year)
+        yearlyData[year].lastDate = dataPoint.date;
+        yearlyData[year].lastPrice = dataPoint.close;
       }
-      
-      // Keep updating the end price as we go through the data
-      yearData[year].endPrice = dataPoint.close;
     });
     
     // Calculate yearly returns
-    return Object.keys(yearData)
-      .filter(year => yearData[Number(year)].startPrice > 0) // Filter out years with no data
+    return Object.keys(yearlyData)
       .map(year => {
-        const { startPrice, endPrice } = yearData[Number(year)];
-        const yearlyReturn = ((endPrice - startPrice) / startPrice) * 100;
+        const yearNum = parseInt(year);
+        const { firstPrice, lastPrice } = yearlyData[yearNum];
+        
+        // Skip years with incomplete data
+        if (firstPrice === undefined || lastPrice === undefined) {
+          return {
+            period: year,
+            avgChange: 0
+          };
+        }
+        
+        const yearlyReturn = ((lastPrice - firstPrice) / firstPrice) * 100;
         return {
           period: year,
           avgChange: Number(yearlyReturn.toFixed(2))
         };
-      });
+      })
+      .filter(item => item.avgChange !== 0); // Remove years with no data
   };
 
   // Fetch data for a specific timeframe and period
@@ -300,10 +321,12 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
       
       // Determine appropriate interval based on timeframe
       let interval = '1d';
-      if (timeframe === 'monthly' || timeframe === 'yearly') {
-        interval = '1mo'; // Monthly data for monthly/yearly analysis
+      if (timeframe === 'yearly') {
+        interval = '1mo'; // Monthly data for yearly analysis is sufficient
+      } else if (timeframe === 'monthly') {
+        interval = '1d'; // Need daily data to properly calculate monthly performance
       } else if (timeframe === 'weekly') {
-        interval = '1wk'; // Weekly data for weekly analysis
+        interval = '1d'; // Need daily data to calculate day of week performance
       }
       
       // Fetch data from API using port 3001 explicitly
