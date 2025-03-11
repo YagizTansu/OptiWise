@@ -17,25 +17,13 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarEleme
 
 // Sample data for charts
 const trendData = {
-  labels: Array.from({ length: 120 }, (_, i) => `${2013 + Math.floor(i/12)}-${(i % 12) + 1}`),
+  labels: Array.from({ length: 120 }, (_, i) => `${2015 + Math.floor(i/12)}-${(i % 12) + 1}`),
   datasets: [{
     label: 'Asset Price ($)',
     data: Array.from({ length: 120 }, () => Math.floor(Math.random() * 500) + 100),
     borderColor: 'rgb(75, 192, 192)',
     tension: 0.1,
     fill: false
-  }]
-};
-
-const annualData = {
-  labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
-  datasets: [{
-    label: 'Annual Return (%)',
-    data: [12, -5, 18, 7, 22, -8, 14, -3, 25, 10, 5],
-    backgroundColor: (context: { dataset: { data: { [x: string]: any; }; }; dataIndex: string | number; }) => {
-      const value = context.dataset.data[context.dataIndex];
-      return value >= 0 ? 'rgba(75, 192, 192, 0.7)' : 'rgba(255, 99, 132, 0.7)';
-    }
   }]
 };
 
@@ -237,13 +225,12 @@ export default function Analyses() {
             includePrePost: false
           }
         });
-        debugger
         if (response.data && response.data.chart && response.data.chart.result && response.data.chart.result[0]) {
           const result = response.data.chart.result[0];
           const timestamps = result.timestamp;
           const quotes = result.indicators.quote[0];
           const meta = result.meta;
-          
+          debugger
           // Update asset info
           setAssetInfo({
             name: meta.symbol,
