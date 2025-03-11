@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import axios from 'axios';
 import { FaArrowUp, FaArrowDown, FaInfoCircle, FaDownload, FaExpand, FaQuestion, FaChartLine, FaCalendarAlt } from 'react-icons/fa';
 import { Line, Bar } from 'react-chartjs-2';
 import styles from '../../styles/Analyses.module.css';
@@ -27,27 +28,130 @@ interface ChartDataPoint {
   date?: string; // Formatted date string
 }
 
+// Performance periods data
+const performancePeriods = [
+  { label: '1M', value: -2.5, months: 1 },
+  { label: '3M', value: 5.7, months: 3 },
+  { label: '6M', value: 12.3, months: 6 },
+  { label: '1Y', value: -8.2, months: 12 },
+  { label: '3Y', value: 45.6, months: 36 },
+  { label: '5Y', value: 78.2, months: 60 },
+  { label: '10Y', value: 134.5, months: 120 },
+  { label: '20Y', value: 267.8, months: 240 },
+];
+
+// Sample trend data for fallback
+const trendData = {
+  labels: Array.from({ length: 120 }, (_, i) => `${2015 + Math.floor(i/12)}-${(i % 12) + 1}`),
+  datasets: [{
+    label: 'Asset Price ($)',
+    data: Array.from({ length: 120 }, () => Math.floor(Math.random() * 500) + 100),
+    borderColor: 'rgb(75, 192, 192)',
+    tension: 0.1,
+    fill: false
+  }]
+};
+
 interface OverviewProps {
-  assetInfo: { name: string; symbol: string };
-  performancePeriods: Array<{ label: string; value: number; months: number }>;
-  selectedPeriod: string;
-  setSelectedPeriod: (period: string) => void;
-  chartData: ChartDataPoint[];
-  isLoading: boolean;
-  error: string | null;
-  trendData: any; // Using any for simplicity here, but ideally should be properly typed
+  symbol: string;
 }
 
-const Overview: React.FC<OverviewProps> = ({
-  assetInfo,
-  performancePeriods,
-  selectedPeriod,
-  setSelectedPeriod,
-  chartData,
-  isLoading,
-  error,
-  trendData
-}) => {
+const Overview: React.FC<OverviewProps> = ({ symbol }) => {
+  // State management moved from analyses.tsx
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string }>({ 
+    name: 'Loading...', 
+    symbol: symbol || 'AAPL'
+  });
+  const [selectedPeriod, setSelectedPeriod] = useState('1Y');
+
+  // Fetch chart data based on the symbol and selected period
+  useEffect(() => {
+    const fetchChartData = async () => {
+      if (!symbol) return;
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Calculate date range based on selected period
+        const selectedPeriodObj = performancePeriods.find(p => p.label === selectedPeriod);
+        const monthsToShow = selectedPeriodObj ? selectedPeriodObj.months : 120; // Default to 10 years
+        
+        // Calculate start date based on months
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setMonth(endDate.getMonth() - monthsToShow);
+        
+        // Determine appropriate interval based on period length
+        let interval = '1d';
+        const response = await axios.get('http://localhost:3001/api/finance/chart', {
+          params: {
+            symbol,
+            period1: startDate.toISOString(),
+            period2: endDate.toISOString(),
+            interval,
+            events: 'div,split',
+            includePrePost: false
+          }
+        });
+        
+        if (response.data && response.data.chart && response.data.chart.result && response.data.chart.result[0]) {
+          const result = response.data.chart.result[0];
+          const timestamps = result.timestamp;
+          const quotes = result.indicators.quote[0];
+          const meta = result.meta;
+          
+          // Update asset info
+          setAssetInfo({
+            name: meta.symbol,
+            symbol: meta.symbol
+          });
+          
+          // Format data for chart
+          const formattedData = timestamps.map((timestamp: number, index: number) => {
+            const date = new Date(timestamp * 1000);
+            return {
+              timestamp,
+              close: quotes.close[index],
+              open: quotes.open[index],
+              high: quotes.high[index],
+              low: quotes.low[index],
+              volume: quotes.volume[index],
+              date: `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
+            };
+          }).filter((point: { close: null | undefined; }) => point.close !== null && point.close !== undefined);
+          
+          setChartData(formattedData);
+        }
+      } catch (err) {
+        console.error('Error fetching chart data:', err);
+        setError('Failed to load chart data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    if (symbol) {
+      fetchChartData();
+      
+      // Also make a simple quote request to get the asset name
+      axios.get(`http://localhost:3001/api/finance/quote?symbol=${symbol}&fields=shortName,longName,regularMarketPrice`)
+        .then(response => {
+          if (response.data && response.data[0]) {
+            const quote = response.data[0];
+            setAssetInfo({
+              name: quote.shortName || quote.longName || symbol,
+              symbol: quote.symbol
+            });
+          }
+        })
+        .catch(err => console.error('Error fetching quote data:', err));
+    }
+  }, [symbol, selectedPeriod]);
+
   // Create chart data from API response
   const realTrendData = useMemo(() => {
     if (chartData.length === 0) return trendData; // Use mock data as fallback
@@ -65,7 +169,7 @@ const Overview: React.FC<OverviewProps> = ({
         fill: false
       }]
     };
-  }, [chartData, trendData]);
+  }, [chartData]);
 
   // Filter trend data based on selected period - replace with real data
   const filteredTrendData = useMemo(() => {
@@ -86,7 +190,7 @@ const Overview: React.FC<OverviewProps> = ({
         data: trendData.datasets[0].data.slice(startIndex)
       }]
     };
-  }, [selectedPeriod, chartData, realTrendData, performancePeriods, trendData]);
+  }, [selectedPeriod, chartData, realTrendData]);
 
   return (
     <div className={styles.overviewTab}>

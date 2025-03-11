@@ -1,11 +1,8 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import Layout from '../components/Layout'
 import styles from '../styles/Analyses.module.css';
-import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaArrowUp, FaArrowDown, FaSearch, FaBars, 
-  FaCircle, FaEye, FaInfoCircle, FaDownload, FaExpand, FaQuestion, FaExchangeAlt, FaHistory } from 'react-icons/fa';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers } from 'react-icons/fa';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, 
   Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import Overview from '../components/analyses/Overview';
@@ -15,7 +12,7 @@ import COTReport from '../components/analyses/COTReport';
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
 
-// Sample data for charts
+// Sample data for charts and components that are not part of Overview
 const trendData = {
   labels: Array.from({ length: 120 }, (_, i) => `${2015 + Math.floor(i/12)}-${(i % 12) + 1}`),
   datasets: [{
@@ -105,180 +102,72 @@ const monthlyAverageData = {
   ]
 };
 
-// Interface for chart data
-interface ChartDataPoint {
-  timestamp: number;
-  close: number;
-  open?: number;
-  high?: number;
-  low?: number;
-  volume?: number;
-  date?: string; // Formatted date string
-}
+// Sample COT data and other tab-specific state
+const positionExtremesData = [
+  {
+    traderType: 'Large Speculators',
+    highestLong: { value: '+126,789', date: 'May 2023', price: '$32,450' },
+    highestShort: { value: '-42,567', date: 'Jan 2022', price: '$49,875' },
+    currentPosition: { value: '+89,452', change: '+12.5%', direction: 'increasing' }
+  },
+  {
+    traderType: 'Commercial Traders',
+    highestLong: { value: '+58,921', date: 'Dec 2021', price: '$47,240' },
+    highestShort: { value: '-137,456', date: 'May 2023', price: '$32,450' },
+    currentPosition: { value: '-63,287', change: '-8.7%', direction: 'decreasing' }
+  },
+  {
+    traderType: 'Small Speculators',
+    highestLong: { value: '+24,567', date: 'Apr 2023', price: '$28,350' },
+    highestShort: { value: '-19,876', date: 'Nov 2022', price: '$16,570' },
+    currentPosition: { value: '+3,835', change: '+2.1%', direction: 'stable' }
+  }
+];
+
+const sentimentData = [
+  {
+    traderCategory: 'Large Speculators',
+    sentiment: 'bullish',
+    netPosition: '+89,452',
+    change: '+12.5%',
+    longPercentage: '67%',
+    description: 'Largest net long position in 6 months. Typically signals strong upward momentum.'
+  },
+  {
+    traderCategory: 'Commercial Traders',
+    sentiment: 'bearish',
+    netPosition: '-63,287',
+    change: '-8.7%',
+    longPercentage: '42%',
+    description: 'Increased short positions over past 3 weeks. Often hedge against market downturns.'
+  },
+  {
+    traderCategory: 'Small Speculators',
+    sentiment: 'neutral',
+    netPosition: '+3,835',
+    change: '+2.1%',
+    longPercentage: '51%',
+    description: 'Nearly balanced positions indicate uncertainty among retail traders.'
+  },
+  {
+    traderCategory: 'Overall Market',
+    sentiment: 'bullish',
+    netPosition: '+30,000',
+    change: '+5.4%',
+    longPercentage: '56%',
+    description: 'Divergence between trader categories suggests potential volatility ahead.'
+  }
+];
 
 export default function Analyses() {
   const router = useRouter();
   const { symbol = 'AAPL' } = router.query; // Default to AAPL if no symbol provided
   
-  // Add state for API data
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string }>({ 
-    name: 'Loading...', 
-    symbol: (symbol as string) || 'AAPL'
-  });
-
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedPeriod, setSelectedPeriod] = useState('1Y'); // Default to 10 years view
   const [comparisonPeriods, setComparisonPeriods] = useState({ first: '3 Years', second: '5 Years' });
   const [activeTimeframe, setActiveTimeframe] = useState('monthly'); // New state for seasonality timeframe
   const [showDataPoints, setShowDataPoints] = useState(true); // Toggle data points
   const [viewMode, setViewMode] = useState('line'); // Toggle between line and bar chart
-
-  // Sample COT data for tables
-  const positionExtremesData = [
-    {
-      traderType: 'Large Speculators',
-      highestLong: { value: '+126,789', date: 'May 2023', price: '$32,450' },
-      highestShort: { value: '-42,567', date: 'Jan 2022', price: '$49,875' },
-      currentPosition: { value: '+89,452', change: '+12.5%', direction: 'increasing' }
-    },
-    {
-      traderType: 'Commercial Traders',
-      highestLong: { value: '+58,921', date: 'Dec 2021', price: '$47,240' },
-      highestShort: { value: '-137,456', date: 'May 2023', price: '$32,450' },
-      currentPosition: { value: '-63,287', change: '-8.7%', direction: 'decreasing' }
-    },
-    {
-      traderType: 'Small Speculators',
-      highestLong: { value: '+24,567', date: 'Apr 2023', price: '$28,350' },
-      highestShort: { value: '-19,876', date: 'Nov 2022', price: '$16,570' },
-      currentPosition: { value: '+3,835', change: '+2.1%', direction: 'stable' }
-    }
-  ];
-
-  const sentimentData = [
-    {
-      traderCategory: 'Large Speculators',
-      sentiment: 'bullish',
-      netPosition: '+89,452',
-      change: '+12.5%',
-      longPercentage: '67%',
-      description: 'Largest net long position in 6 months. Typically signals strong upward momentum.'
-    },
-    {
-      traderCategory: 'Commercial Traders',
-      sentiment: 'bearish',
-      netPosition: '-63,287',
-      change: '-8.7%',
-      longPercentage: '42%',
-      description: 'Increased short positions over past 3 weeks. Often hedge against market downturns.'
-    },
-    {
-      traderCategory: 'Small Speculators',
-      sentiment: 'neutral',
-      netPosition: '+3,835',
-      change: '+2.1%',
-      longPercentage: '51%',
-      description: 'Nearly balanced positions indicate uncertainty among retail traders.'
-    },
-    {
-      traderCategory: 'Overall Market',
-      sentiment: 'bullish',
-      netPosition: '+30,000',
-      change: '+5.4%',
-      longPercentage: '56%',
-      description: 'Divergence between trader categories suggests potential volatility ahead.'
-    }
-  ];
-
-  // Fetch chart data based on the symbol and selected period
-  useEffect(() => {
-    const fetchChartData = async () => {
-      if (!symbol) return;
-      
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        // Calculate date range based on selected period
-        const selectedPeriodObj = performancePeriods.find(p => p.label === selectedPeriod);
-        const monthsToShow = selectedPeriodObj ? selectedPeriodObj.months : 120; // Default to 10 years
-        
-        // Calculate start date based on months
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setMonth(endDate.getMonth() - monthsToShow);
-        
-        // Determine appropriate interval based on period length
-        let interval = '1d';
-        // if (monthsToShow > 60) interval = '1wk';
-        // if (monthsToShow > 120) interval = '1mo';
-        const response = await axios.get('http://localhost:3001/api/finance/chart', {
-          params: {
-            symbol,
-            period1: startDate.toISOString(),
-            period2: endDate.toISOString(),
-            interval,
-            events: 'div,split',
-            includePrePost: false
-          }
-        });
-        if (response.data && response.data.chart && response.data.chart.result && response.data.chart.result[0]) {
-          const result = response.data.chart.result[0];
-          const timestamps = result.timestamp;
-          const quotes = result.indicators.quote[0];
-          const meta = result.meta;
-          debugger
-          // Update asset info
-          setAssetInfo({
-            name: meta.symbol,
-            symbol: meta.symbol
-          });
-          
-          // Format data for chart
-          const formattedData = timestamps.map((timestamp: number, index: number) => {
-            const date = new Date(timestamp * 1000);
-            return {
-              timestamp,
-              close: quotes.close[index],
-              open: quotes.open[index],
-              high: quotes.high[index],
-              low: quotes.low[index],
-              volume: quotes.volume[index],
-              date: `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
-            };
-          }).filter((point: { close: null | undefined; }) => point.close !== null && point.close !== undefined);
-          
-          setChartData(formattedData);
-        }
-      } catch (err) {
-        console.error('Error fetching chart data:', err);
-        setError('Failed to load chart data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    if (symbol) {
-      fetchChartData();
-      
-      // Also make a simple quote request to get the asset name
-      axios.get(`http://localhost:3001/api/finance/quote?symbol=${symbol}&fields=shortName,longName,regularMarketPrice`)
-        .then(response => {
-          if (response.data && response.data[0]) {
-            const quote = response.data[0];
-            setAssetInfo({
-              name: quote.shortName || quote.longName || (symbol as string),
-              symbol: quote.symbol
-            });
-          }
-        })
-        .catch(err => console.error('Error fetching quote data:', err));
-    }
-  }, [symbol, selectedPeriod]);
-
 
   // Function to get the current seasonality data based on the timeframe
   const getCurrentSeasonalityData = () => {
@@ -417,7 +306,7 @@ export default function Analyses() {
       <div className={styles.analysesContainer}>
         {/* Header with Asset Name and AI Button */}
         <div className={styles.header}>
-          <h1 className={styles.assetName}>{assetInfo.name} ({assetInfo.symbol})</h1>
+          <h1 className={styles.assetName}>{symbol as string}</h1>
           <button className={styles.aiButton}>
             <FaRobot /> Forecast AI AGENT
           </button>
@@ -449,22 +338,13 @@ export default function Analyses() {
         <div className={styles.tabContent}>
           {/* Overview Tab */}
           {activeTab === 'overview' && (
-            <Overview 
-              assetInfo={assetInfo}
-              performancePeriods={performancePeriods}
-              selectedPeriod={selectedPeriod}
-              setSelectedPeriod={setSelectedPeriod}
-              chartData={chartData}
-              isLoading={isLoading}
-              error={error}
-              trendData={trendData}
-            />
+            <Overview symbol={symbol as string} />
           )}
 
           {/* Seasonality Tab */}
           {activeTab === 'seasonality' && (
             <Seasonality
-              assetInfo={assetInfo}
+              assetInfo={{ name: symbol as string, symbol: symbol as string }}
               comparisonPeriods={comparisonPeriods}
               setComparisonPeriods={setComparisonPeriods}
               activeTimeframe={activeTimeframe}
@@ -487,7 +367,7 @@ export default function Analyses() {
           {/* COT Report Tab */}
           {activeTab === 'cot' && (
             <COTReport 
-              assetInfo={assetInfo}
+              assetInfo={{ name: symbol as string, symbol: symbol as string }}
               positionExtremesData={positionExtremesData}
               sentimentData={sentimentData}
             />
