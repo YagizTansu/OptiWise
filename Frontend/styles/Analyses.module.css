@@ -1330,3 +1330,83 @@
 .cancelButton:hover {
   background-color: #f0f0f0;
 }
+
+/* Fullscreen chart styling */
+.fullscreenChart {
+  height: calc(100vh - 100px) !important;
+}
+
+/* Modal styles for info popup */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modalHeader {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.modalFooter {
+  padding: 15px 20px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.infoList {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.infoList li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Style adjustments for fullscreen mode */
+:fullscreen .chartCard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  border-radius: 0;
+}
+
+:fullscreen .trendChart {
+  flex-grow: 1;
+  height: auto !important;
+}

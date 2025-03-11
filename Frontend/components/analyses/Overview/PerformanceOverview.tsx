@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
-import { FaDownload, FaExpand, FaQuestion, FaInfoCircle } from 'react-icons/fa';
+import { FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
 import styles from '../../../styles/Analyses.module.css';
+import html2canvas from 'html2canvas';
 
 interface ChartDataPoint {
   timestamp: number;
@@ -54,6 +55,10 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
     endDate: new Date()
   });
   const [showCustomDateRange, setShowCustomDateRange] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
 
   // Make selectedPeriod available to other components if needed
   useEffect(() => {
@@ -362,6 +367,76 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
     }
   };
 
+  // Handle fullscreen toggle
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      // Enter fullscreen
+      if (chartContainerRef.current?.requestFullscreen) {
+        chartContainerRef.current.requestFullscreen()
+          .then(() => {
+            setIsFullscreen(true);
+          })
+          .catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+          });
+      }
+    } else {
+      // Exit fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+          .then(() => {
+            setIsFullscreen(false);
+          })
+          .catch(err => {
+            console.error(`Error attempting to exit fullscreen: ${err.message}`);
+          });
+      }
+    }
+  };
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  // Download chart as image
+  const downloadChart = async () => {
+    if (!chartRef.current) return;
+    
+    try {
+      // Set loading indicator or cursor if needed
+      document.body.style.cursor = 'wait';
+      
+      const canvas = await html2canvas(chartRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2, // Higher scale for better quality
+      });
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `${assetInfo.symbol}-chart-${formatDateForFilename(new Date())}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error('Failed to download chart:', error);
+      alert('Failed to download chart. Please try again.');
+    } finally {
+      document.body.style.cursor = 'default';
+    }
+  };
+
+  // Format date for filename
+  const formatDateForFilename = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+  };
+
   return (
     <>
       {/* Overview Header Section */}
@@ -539,29 +614,53 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
       )}
 
       {/* Main Trend Chart */}
-      <div className={styles.chartCard}>
+      <div className={styles.chartCard} ref={chartContainerRef}>
         <div className={styles.chartHeader}>
           <h2>
             {selectedPeriod === 'custom' 
-              ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)})` 
+              ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
               : selectedPeriod} 
             Price Trend for {assetInfo.symbol}
           </h2>
           <div className={styles.chartControls}>
-            <button className={styles.modernActionButton} title="Download Chart">
+            <button 
+              className={styles.modernActionButton} 
+              title="Download Chart"
+              onClick={downloadChart}
+            >
               <FaDownload className={styles.buttonIcon} /> 
               <span>Download</span>
             </button>
-            <button className={styles.modernActionButton} title="Fullscreen">
-              <FaExpand className={styles.buttonIcon} /> 
-              <span>Fullscreen</span>
+            <button 
+              className={styles.modernActionButton} 
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <>
+                  <FaCompress className={styles.buttonIcon} /> 
+                  <span>Exit Fullscreen</span>
+                </>
+              ) : (
+                <>
+                  <FaExpand className={styles.buttonIcon} /> 
+                  <span>Fullscreen</span>
+                </>
+              )}
             </button>
-            <button className={styles.modernIconButton} title="Learn More">
+            <button 
+              className={styles.modernIconButton} 
+              title="Learn More"
+              onClick={() => setShowInfoModal(true)}
+            >
               <FaQuestion />
             </button>
           </div>
         </div>
-        <div className={styles.trendChart}>
+        <div 
+          className={`${styles.trendChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
+          ref={chartRef}
+        >
           {isLoading ? (
             <div className={styles.loadingContainer}>
               <div className={styles.loadingSpinner}></div>
@@ -689,6 +788,52 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
           )}
         </div>
       </div>
+      
+      {/* Info Modal */}
+      {showInfoModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>About Price Trends Chart</h3>
+              <button 
+                className={styles.closeButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <h4>How to use this chart:</h4>
+              <ul className={styles.infoList}>
+                <li>Select different time periods from the top menu (1M to 20Y)</li>
+                <li>Choose intervals (Daily, Weekly, Monthly) to adjust the data granularity</li>
+                <li>Hover over any point on the chart to see detailed price information</li>
+                <li>Use the custom date range option for specific time periods</li>
+                <li>Download the chart as an image using the download button</li>
+                <li>View the chart in fullscreen for a larger display</li>
+              </ul>
+              
+              <h4>Reading the data:</h4>
+              <p>
+                The chart displays the closing price of {assetInfo.symbol} over your selected time period. 
+                Each data point represents the price at the end of the selected interval (day, week, or month).
+              </p>
+              <p>
+                When you hover over a data point, you'll see additional information like the open, high, low, and 
+                volume for that specific time period.
+              </p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.applyButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
