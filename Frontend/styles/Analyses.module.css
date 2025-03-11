@@ -1410,3 +1410,142 @@
   flex-grow: 1;
   height: auto !important;
 }
+
+/* Add these new styles to your existing CSS file */
+
+/* Correlation flex container for chart and info side by side */
+.correlationFlexContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 2rem;
+}
+
+.correlationChartSection {
+  flex: 0 0 auto;
+  max-width: 160px;
+}
+
+.correlationInfoSection {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.chartContainerSmall {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+}
+
+.correlationInfoTitle {
+  margin-top: 0;
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.correlationQuickStats {
+  margin-top: 1rem;
+}
+
+.quickStatItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.quickStatLabel {
+  font-weight: 500;
+  min-width: 100px;
+  color: #666;
+}
+
+.quickStatValue {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.miniReliabilityBar {
+  width: 80px;
+  height: 6px;
+  background-color: rgba(230, 230, 230, 0.7);
+  border-radius: 3px;
+  margin-left: 8px;
+  overflow: hidden;
+}
+
+.miniReliabilityFill {
+  height: 100%;
+  background: linear-gradient(90deg, #5e88fc, #20a0b8);
+  border-radius: 3px;
+  transition: width 0.5s ease-out;
+}
+
+.chartCenterText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.correlationValue {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #333;
+}
+
+.correlationDirection {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+}
+
+.periodHighlight {
+  background-color: rgba(94, 136, 252, 0.1);
+  color: #5e88fc;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Make correlation stats more compact */
+.correlationStats {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.statCard {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .correlationFlexContainer {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .correlationInfoSection {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .quickStatItem {
+    justify-content: center;
+  }
+}

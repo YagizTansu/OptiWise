@@ -10,11 +10,7 @@ interface SeasonalityProps {
 }
 
 const Seasonality: React.FC<SeasonalityProps> = ({ symbol }) => {
-  // State management
-  const [comparisonPeriods, setComparisonPeriods] = useState({ first: '3 Years', second: '5 Years' });
-  const [activeTimeframe, setActiveTimeframe] = useState('monthly');
-  const [showDataPoints, setShowDataPoints] = useState(true);
-  const [viewMode, setViewMode] = useState('line');
+  // Only keep asset info state in the parent component
   const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string }>({
     name: symbol,
     symbol: symbol
@@ -31,20 +27,11 @@ const Seasonality: React.FC<SeasonalityProps> = ({ symbol }) => {
         </p>
       </div>
       
-      <SeasonalityAnalysis 
-        comparisonPeriods={comparisonPeriods}
-        setComparisonPeriods={setComparisonPeriods}
-        activeTimeframe={activeTimeframe}
-        setActiveTimeframe={setActiveTimeframe}
-        showDataPoints={showDataPoints}
-        setShowDataPoints={setShowDataPoints}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
+      <SeasonalityAnalysis symbol={symbol} />
 
-      <PatternCorrelation comparisonPeriods={comparisonPeriods} />
+      <PatternCorrelation symbol={symbol} />
 
-      <TimeAverageReturns />
+      <TimeAverageReturns symbol={symbol} />
       
       {/* Strategy Suggestions based on seasonality */}
       <div className={styles.strategySuggestions}>
