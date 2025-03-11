@@ -247,6 +247,7 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
   };
 
   return (
+    
     <div className={styles.chartCard} ref={chartContainerRef}>
       <div className={styles.chartHeader}>
         <h2>Annual Performance</h2>

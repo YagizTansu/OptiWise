@@ -6,6 +6,7 @@ import PerformanceOverview from './Overview/PerformanceOverview';
 import PerformanceMetrics from './Overview/PerformanceMetrics';
 import AnnualPerformance from './Overview/AnnualPerformance';
 import KeyStatistics from './Overview/KeyStatistics';
+import Dividends from './Overview/Dividends'; // Ensure this path is correct or update it to the correct path
 
 interface OverviewProps {
   symbol: string;
@@ -25,6 +26,9 @@ const Overview: React.FC<OverviewProps> = ({ symbol }) => {
       
       {/* Key Statistics Component */}
       <KeyStatistics symbol={symbol} />
+      
+      {/* Dividends Component */}
+      <Dividends symbol={symbol} />
     </div>
   );
 };
