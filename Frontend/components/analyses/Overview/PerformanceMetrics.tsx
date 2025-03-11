@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaArrowUp, FaArrowDown, FaInfoCircle } from 'react-icons/fa';
+import { FaArrowUp, FaArrowDown, FaInfoCircle, FaQuestionCircle } from 'react-icons/fa';
 import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
 
@@ -14,21 +14,23 @@ interface PerformanceMetricsProps {
 }
 
 const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
-  // Performance periods data
-  const performancePeriods = [
-    { label: '1M', value: -2.5, months: 1 },
-    { label: '3M', value: 5.7, months: 3 },
-    { label: '6M', value: 12.3, months: 6 },
-    { label: '1Y', value: -8.2, months: 12 },
-    { label: '3Y', value: 45.6, months: 36 },
-    { label: '5Y', value: 78.2, months: 60 },
-    { label: '10Y', value: 134.5, months: 120 },
-    { label: '20Y', value: 267.8, months: 240 },
+  // Define performance periods
+  const performancePeriodDefinitions = [
+    { label: '1M', months: 1 },
+    { label: '3M', months: 3 },
+    { label: '6M', months: 6 },
+    { label: '1Y', months: 12 },
+    { label: '3Y', months: 36 },
+    { label: '5Y', months: 60 },
+    { label: '10Y', months: 120 },
+    { label: '20Y', months: 240 },
   ];
   
   const [selectedPeriod, setSelectedPeriod] = useState('1Y');
-  const [metrics, setMetrics] = useState<PeriodData[]>(performancePeriods);
-  const [isLoading, setIsLoading] = useState(false);
+  const [metrics, setMetrics] = useState<PeriodData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // Listen for period changes from other components
   useEffect(() => {
@@ -43,24 +45,79 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
     };
   }, []);
   
-  // In a real app, you would fetch actual metrics based on the symbol
+  // Fetch real performance metrics based on the symbol
   useEffect(() => {
     if (!symbol) return;
     
-    // Example of how you might fetch performance metrics
-    // This is a placeholder - replace with real API call
     const fetchPerformanceMetrics = async () => {
       setIsLoading(true);
+      setError(null);
+      
       try {
-        // In a real application, you would make API calls to get real performance data
-        // For now, we'll use the static data with a simulated delay
-        setTimeout(() => {
-          // In a real app, you might modify this with actual data from an API
-          setMetrics(performancePeriods);
-          setIsLoading(false);
-        }, 500);
+        const today = new Date();
+        const results: PeriodData[] = [];
+        
+        // Fetch data for each period
+        for (const period of performancePeriodDefinitions) {
+          // Calculate the start date for this period
+          const startDate = new Date();
+          startDate.setMonth(today.getMonth() - period.months);
+          
+          // Format dates for API
+          const fromDate = startDate.toISOString().split('T')[0];
+          const toDate = today.toISOString().split('T')[0];
+          
+          // Determine appropriate interval based on period length
+          const interval = period.months > 60 ? '1mo' : period.months > 12 ? '1wk' : '1d';
+          
+          // Fetch historical data from port 3001
+          const response = await axios.get(`http://localhost:3001/api/finance/historical`, {
+            params: {
+              symbol,
+              from: fromDate,
+              to: toDate,
+              interval
+            }
+          });
+          
+          if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+            // Get first and last valid closing prices
+            const firstValidDataPoint = response.data.find(point => point.close !== null);
+            const lastValidDataPoint = [...response.data].reverse().find(point => point.close !== null);
+            
+            if (firstValidDataPoint && lastValidDataPoint) {
+              const startPrice = firstValidDataPoint.close;
+              const endPrice = lastValidDataPoint.close;
+              const performanceValue = ((endPrice - startPrice) / startPrice) * 100;
+              
+              results.push({
+                label: period.label,
+                value: performanceValue,
+                months: period.months
+              });
+            } else {
+              // Handle case where we don't have valid data points
+              results.push({
+                label: period.label,
+                value: 0,
+                months: period.months
+              });
+            }
+          } else {
+            // If no data returned, add a placeholder
+            results.push({
+              label: period.label,
+              value: 0,
+              months: period.months
+            });
+          }
+        }
+        
+        setMetrics(results);
       } catch (error) {
         console.error('Error fetching performance metrics:', error);
+        setError('Failed to load performance metrics');
+      } finally {
         setIsLoading(false);
       }
     };
@@ -74,17 +131,37 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
     document.dispatchEvent(new CustomEvent('periodChange', { detail: period }));
   };
 
+  const toggleTooltip = () => {
+    setShowTooltip(!showTooltip);
+  };
+
   if (isLoading) {
     return <div className={styles.loadingContainer}>Loading metrics...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.errorContainer}>{error}</div>;
   }
 
   return (
     <div className={styles.overviewSection}>
       <div className={styles.sectionHeader}>
         <h2>Performance Metrics</h2>
-        <button className={styles.modernIconButton} title="Learn About Performance Metrics">
-          <FaInfoCircle />
-        </button>
+        <div className={styles.infoIconWrapper}>
+          <button 
+            className={`${styles.modernIconButton} ${showTooltip ? styles.active : ''}`}
+            onClick={toggleTooltip}
+            aria-label="Performance Metrics Information"
+          >
+            <FaQuestionCircle />
+          </button>
+          {showTooltip && (
+            <div className={styles.tooltipContent}>
+              <p>Performance metrics show the percentage change in stock value over different time periods.</p>
+              <p>Select a time period to update all related charts and analyses.</p>
+            </div>
+          )}
+        </div>
       </div>
       <div className={styles.metricsGrid}>
         {metrics.map((period) => (

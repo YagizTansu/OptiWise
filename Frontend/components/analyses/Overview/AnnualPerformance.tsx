@@ -8,16 +8,26 @@ interface AnnualPerformanceProps {
   symbol: string;
 }
 
+interface HistoricalDataPoint {
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  adjClose: number;
+}
+
 const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Default annual data
+  // Default annual data structure (will be populated with real data)
   const [annualData, setAnnualData] = useState({
-    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+    labels: [] as string[],
     datasets: [{
       label: 'Annual Return (%)',
-      data: [12, -5, 18, 7, 22, -8, 14, -3, 25, 10, 5],
+      data: [] as number[],
       backgroundColor: (context: { dataset: { data: { [x: string]: any; }; }; dataIndex: string | number; }) => {
         const value = context.dataset.data[context.dataIndex];
         return value >= 0 ? 'rgba(75, 192, 192, 0.7)' : 'rgba(255, 99, 132, 0.7)';
@@ -26,10 +36,61 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
   });
 
   const [statistics, setStatistics] = useState({
-    bestYear: '2021 (+25%)',
-    worstYear: '2018 (-8%)',
-    average: '+8.8%'
+    bestYear: '',
+    worstYear: '',
+    average: ''
   });
+
+  // Calculate annual performance from historical data
+  const calculateAnnualReturns = (historicalData: HistoricalDataPoint[]) => {
+    // Group data by year
+    const dataByYear = historicalData.reduce((acc, dataPoint) => {
+      const year = new Date(dataPoint.date).getFullYear();
+      if (!acc[year]) {
+        acc[year] = [];
+      }
+      acc[year].push(dataPoint);
+      return acc;
+    }, {} as Record<number, HistoricalDataPoint[]>);
+
+    // Sort years in ascending order
+    const sortedYears = Object.keys(dataByYear)
+      .map(Number)
+      .sort((a, b) => a - b);
+
+    // Get the most recent year data that has at least some entries
+    // This handles partial current year data
+    if (sortedYears.length > 0) {
+      const currentYear = new Date().getFullYear();
+      if (dataByYear[currentYear] && dataByYear[currentYear].length < 5) {
+        // If we have very few data points for current year, exclude it
+        sortedYears.pop();
+      }
+    }
+
+    // Calculate returns between consecutive year-end prices
+    const annualReturns: number[] = [];
+    const yearLabels: string[] = [];
+    
+    for (let i = 1; i < sortedYears.length; i++) {
+      const previousYear = sortedYears[i-1];
+      const currentYear = sortedYears[i];
+      
+      // Get the last data point (year-end) for each year
+      const previousYearEnd = dataByYear[previousYear].slice(-1)[0].adjClose;
+      const currentYearEnd = dataByYear[currentYear].slice(-1)[0].adjClose;
+      
+      // Calculate percentage return
+      const annualReturn = ((currentYearEnd - previousYearEnd) / previousYearEnd) * 100;
+      annualReturns.push(parseFloat(annualReturn.toFixed(2)));
+      yearLabels.push(currentYear.toString());
+    }
+
+    return {
+      labels: yearLabels,
+      returns: annualReturns
+    };
+  };
 
   // Fetch annual performance data
   useEffect(() => {
@@ -40,36 +101,66 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
       setError(null);
       
       try {
-        // This would be a real API call in a production app
-        // For this example, we'll simulate a delay and use the static data
+        // Calculate a start date 10 years ago from today
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setFullYear(startDate.getFullYear() - 10);
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 800));
+        // Format dates as ISO strings
+        const fromDate = startDate.toISOString();
+        const toDate = endDate.toISOString();
         
-        // In a real app, you would process the API response here
-        // and update the annualData state with real data
-        
-        // For now, we'll just use the default data
-        setIsLoading(false);
-        
-        // Calculate statistics based on the data
-        const allReturns = annualData.datasets[0].data;
-        const maxReturn = Math.max(...allReturns);
-        const maxIndex = allReturns.indexOf(maxReturn);
-        const bestYear = annualData.labels[maxIndex];
-        
-        const minReturn = Math.min(...allReturns);
-        const minIndex = allReturns.indexOf(minReturn);
-        const worstYear = annualData.labels[minIndex];
-        
-        const avgReturn = allReturns.reduce((sum, val) => sum + val, 0) / allReturns.length;
-        
-        setStatistics({
-          bestYear: `${bestYear} (+${maxReturn}%)`,
-          worstYear: `${worstYear} (${minReturn}%)`,
-          average: `${avgReturn > 0 ? '+' : ''}${avgReturn.toFixed(1)}%`
+        // Call the historical API with monthly data using port 3001
+        const response = await axios.get(`http://localhost:3001/api/finance/historical`, {
+          params: {
+            symbol: symbol,
+            from: fromDate,
+            to: toDate,
+            interval: '1mo'
+          }
         });
         
+        if (!response.data || !response.data.length) {
+          throw new Error('No historical data available');
+        }
+        
+        // Calculate annual returns from monthly data
+        const calculatedData = calculateAnnualReturns(response.data);
+        
+        // Update chart data
+        setAnnualData({
+          labels: calculatedData.labels,
+          datasets: [{
+            label: 'Annual Return (%)',
+            data: calculatedData.returns,
+            backgroundColor: (context: { dataset: { data: { [x: string]: any; }; }; dataIndex: string | number; }) => {
+              const value = context.dataset.data[context.dataIndex];
+              return value >= 0 ? 'rgba(75, 192, 192, 0.7)' : 'rgba(255, 99, 132, 0.7)';
+            }
+          }]
+        });
+        
+        // Calculate statistics based on the real data
+        const allReturns = calculatedData.returns;
+        if (allReturns.length > 0) {
+          const maxReturn = Math.max(...allReturns);
+          const maxIndex = allReturns.indexOf(maxReturn);
+          const bestYear = calculatedData.labels[maxIndex];
+          
+          const minReturn = Math.min(...allReturns);
+          const minIndex = allReturns.indexOf(minReturn);
+          const worstYear = calculatedData.labels[minIndex];
+          
+          const avgReturn = allReturns.reduce((sum, val) => sum + val, 0) / allReturns.length;
+          
+          setStatistics({
+            bestYear: `${bestYear} (+${maxReturn.toFixed(1)}%)`,
+            worstYear: `${worstYear} (${minReturn >= 0 ? '+' : ''}${minReturn.toFixed(1)}%)`,
+            average: `${avgReturn >= 0 ? '+' : ''}${avgReturn.toFixed(1)}%`
+          });
+        }
+        
+        setIsLoading(false);
       } catch (err) {
         console.error('Error fetching annual performance data:', err);
         setError('Failed to load annual performance data');
