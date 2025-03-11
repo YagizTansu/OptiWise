@@ -1636,3 +1636,61 @@
     grid-template-columns: 1fr 1fr 1fr;
   }
 }
+
+/* Loading and error states */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #666;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #0066cc;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #d32f2f;
+}
+
+.errorIcon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.statsTableContainer {
+  margin-top: 24px;
+}
+
+.statsTableContainer h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Time Average Returns section style */
+.timeAverageReturnsSection {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 24px;
+}

@@ -329,85 +329,128 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
   };
 
   return (
-    <div className={styles.timeAverageReturnsSection}>
-      <h2>Average Returns by Time Period</h2>
+    <div className={styles.analysisCard}>
+      <div className={styles.cardHeader}>
+        <h3>Average Returns by Time Period</h3>
+        <div className={styles.cardActions}>
+          <button className={styles.modernIconButton}>
+            <FaInfoCircle />
+          </button>
+          <button className={styles.modernIconButton}>
+            <FaExpand />
+          </button>
+        </div>
+      </div>
       
-      <div className={styles.controls}>
-        <div className={styles.controlsRow}>
-          <div className={styles.controlGroup}>
-            <label>Analysis Period:</label>
-            <div className={styles.buttonGroup}>
+      <div className={styles.seasonalityControls}>
+        <div className={styles.controlGroup}>
+          <label>Analysis Period:</label>
+          <div className={styles.seasonalityTimeframeSelector}>
+            {['1 Year', '3 Years', '5 Years', '10 Years', 'Max'].map((period) => (
               <button 
-                className={selectedPeriod === '1 Year' ? styles.activeButton : styles.button}
-                onClick={() => setSelectedPeriod('1 Year')}
+                key={period}
+                className={selectedPeriod === period ? styles.modernTabButton + ' ' + styles.activeTab : styles.modernTabButton}
+                onClick={() => setSelectedPeriod(period)}
               >
-                1 Year
+                {period}
               </button>
-              <button 
-                className={selectedPeriod === '3 Years' ? styles.activeButton : styles.button}
-                onClick={() => setSelectedPeriod('3 Years')}
-              >
-                3 Years
-              </button>
-              <button 
-                className={selectedPeriod === '5 Years' ? styles.activeButton : styles.button}
-                onClick={() => setSelectedPeriod('5 Years')}
-              >
-                5 Years
-              </button>
-              <button 
-                className={selectedPeriod === '10 Years' ? styles.activeButton : styles.button}
-                onClick={() => setSelectedPeriod('10 Years')}
-              >
-                10 Years
-              </button>
-              <button 
-                className={selectedPeriod === 'Max' ? styles.activeButton : styles.button}
-                onClick={() => setSelectedPeriod('Max')}
-              >
-                Max
-              </button>
-            </div>
+            ))}
           </div>
         </div>
         
-        <div className={styles.controlsRow}>
-          <div className={styles.controlGroup}>
-            <label>View Mode:</label>
-            <div className={styles.viewSelector}>
+        <div className={styles.viewControls}>
+          <label>View:</label>
+          <div className={styles.viewSelector}>
+            {['daily', 'monthly', 'yearly'].map((view) => (
               <button 
-                className={selectedView === 'daily' ? styles.activeView : styles.viewButton}
-                onClick={() => setSelectedView('daily')}
+                key={view}
+                className={selectedView === view ? styles.activeView : styles.viewButton}
+                onClick={() => setSelectedView(view)}
               >
-                Daily
+                {view.charAt(0).toUpperCase() + view.slice(1)}
               </button>
-              <button 
-                className={selectedView === 'monthly' ? styles.activeView : styles.viewButton}
-                onClick={() => setSelectedView('monthly')}
-              >
-                Monthly
-              </button>
-              <button 
-                className={selectedView === 'yearly' ? styles.activeView : styles.viewButton}
-                onClick={() => setSelectedView('yearly')}
-              >
-                Yearly
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </div>
       
-      <div className={styles.returnsChart}>
-        {loading && <p>Loading data...</p>}
-        {error && <p className={styles.error}>{error}</p>}
+      <div className={styles.chartContainer}>
+        {loading && (
+          <div className={styles.loadingContainer}>
+            <div className={styles.loadingSpinner}></div>
+            <p>Loading chart data...</p>
+          </div>
+        )}
+        
+        {error && (
+          <div className={styles.errorContainer}>
+            <FaInfoCircle className={styles.errorIcon} />
+            <p>{error}</p>
+          </div>
+        )}
+        
         {!loading && !error && chartData && (
-          <Bar data={chartData} options={chartOptions} />
+          <Bar data={chartData} options={chartOptions} className={styles.trendChart} />
         )}
       </div>
       
+      {!loading && !error && statsData.length > 0 && (
+        <div className={styles.statsTableContainer}>
+          <h4>Detailed Statistics</h4>
+          <div className={styles.extremesTable}>
+            <table className={styles.dataTable}>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Avg. Return</th>
+                  <th>Std. Dev.</th>
+                  <th>Win Rate</th>
+                  <th>Best</th>
+                  <th>Worst</th>
+                </tr>
+              </thead>
+              <tbody>
+                {statsData.map((row, idx) => (
+                  <tr key={idx}>
+                    <td>{row.period}</td>
+                    <td className={row.avgReturn >= 0 ? styles.positive : styles.negative}>
+                      {row.avgReturn >= 0 ? '+' : ''}{row.avgReturn.toFixed(1)}%
+                    </td>
+                    <td>{row.stdDev.toFixed(1)}%</td>
+                    <td>{row.winRate}%</td>
+                    <td className={styles.positive}>+{row.best.toFixed(1)}%</td>
+                    <td className={styles.negative}>{row.worst.toFixed(1)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className={styles.bestWorstDays}>
+            <div className={styles.bestDay}>
+              Best performing: <span>{getBestPerformingPeriod()}</span>
+            </div>
+            <div className={styles.worstDay}>
+              Worst performing: <span>{getWorstPerformingPeriod()}</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+  
+  // Helper functions to identify best and worst periods
+  function getBestPerformingPeriod() {
+    if (statsData.length === 0) return 'N/A';
+    const best = [...statsData].sort((a, b) => b.avgReturn - a.avgReturn)[0];
+    return `${best.period} (+${best.avgReturn.toFixed(1)}%)`;
+  }
+  
+  function getWorstPerformingPeriod() {
+    if (statsData.length === 0) return 'N/A';
+    const worst = [...statsData].sort((a, b) => a.avgReturn - b.avgReturn)[0];
+    return `${worst.period} (${worst.avgReturn.toFixed(1)}%)`;
+  }
 };
 
 export default TimeAverageReturns;
