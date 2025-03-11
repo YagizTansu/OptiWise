@@ -316,7 +316,26 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
       return;
     }
     
+    // Set the period to 'custom' explicitly
+    setSelectedPeriod('custom');
+    
+    // Close the date picker panel
     setShowCustomDateRange(false);
+    
+    // Trigger a chart data refresh (this is already handled by the dateRange dependency in the useEffect)
+    console.log('Applied custom date range:', {
+      startDate: dateRange.startDate.toLocaleDateString(),
+      endDate: dateRange.endDate.toLocaleDateString()
+    });
+  };
+
+  // Format date for display
+  const formatDateForDisplay = (date: Date): string => {
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
   // Determine the appropriate label for X-axis based on selected interval
@@ -394,40 +413,119 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
         </div>
       </div>
 
-      {/* Custom Date Range Panel */}
+      {/* Custom Date Range Panel - Enhanced UI */}
       {showCustomDateRange && (
         <div className={styles.customDatePanel}>
           <form onSubmit={handleCustomDateSubmit}>
-            <div className={styles.dateInputGroup}>
-              <label>
-                Start Date:
-                <input 
-                  type="date" 
-                  value={dateRange.startDate.toISOString().substring(0, 10)}
-                  onChange={(e) => setDateRange(prev => ({ 
-                    ...prev, 
-                    startDate: new Date(e.target.value) 
-                  }))}
-                  required
-                />
-              </label>
-              <label>
-                End Date:
-                <input 
-                  type="date" 
-                  value={dateRange.endDate.toISOString().substring(0, 10)}
-                  onChange={(e) => setDateRange(prev => ({ 
-                    ...prev, 
-                    endDate: new Date(e.target.value) 
-                  }))}
-                  required
-                  min={dateRange.startDate.toISOString().substring(0, 10)}
-                  max={new Date().toISOString().substring(0, 10)}
-                />
-              </label>
+            <div className={styles.dateRangeHeader}>
+              <h3>Select Custom Date Range</h3>
+              <button 
+                type="button" 
+                className={styles.closeButton}
+                onClick={() => setShowCustomDateRange(false)}
+              >
+                &times;
+              </button>
             </div>
+            
+            <div className={styles.dateInputGroup}>
+              <div className={styles.dateInputWrapper}>
+                <label>Start Date</label>
+                <div className={styles.dateInputContainer}>
+                  <input 
+                    type="date" 
+                    value={dateRange.startDate.toISOString().substring(0, 10)}
+                    onChange={(e) => setDateRange(prev => ({ 
+                      ...prev, 
+                      startDate: new Date(e.target.value) 
+                    }))}
+                    required
+                    max={dateRange.endDate.toISOString().substring(0, 10)}
+                    className={styles.dateInput}
+                  />
+                </div>
+              </div>
+              
+              <div className={styles.dateSeparator}>to</div>
+              
+              <div className={styles.dateInputWrapper}>
+                <label>End Date</label>
+                <div className={styles.dateInputContainer}>
+                  <input 
+                    type="date" 
+                    value={dateRange.endDate.toISOString().substring(0, 10)}
+                    onChange={(e) => setDateRange(prev => ({ 
+                      ...prev, 
+                      endDate: new Date(e.target.value) 
+                    }))}
+                    required
+                    min={dateRange.startDate.toISOString().substring(0, 10)}
+                    max={new Date().toISOString().substring(0, 10)}
+                    className={styles.dateInput}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.dateRangeFeedback}>
+              {dateRange.endDate.getTime() - dateRange.startDate.getTime() > 0 ? (
+                <span className={styles.validRange}>
+                  {Math.ceil((dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 60 * 60 * 24))} days selected
+                </span>
+              ) : (
+                <span className={styles.invalidRange}>
+                  End date must be after start date
+                </span>
+              )}
+            </div>
+            
+            <div className={styles.dateQuickOptions}>
+              <button 
+                type="button" 
+                className={styles.quickOptionButton}
+                onClick={() => {
+                  const end = new Date();
+                  const start = new Date();
+                  start.setMonth(end.getMonth() - 3);
+                  setDateRange({ startDate: start, endDate: end });
+                }}
+              >
+                Last 3 months
+              </button>
+              <button 
+                type="button" 
+                className={styles.quickOptionButton}
+                onClick={() => {
+                  const end = new Date();
+                  const start = new Date();
+                  start.setFullYear(end.getFullYear() - 1);
+                  setDateRange({ startDate: start, endDate: end });
+                }}
+              >
+                Last year
+              </button>
+              <button 
+                type="button" 
+                className={styles.quickOptionButton}
+                onClick={() => {
+                  const end = new Date();
+                  const start = new Date();
+                  start.setFullYear(end.getFullYear() - 5);
+                  setDateRange({ startDate: start, endDate: end });
+                }}
+              >
+                Last 5 years
+              </button>
+            </div>
+            
             <div className={styles.buttonGroup}>
-              <button type="submit" className={styles.applyButton}>Apply Range</button>
+              <button 
+                type="submit" 
+                className={styles.applyButton}
+                disabled={dateRange.endDate.getTime() <= dateRange.startDate.getTime()}
+              >
+                Apply Range
+              </button>
               <button 
                 type="button" 
                 className={styles.cancelButton}
@@ -443,7 +541,12 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
       {/* Main Trend Chart */}
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2>{selectedPeriod === 'custom' ? 'Custom Period' : selectedPeriod} Price Trend for {assetInfo.symbol}</h2>
+          <h2>
+            {selectedPeriod === 'custom' 
+              ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)})` 
+              : selectedPeriod} 
+            Price Trend for {assetInfo.symbol}
+          </h2>
           <div className={styles.chartControls}>
             <button className={styles.modernActionButton} title="Download Chart">
               <FaDownload className={styles.buttonIcon} /> 
