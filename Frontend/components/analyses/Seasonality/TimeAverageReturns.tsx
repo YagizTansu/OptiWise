@@ -1,4 +1,4 @@
-import { FaExpand, FaInfoCircle, FaCompress, FaTimes, FaDownload } from 'react-icons/fa';
+import { FaExpand, FaInfoCircle, FaCompress, FaTimes, FaDownload, FaQuestion } from 'react-icons/fa';
 import { Bar } from 'react-chartjs-2';
 import { useState, useEffect, useRef } from 'react';
 import styles from '../../../styles/Analyses.module.css';
@@ -447,7 +447,7 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
             title="Learn About Seasonality"
             onClick={() => setShowInfoModal(true)}
           >
-            <FaInfoCircle />
+            <FaQuestion />
           </button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaQuestion, FaChartLine, FaExchangeAlt, FaInfoCircle } from 'react-icons/fa';
+import { FaQuestion, FaChartLine, FaExchangeAlt, FaInfoCircle, FaTimes, FaLightbulb } from 'react-icons/fa';
 import { Doughnut } from 'react-chartjs-2';
 import styles from '../../../styles/Analyses.module.css';
 import axios from 'axios';
@@ -27,6 +27,8 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
   const [comparisonPeriods, setComparisonPeriods] = useState({ first: '3 Years', second: '5 Years' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Add state for modal visibility
+  const [showInfoModal, setShowInfoModal] = useState(false);
   const [correlationData, setCorrelationData] = useState({
     coefficient: 0,
     strength: 'N/A',
@@ -214,9 +216,91 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
       <div className={styles.cardHeader}>
         <h2><FaChartLine className={styles.headerIcon} /> Pattern Correlation</h2>
         <div className={styles.infoIconContainer}>
-          <FaInfoCircle className={styles.infoIcon} title="Compare historical price patterns across different time periods" />
+          <button 
+            className={styles.modernIconButton} 
+            title="Learn About Pattern Correlation"
+            onClick={() => setShowInfoModal(true)}
+          >
+            <FaQuestion />
+          </button>
         </div>
       </div>
+      
+      {/* Info Modal - Styled to match TimeAverageReturns */}
+      {showInfoModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Understanding Pattern Correlation</h3>
+              <button 
+                className={styles.closeButton} 
+                onClick={() => setShowInfoModal(false)}
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>
+                Pattern correlation measures how similarly a stock's price patterns behave across different time periods.
+                A high correlation coefficient (close to 1 or -1) indicates that patterns from one period closely match
+                or inversely match patterns from another period.
+              </p>
+              
+              <h4>How to interpret the results:</h4>
+              <ul className={styles.infoList}>
+                <li>
+                  <strong>Correlation Coefficient:</strong> Ranges from -1 to +1. Positive values indicate similar patterns, 
+                  negative values indicate inverse patterns.
+                </li>
+                <li>
+                  <strong>Strength:</strong> Describes how powerful the correlation is between time periods:
+                  <ul>
+                    <li><span style={{color: '#20a0b8'}}>Strong (0.7-1.0)</span>: High level of pattern similarity</li>
+                    <li><span style={{color: '#5e88fc'}}>Moderate (0.5-0.7)</span>: Noticeable pattern similarity</li>
+                    <li><span style={{color: '#ba68c8'}}>Weak (0.3-0.5)</span>: Some pattern similarity</li>
+                    <li><span style={{color: '#9e9e9e'}}>Very Weak (0.0-0.3)</span>: Little to no pattern similarity</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong>Reliability:</strong> Indicates confidence level in the correlation based on available historical data 
+                  volume and consistency.
+                </li>
+              </ul>
+              
+              <h4>Trading Implications:</h4>
+              <p>
+                Strong correlations may suggest that historical patterns could repeat in the future, potentially 
+                providing insights for trading strategies. However, remember that past performance is not always 
+                indicative of future results.
+              </p>
+              
+              <h4>Using the Pattern Correlation tool:</h4>
+              <ul className={styles.infoList}>
+                <li>
+                  <strong>Compare Periods:</strong> Select two different time periods to analyze pattern similarities
+                </li>
+                <li>
+                  <strong>Correlation Value:</strong> The central number shows the correlation coefficient
+                </li>
+                <li>
+                  <strong>Donut Chart:</strong> Visually represents the strength of the correlation
+                </li>
+                <li>
+                  <strong>Detailed Stats:</strong> Review additional metrics in the statistics section below the chart
+                </li>
+              </ul>
+            </div>
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.modernPrimaryButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <div className={styles.periodSelectorContainer}>
         <div className={styles.periodSelector}>
