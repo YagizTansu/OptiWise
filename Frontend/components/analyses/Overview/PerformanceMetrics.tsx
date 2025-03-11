@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { FaArrowUp, FaArrowDown, FaInfoCircle, FaQuestionCircle } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaArrowUp, FaArrowDown, FaQuestionCircle, FaDownload, FaExpand, FaCompress } from 'react-icons/fa';
 import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
+import html2canvas from 'html2canvas';
 
 interface PeriodData {
   label: string;
@@ -30,7 +31,10 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
   const [metrics, setMetrics] = useState<PeriodData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const metricsRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Listen for period changes from other components
   useEffect(() => {
@@ -131,8 +135,69 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
     document.dispatchEvent(new CustomEvent('periodChange', { detail: period }));
   };
 
-  const toggleTooltip = () => {
-    setShowTooltip(!showTooltip);
+  // Handle fullscreen toggle
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      // Enter fullscreen
+      if (containerRef.current?.requestFullscreen) {
+        containerRef.current.requestFullscreen()
+          .then(() => {
+            setIsFullscreen(true);
+          })
+          .catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+          });
+      }
+    } else {
+      // Exit fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+          .then(() => {
+            setIsFullscreen(false);
+          })
+          .catch(err => {
+            console.error(`Error attempting to exit fullscreen: ${err.message}`);
+          });
+      }
+    }
+  };
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  // Download metrics as image
+  const downloadMetrics = async () => {
+    if (!metricsRef.current) return;
+    
+    try {
+      // Set loading indicator or cursor if needed
+      document.body.style.cursor = 'wait';
+      
+      const canvas = await html2canvas(metricsRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2, // Higher scale for better quality
+      });
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `${symbol}-performance-metrics-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error('Failed to download metrics:', error);
+      alert('Failed to download metrics. Please try again.');
+    } finally {
+      document.body.style.cursor = 'default';
+    }
   };
 
   if (isLoading) {
@@ -144,26 +209,48 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
   }
 
   return (
-    <div className={styles.overviewSection}>
+    <div className={styles.overviewSection} ref={containerRef}>
       <div className={styles.sectionHeader}>
         <h2>Performance Metrics</h2>
-        <div className={styles.infoIconWrapper}>
+        <div className={styles.chartControls}>
           <button 
-            className={`${styles.modernIconButton} ${showTooltip ? styles.active : ''}`}
-            onClick={toggleTooltip}
-            aria-label="Performance Metrics Information"
+            className={styles.modernActionButton} 
+            title="Download Metrics"
+            onClick={downloadMetrics}
+          >
+            <FaDownload className={styles.buttonIcon} /> 
+            <span>Download</span>
+          </button>
+          <button 
+            className={styles.modernActionButton} 
+            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+            onClick={toggleFullscreen}
+          >
+            {isFullscreen ? (
+              <>
+                <FaCompress className={styles.buttonIcon} /> 
+                <span>Exit Fullscreen</span>
+              </>
+            ) : (
+              <>
+                <FaExpand className={styles.buttonIcon} /> 
+                <span>Fullscreen</span>
+              </>
+            )}
+          </button>
+          <button 
+            className={styles.modernIconButton} 
+            title="Learn More"
+            onClick={() => setShowInfoModal(true)}
           >
             <FaQuestionCircle />
           </button>
-          {showTooltip && (
-            <div className={styles.tooltipContent}>
-              <p>Performance metrics show the percentage change in stock value over different time periods.</p>
-              <p>Select a time period to update all related charts and analyses.</p>
-            </div>
-          )}
         </div>
       </div>
-      <div className={styles.metricsGrid}>
+      <div 
+        className={`${styles.metricsGrid} ${isFullscreen ? styles.fullscreenMetrics : ''}`}
+        ref={metricsRef}
+      >
         {metrics.map((period) => (
           <div 
             key={period.label} 
@@ -184,6 +271,48 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
           </div>
         ))}
       </div>
+      
+      {/* Info Modal */}
+      {showInfoModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>About Performance Metrics</h3>
+              <button 
+                className={styles.closeButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <h4>How to use these metrics:</h4>
+              <ul className={styles.infoList}>
+                <li>Performance metrics show the percentage change in stock value over different time periods</li>
+                <li>Click on any time period to update all related charts and analyses</li>
+                <li>Green indicates positive returns, red indicates negative returns</li>
+                <li>The currently selected period is highlighted and marked as "Active"</li>
+                <li>Download the metrics panel as an image using the download button</li>
+                <li>View the metrics in fullscreen for a larger display</li>
+              </ul>
+              
+              <p>
+                When you select a time period, all other components on the page will update 
+                to reflect data for the same period, providing a consistent view of the asset's 
+                performance across different analyses.
+              </p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.applyButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
