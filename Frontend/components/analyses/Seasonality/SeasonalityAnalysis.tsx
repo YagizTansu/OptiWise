@@ -23,28 +23,16 @@ interface SeasonalityChartData {
 }
 
 interface SeasonalityAnalysisProps {
-  comparisonPeriods: { first: string; second: string };
-  setComparisonPeriods: (periods: { first: string; second: string }) => void;
-  activeTimeframe: string;
-  setActiveTimeframe: (timeframe: string) => void;
-  showDataPoints: boolean;
-  setShowDataPoints: (show: boolean) => void;
-  viewMode: string;
-  setViewMode: (mode: string) => void;
-  symbol?: string; // Optional prop to specify which symbol to analyze
+  symbol: string;
 }
 
-const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({
-  comparisonPeriods,
-  setComparisonPeriods,
-  activeTimeframe,
-  setActiveTimeframe,
-  showDataPoints,
-  setShowDataPoints,
-  viewMode,
-  setViewMode,
-  symbol = 'SPY', // Default to SPY if no symbol provided
-}) => {
+const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => {
+  // Internal state management - moved from parent
+  const [comparisonPeriods, setComparisonPeriods] = useState({ first: '3 Years', second: '5 Years' });
+  const [activeTimeframe, setActiveTimeframe] = useState('monthly');
+  const [showDataPoints, setShowDataPoints] = useState(true);
+  const [viewMode, setViewMode] = useState('line');
+
   // State for data loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
