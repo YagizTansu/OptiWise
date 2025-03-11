@@ -1,4 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 import Layout from '../components/Layout'
 import styles from '../styles/Analyses.module.css';
 import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaArrowUp, FaArrowDown, FaSearch, FaBars, 
@@ -112,9 +114,31 @@ const monthlyAverageData = {
   ]
 };
 
+// Interface for chart data
+interface ChartDataPoint {
+  timestamp: number;
+  close: number;
+  open?: number;
+  high?: number;
+  low?: number;
+  volume?: number;
+  date?: string; // Formatted date string
+}
+
 export default function Analyses() {
+  const router = useRouter();
+  const { symbol = 'AAPL' } = router.query; // Default to AAPL if no symbol provided
+  
+  // Add state for API data
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string }>({ 
+    name: 'Loading...', 
+    symbol: (symbol as string) || 'AAPL'
+  });
+
   const [activeTab, setActiveTab] = useState('overview');
-  const [assetName] = useState('Bitcoin (BTC)');
   const [selectedPeriod, setSelectedPeriod] = useState('10Y'); // Default to 10 years view
   const [comparisonPeriods, setComparisonPeriods] = useState({ first: '3 Years', second: '5 Years' });
   const [activeTimeframe, setActiveTimeframe] = useState('monthly'); // New state for seasonality timeframe
@@ -178,12 +202,122 @@ export default function Analyses() {
     }
   ];
 
-  // Filter trend data based on selected period
-  const filteredTrendData = useMemo(() => {
-    const selectedPeriodObj = performancePeriods.find(p => p.label === selectedPeriod);
-    const monthsToShow = selectedPeriodObj ? selectedPeriodObj.months : 120; // Default to 10 years (120 months)
+  // Fetch chart data based on the symbol and selected period
+  useEffect(() => {
+    const fetchChartData = async () => {
+      if (!symbol) return;
+      
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Calculate date range based on selected period
+        const selectedPeriodObj = performancePeriods.find(p => p.label === selectedPeriod);
+        const monthsToShow = selectedPeriodObj ? selectedPeriodObj.months : 120; // Default to 10 years
+        
+        // Calculate start date based on months
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setMonth(endDate.getMonth() - monthsToShow);
+        
+        // Determine appropriate interval based on period length
+        let interval = '1d';
+        if (monthsToShow > 60) interval = '1wk';
+        if (monthsToShow > 120) interval = '1mo';
+        const response = await axios.get('http://localhost:3001/api/finance/chart', {
+          params: {
+            symbol,
+            period1: startDate.toISOString(),
+            period2: endDate.toISOString(),
+            interval,
+            events: 'div,split',
+            includePrePost: false
+          }
+        });
+        debugger
+        if (response.data && response.data.chart && response.data.chart.result && response.data.chart.result[0]) {
+          const result = response.data.chart.result[0];
+          const timestamps = result.timestamp;
+          const quotes = result.indicators.quote[0];
+          const meta = result.meta;
+          
+          // Update asset info
+          setAssetInfo({
+            name: meta.symbol,
+            symbol: meta.symbol
+          });
+          
+          // Format data for chart
+          const formattedData = timestamps.map((timestamp: number, index: number) => {
+            const date = new Date(timestamp * 1000);
+            return {
+              timestamp,
+              close: quotes.close[index],
+              open: quotes.open[index],
+              high: quotes.high[index],
+              low: quotes.low[index],
+              volume: quotes.volume[index],
+              date: `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`
+            };
+          }).filter(point => point.close !== null && point.close !== undefined);
+          
+          setChartData(formattedData);
+        }
+      } catch (err) {
+        console.error('Error fetching chart data:', err);
+        setError('Failed to load chart data');
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    // Take only the most recent X months based on selection
+    if (symbol) {
+      fetchChartData();
+      
+      // Also make a simple quote request to get the asset name
+      axios.get(`http://localhost:3001/api/finance/quote?symbol=${symbol}&fields=shortName,longName,regularMarketPrice`)
+        .then(response => {
+          if (response.data && response.data[0]) {
+            const quote = response.data[0];
+            setAssetInfo({
+              name: quote.shortName || quote.longName || (symbol as string),
+              symbol: quote.symbol
+            });
+          }
+        })
+        .catch(err => console.error('Error fetching quote data:', err));
+    }
+  }, [symbol, selectedPeriod]);
+
+  // Create chart data from API response
+  const realTrendData = useMemo(() => {
+    if (chartData.length === 0) return trendData; // Use mock data as fallback
+    
+    // Filter data to appropriate number of points
+    const dataPoints = chartData;
+    
+    return {
+      labels: dataPoints.map(point => point.date),
+      datasets: [{
+        label: 'Asset Price ($)',
+        data: dataPoints.map(point => point.close),
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1,
+        fill: false
+      }]
+    };
+  }, [chartData]);
+
+  // Filter trend data based on selected period - replace with real data
+  const filteredTrendData = useMemo(() => {
+    if (chartData.length > 0) {
+      return realTrendData; // Use real data when available
+    }
+    
+    // Fallback to mock data when API data is not available
+    const selectedPeriodObj = performancePeriods.find(p => p.label === selectedPeriod);
+    const monthsToShow = selectedPeriodObj ? selectedPeriodObj.months : 120;
+    
     const startIndex = Math.max(0, trendData.labels.length - monthsToShow);
     
     return {
@@ -193,7 +327,7 @@ export default function Analyses() {
         data: trendData.datasets[0].data.slice(startIndex)
       }]
     };
-  }, [selectedPeriod]);
+  }, [selectedPeriod, chartData, realTrendData]);
 
   // Function to get the current seasonality data based on the timeframe
   const getCurrentSeasonalityData = () => {
@@ -332,7 +466,7 @@ export default function Analyses() {
       <div className={styles.analysesContainer}>
         {/* Header with Asset Name and AI Button */}
         <div className={styles.header}>
-          <h1 className={styles.assetName}>{assetName}</h1>
+          <h1 className={styles.assetName}>{assetInfo.name} ({assetInfo.symbol})</h1>
           <button className={styles.aiButton}>
             <FaRobot /> Forecast AI AGENT
           </button>
@@ -367,7 +501,7 @@ export default function Analyses() {
             <div className={styles.overviewTab}>
               {/* Overview Header Section */}
               <div className={styles.seasonalityHeader}>
-                <h1>Performance Overview for {assetName}</h1>
+                <h1>Performance Overview for {assetInfo.name}</h1>
                 <p className={styles.seasonalityDescription}>
                   <FaInfoCircle className={styles.infoIcon} /> 
                   Track historical performance trends and compare returns across different timeframes to make 
@@ -394,7 +528,7 @@ export default function Analyses() {
               {/* Main Trend Chart */}
               <div className={styles.chartCard}>
                 <div className={styles.chartHeader}>
-                  <h2>{selectedPeriod} Price Trend</h2>
+                  <h2>{selectedPeriod} Price Trend for {assetInfo.symbol}</h2>
                   <div className={styles.chartControls}>
                     <button className={styles.modernActionButton} title="Download Chart">
                       <FaDownload className={styles.buttonIcon} /> 
@@ -410,52 +544,68 @@ export default function Analyses() {
                   </div>
                 </div>
                 <div className={styles.trendChart}>
-                  <Line 
-                    data={filteredTrendData} 
-                    options={{
-                      responsive: true,
-                      maintainAspectRatio: false,
-                      elements: {
-                        line: {
-                          tension: 0.3
-                        },
-                        point: {
-                          radius: 2,
-                          hoverRadius: 5
-                        }
-                      },
-                      scales: {
-                        y: {
-                          beginAtZero: false,
-                          grid: {
-                            color: 'rgba(200, 200, 200, 0.1)'
-                          }
-                        },
-                        x: {
-                          grid: {
-                            display: false
-                          }
-                        }
-                      },
-                      plugins: {
-                        legend: {
-                          display: false
-                        },
-                        tooltip: {
-                          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                          padding: 12,
-                          titleFont: {
-                            size: 14,
-                            weight: 'bold'
+                  {isLoading ? (
+                    <div className={styles.loadingContainer}>
+                      <div className={styles.loadingSpinner}></div>
+                      <p>Loading chart data...</p>
+                    </div>
+                  ) : error ? (
+                    <div className={styles.errorContainer}>
+                      <p>{error}</p>
+                      <button onClick={() => router.reload()}>Retry</button>
+                    </div>
+                  ) : (
+                    <Line 
+                      data={filteredTrendData} 
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        elements: {
+                          line: {
+                            tension: 0.3
                           },
-                          bodyFont: {
-                            size: 13
+                          point: {
+                            radius: 0, // Hide points for cleaner look with real data
+                            hoverRadius: 5
+                          }
+                        },
+                        scales: {
+                          y: {
+                            beginAtZero: false,
+                            grid: {
+                              color: 'rgba(200, 200, 200, 0.1)'
+                            }
+                          },
+                          x: {
+                            grid: {
+                              display: false
+                            },
+                            ticks: {
+                              maxTicksLimit: 12, // Limit x-axis labels
+                              autoSkip: true
+                            }
+                          }
+                        },
+                        plugins: {
+                          legend: {
+                            display: false
+                          },
+                          tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                              size: 14,
+                              weight: 'bold'
+                            },
+                            bodyFont: {
+                              size: 13
+                            }
                           }
                         }
-                      }
-                    }}
-                    height={400}
-                  />
+                      }}
+                      height={400}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -608,7 +758,7 @@ export default function Analyses() {
           {activeTab === 'seasonality' && (
             <div className={styles.seasonalityTab}>
               <div className={styles.seasonalityHeader}>
-                <h1>Seasonality Analysis for {assetName}</h1>
+                <h1>Seasonality Analysis for {assetInfo.name}</h1>
                 <p className={styles.seasonalityDescription}>
                   <FaInfoCircle className={styles.infoIcon} /> 
                   Seasonality analysis helps identify recurring patterns in asset price movements during specific 
@@ -990,7 +1140,7 @@ export default function Analyses() {
           {activeTab === 'cot' && (
             <div className={styles.cotTab}>
               <div className={styles.seasonalityHeader}>
-                <h1>Commitment of Traders (COT) Report for {assetName}</h1>
+                <h1>Commitment of Traders (COT) Report for {assetInfo.name}</h1>
                 <p className={styles.seasonalityDescription}>
                   <FaInfoCircle className={styles.infoIcon} /> 
                   The COT report shows the positions of different types of traders in the futures markets. 
