@@ -662,7 +662,6 @@
 .modernPrimaryButton:hover {
   background-color: #1976d2;
   box-shadow: 0 3px 8px rgba(25,118,210,0.4);
-  transform: translateY(-1px);
 }
 
 /* Compact Correlation Cards */
@@ -2091,6 +2090,236 @@
 
 .modernPrimaryButton:hover .buttonIcon {
   transform: translateX(3px);
+}
+
+/* ...existing code... */
+
+/* Strategy exploration modal */
+.strategyModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.strategyModalContent {
+  background-color: var(--card-bg, #fff);
+  border-radius: 8px;
+  width: 800px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+.strategyModalHeader {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color, #eaeaea);
+}
+
+.strategyModalHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.closeModalButton {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-secondary, #777);
+}
+
+.strategyModalBody {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+.strategyDescription {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: var(--text-secondary, #777);
+  line-height: 1.5;
+}
+
+.strategyModalFooter {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--border-color, #eaeaea);
+}
+
+.modernSecondaryButton {
+  padding: 0.6rem 1.2rem;
+  background-color: transparent;
+  border: 1px solid var(--primary-color, #3d7aed);
+  border-radius: 6px;
+  color: var(--primary-color, #3d7aed);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modernSecondaryButton:hover {
+  background-color: rgba(61, 122, 237, 0.05);
+}
+
+/* Strategy analysis components */
+.strategyAnalysis {
+  margin-top: 1rem;
+}
+
+.strategyAnalysis h3 {
+  margin: 1.5rem 0 1rem;
+  font-size: 1.2rem;
+}
+
+.monthlyTable {
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.monthlyTable table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.monthlyTable th {
+  background-color: var(--bg-light, #f8f9fc);
+  padding: 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border-color, #eaeaea);
+}
+
+.monthlyTable td {
+  padding: 0.8rem;
+  border-bottom: 1px solid var(--border-color, #eaeaea);
+}
+
+.positive {
+  color: var(--success, #28a745);
+}
+
+.negative {
+  color: var(--danger, #dc3545);
+}
+
+.tradingStrategy {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: var(--bg-light, #f8f9fc);
+  border-left: 4px solid var(--primary-color, #3d7aed);
+  border-radius: 4px;
+}
+
+.riskMetrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.riskMetric {
+  padding: 1rem;
+  background-color: var(--bg-light, #f8f9fc);
+  border-radius: 6px;
+}
+
+.metricLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #777);
+  margin-bottom: 0.5rem;
+}
+
+.metricValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.aiRecommendations {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.aiRecommendation {
+  padding: 1rem;
+  background-color: var(--bg-light, #f8f9fc);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.aiRecommendation h4 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.recReturn {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.recConfidence {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #777);
+}
+
+.recAction {
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.aiDisclaimer {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--bg-light, #f8f9fc);
+  border-left: 4px solid var(--warning, #ffc107);
+  border-radius: 4px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingContainer, .errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.errorIcon {
+  color: var(--danger, #dc3545);
+  font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
 /* ...existing code... */
