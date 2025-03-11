@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FaInfoCircle, FaDownload, FaExpand, FaQuestion, FaArrowUp, FaArrowDown, 
   FaExchangeAlt, FaEye, FaHistory } from 'react-icons/fa';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
@@ -19,17 +20,76 @@ interface SentimentData {
   description: string;
 }
 
+// Moving data into the component
+const positionExtremesData: TraderPosition[] = [
+  {
+    traderType: 'Large Speculators',
+    highestLong: { value: '+126,789', date: 'May 2023', price: '$32,450' },
+    highestShort: { value: '-42,567', date: 'Jan 2022', price: '$49,875' },
+    currentPosition: { value: '+89,452', change: '+12.5%', direction: 'increasing' }
+  },
+  {
+    traderType: 'Commercial Traders',
+    highestLong: { value: '+58,921', date: 'Dec 2021', price: '$47,240' },
+    highestShort: { value: '-137,456', date: 'May 2023', price: '$32,450' },
+    currentPosition: { value: '-63,287', change: '-8.7%', direction: 'decreasing' }
+  },
+  {
+    traderType: 'Small Speculators',
+    highestLong: { value: '+24,567', date: 'Apr 2023', price: '$28,350' },
+    highestShort: { value: '-19,876', date: 'Nov 2022', price: '$16,570' },
+    currentPosition: { value: '+3,835', change: '+2.1%', direction: 'stable' }
+  }
+];
+
+const sentimentData: SentimentData[] = [
+  {
+    traderCategory: 'Large Speculators',
+    sentiment: 'bullish',
+    netPosition: '+89,452',
+    change: '+12.5%',
+    longPercentage: '67%',
+    description: 'Largest net long position in 6 months. Typically signals strong upward momentum.'
+  },
+  {
+    traderCategory: 'Commercial Traders',
+    sentiment: 'bearish',
+    netPosition: '-63,287',
+    change: '-8.7%',
+    longPercentage: '42%',
+    description: 'Increased short positions over past 3 weeks. Often hedge against market downturns.'
+  },
+  {
+    traderCategory: 'Small Speculators',
+    sentiment: 'neutral',
+    netPosition: '+3,835',
+    change: '+2.1%',
+    longPercentage: '51%',
+    description: 'Nearly balanced positions indicate uncertainty among retail traders.'
+  },
+  {
+    traderCategory: 'Overall Market',
+    sentiment: 'bullish',
+    netPosition: '+30,000',
+    change: '+5.4%',
+    longPercentage: '56%',
+    description: 'Divergence between trader categories suggests potential volatility ahead.'
+  }
+];
+
+// Simplified props interface
 interface COTReportProps {
-  assetInfo: { name: string; symbol: string };
-  positionExtremesData: TraderPosition[];
-  sentimentData: SentimentData[];
+  symbol: string;
 }
 
-const COTReport: React.FC<COTReportProps> = ({
-  assetInfo,
-  positionExtremesData,
-  sentimentData
-}) => {
+const COTReport: React.FC<COTReportProps> = ({ symbol }) => {
+  // Internal state management
+  const [selectedPeriod, setSelectedPeriod] = useState('1Y');
+  const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string }>({
+    name: symbol,
+    symbol: symbol
+  });
+
   return (
     <div className={styles.cotTab}>
       <div className={styles.seasonalityHeader}>
@@ -48,7 +108,8 @@ const COTReport: React.FC<COTReportProps> = ({
           {['3M', '6M', '1Y', '2Y', '5Y'].map((period) => (
             <button 
               key={period}
-              className={`${styles.modernTabButton} ${period === '1Y' ? styles.activeTab : ''}`}
+              className={`${styles.modernTabButton} ${period === selectedPeriod ? styles.activeTab : ''}`}
+              onClick={() => setSelectedPeriod(period)}
             >
               {period}
             </button>

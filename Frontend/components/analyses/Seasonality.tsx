@@ -3,45 +3,218 @@ import { FaInfoCircle, FaChartLine, FaCircle, FaDownload, FaExpand, FaQuestion }
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import styles from '../../styles/Analyses.module.css';
 
+// Sample seasonality data
+const monthlySeasonalityData = {
+  labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+  datasets: [
+    {
+      label: '3 Years',
+      data: [5.2, 3.7, -2.1, 4.5, 2.8, -1.3, 3.9, 4.2, 2.5, -3.1, 1.8, 3.6],
+      borderColor: 'rgb(53, 162, 235)',
+      backgroundColor: 'rgba(53, 162, 235, 0.5)',
+    },
+    {
+      label: '5 Years',
+      data: [4.1, 2.9, -1.5, 3.8, 1.9, -0.8, 4.7, 3.5, 2.0, -2.5, 1.2, 2.8],
+      borderColor: 'rgb(255, 159, 64)',
+      backgroundColor: 'rgba(255, 159, 64, 0.5)',
+    }
+  ]
+};
+
+const dailyAverageData = {
+  labels: Array.from({length: 31}, (_, i) => (i + 1).toString()),
+  datasets: [
+    {
+      label: '3 Years',
+      data: Array.from({length: 31}, () => (Math.random() * 30) - 15),
+      backgroundColor: 'rgba(53, 162, 235, 0.7)',
+    },
+    {
+      label: '5 Years',
+      data: Array.from({length: 31}, () => (Math.random() * 30) - 15),
+      backgroundColor: 'rgba(255, 159, 64, 0.7)',
+    }
+  ]
+};
+
+const weeklyAverageData = {
+  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+  datasets: [
+    {
+      label: '3 Years',
+      data: [2.1, -1.4, 3.5, 1.8, -0.7],
+      backgroundColor: 'rgba(53, 162, 235, 0.7)',
+    },
+    {
+      label: '5 Years',
+      data: [1.5, -0.9, 2.8, 1.2, -1.1],
+      backgroundColor: 'rgba(255, 159, 64, 0.7)',
+    }
+  ]
+};
+
+const monthlyAverageData = {
+  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  datasets: [
+    {
+      label: '3 Years',
+      data: [2.8, -1.3, 3.9, 4.2, 2.5, -3.1, 1.8, 3.6, 5.2, 3.7, -2.1, 4.5],
+      backgroundColor: 'rgba(53, 162, 235, 0.7)',
+    },
+    {
+      label: '5 Years',
+      data: [1.9, -0.8, 4.7, 3.5, 2.0, -2.5, 1.2, 2.8, 4.1, 2.9, -1.5, 3.8],
+      backgroundColor: 'rgba(255, 159, 64, 0.7)',
+    }
+  ]
+};
+
+// Correlation data for visualizations
+const correlationData = {
+  labels: ['Correlation', 'No Correlation'],
+  datasets: [
+    {
+      data: [50.06, 49.94],
+      backgroundColor: ['rgba(75, 192, 192, 0.8)', 'rgba(230, 230, 230, 0.5)'],
+      borderWidth: 0,
+      cutout: '75%'
+    }
+  ]
+};
+
+const correlation2Data = {
+  labels: ['Correlation', 'No Correlation'],
+  datasets: [
+    {
+      data: [38.98, 61.02],
+      backgroundColor: ['rgba(255, 159, 64, 0.8)', 'rgba(230, 230, 230, 0.5)'],
+      borderWidth: 0,
+      cutout: '75%'
+    }
+  ]
+};
+
 interface SeasonalityProps {
-  assetInfo: { name: string; symbol: string };
-  comparisonPeriods: { first: string; second: string };
-  setComparisonPeriods: (periods: { first: string; second: string }) => void;
-  activeTimeframe: string;
-  setActiveTimeframe: (timeframe: string) => void;
-  showDataPoints: boolean;
-  setShowDataPoints: (show: boolean) => void;
-  viewMode: string;
-  setViewMode: (mode: string) => void;
-  getCurrentSeasonalityData: () => any;
-  getChartTitle: () => string;
-  seasonalityChartOptions: any;
-  correlationData: any;
-  correlation2Data: any;
-  dailyAverageData: any;
-  weeklyAverageData: any;
-  monthlyAverageData: any;
+  symbol: string;
 }
 
-const Seasonality: React.FC<SeasonalityProps> = ({
-  assetInfo,
-  comparisonPeriods,
-  setComparisonPeriods,
-  activeTimeframe,
-  setActiveTimeframe,
-  showDataPoints,
-  setShowDataPoints,
-  viewMode,
-  setViewMode,
-  getCurrentSeasonalityData,
-  getChartTitle,
-  seasonalityChartOptions,
-  correlationData,
-  correlation2Data,
-  dailyAverageData,
-  weeklyAverageData,
-  monthlyAverageData
-}) => {
+const Seasonality: React.FC<SeasonalityProps> = ({ symbol }) => {
+  // State management moved from analyses.tsx
+  const [comparisonPeriods, setComparisonPeriods] = useState({ first: '3 Years', second: '5 Years' });
+  const [activeTimeframe, setActiveTimeframe] = useState('monthly');
+  const [showDataPoints, setShowDataPoints] = useState(true);
+  const [viewMode, setViewMode] = useState('line');
+  const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string }>({
+    name: symbol,
+    symbol: symbol
+  });
+
+  // Chart options with data points toggle
+  const seasonalityChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    elements: {
+      point: {
+        radius: showDataPoints ? 4 : 0,
+        hoverRadius: showDataPoints ? 6 : 0
+      },
+      line: {
+        borderWidth: 2,
+        tension: 0.3
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Percent Change (%)',
+          font: {
+            size: 14,
+            weight: 'bold' as const
+          }
+        },
+        grid: {
+          color: 'rgba(200, 200, 200, 0.1)'
+        }
+      },
+      x: {
+        grid: {
+          color: 'rgba(200, 200, 200, 0.1)'
+        }
+      }
+    },
+    plugins: {
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        titleFont: {
+          size: 14,
+          weight: 700
+        },
+        bodyFont: {
+          size: 13
+        },
+        displayColors: true,
+        usePointStyle: true
+      },
+      legend: {
+        position: 'top' as const,
+        align: 'end' as const,
+        labels: {
+          boxWidth: 15,
+          usePointStyle: true,
+          pointStyle: 'circle'
+        }
+      }
+    }
+  };
+
+  // Function to get the current seasonality data based on the timeframe
+  const getCurrentSeasonalityData = () => {
+    switch(activeTimeframe) {
+      case 'daily':
+        return dailyAverageData;
+      case 'weekly':
+        return weeklyAverageData;
+      case 'yearly':
+        return {
+          labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+          datasets: [
+            {
+              label: '3 Years',
+              data: [12.5, -5.2, 34.7, 28.9, -15.3, 42.1],
+              backgroundColor: 'rgba(53, 162, 235, 0.7)',
+            },
+            {
+              label: '5 Years',
+              data: [8.3, -3.1, 22.6, 18.5, -10.2, 31.7],
+              backgroundColor: 'rgba(255, 159, 64, 0.7)',
+            }
+          ]
+        };
+      case 'monthly':
+      default:
+        return monthlySeasonalityData;
+    }
+  };
+
+  // Get chart title based on timeframe
+  const getChartTitle = () => {
+    switch(activeTimeframe) {
+      case 'daily':
+        return 'Daily Seasonality';
+      case 'weekly':
+        return 'Weekly Seasonality';
+      case 'yearly':
+        return 'Yearly Seasonality';
+      case 'monthly':
+      default:
+        return 'Monthly Seasonality';
+    }
+  };
+
   return (
     <div className={styles.seasonalityTab}>
       <div className={styles.seasonalityHeader}>
