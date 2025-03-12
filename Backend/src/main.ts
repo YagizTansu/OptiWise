@@ -1,6 +1,9 @@
 // Import polyfill before any other imports
 import './polyfill';
 
+import { config } from 'dotenv';
+config(); // Load .env file contents into process.env
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
