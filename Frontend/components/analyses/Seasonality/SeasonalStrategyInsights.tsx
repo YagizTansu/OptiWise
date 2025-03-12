@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaChartLine, FaExclamationTriangle, FaRobot, FaArrowRight, FaSpinner, FaTimes } from 'react-icons/fa';
+import { FaChartLine, FaExclamationTriangle, FaRobot, FaArrowRight, FaSpinner, FaTimes, FaInfoCircle } from 'react-icons/fa';
 import styles from '../../../styles/Analyses.module.css';
 import axios from 'axios';
 
@@ -45,6 +45,7 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
   const [showStrategyModal, setShowStrategyModal] = useState<boolean>(false);
   const [activeStrategy, setActiveStrategy] = useState<StrategyDetails | null>(null);
   const [monthlyDetailedData, setMonthlyDetailedData] = useState<Record<string, any>>({});
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchHistoricalData = async () => {
@@ -291,6 +292,15 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
     return result;
   };
 
+  // Info button click handler
+  const handleInfoClick = () => {
+    setShowInfoModal(true);
+  };
+
+  const closeInfoModal = () => {
+    setShowInfoModal(false);
+  };
+
   if (loading) {
     return (
       <div className={styles.strategySuggestionsContainer}>
@@ -318,9 +328,20 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
   
   return (
     <div className={styles.strategySuggestionsContainer}>
-      <div className={styles.strategySuggestionsHeader}>
-        <h2>Strategic Insights</h2>
-        <p>Actionable trading opportunities based on historical seasonal patterns for {symbol}</p>
+      <div className={`${styles.strategySuggestionsHeader} ${styles.leftAligned}`}>
+        <div className={styles.headerContent}>
+          <h2>Strategic Insights</h2>
+          <div className={styles.headerDescription}>
+            <p>Actionable trading opportunities based on historical seasonal patterns for {symbol}</p>
+            <button 
+              className={styles.infoButton}
+              onClick={handleInfoClick}
+              aria-label="More information about seasonal patterns"
+            >
+              <FaInfoCircle />
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className={styles.strategyCards}>
@@ -501,6 +522,54 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
               </button>
               <button className={styles.modernPrimaryButton}>
                 Export Analysis
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Info Modal */}
+      {showInfoModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h3>About Seasonal Trading Patterns</h3>
+              <button className={styles.closeModalButton} onClick={closeInfoModal}>
+                <FaTimes />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>Seasonal analysis examines how a security has historically performed during specific times of the year. This can reveal recurring patterns that may offer trading opportunities.</p>
+              
+              <h4>What You're Looking At:</h4>
+              <ul className={styles.infoList}>
+                <li>
+                  <strong>Strongest Pattern:</strong> Identifies the consecutive months with the historically strongest positive returns for {symbol}, based on 5-year analysis. These periods often represent optimal times to consider long positions.
+                </li>
+                <li>
+                  <strong>Risk Pattern:</strong> Highlights months where {symbol} has consistently shown negative returns, suggesting periods when caution may be warranted or when hedging strategies could be considered.
+                </li>
+                <li>
+                  <strong>AI Recommendation:</strong> Coming soon! Advanced algorithms will analyze multiple factors to provide intelligent seasonal trading guidance.
+                </li>
+              </ul>
+              
+              <h4>How to Use This Information:</h4>
+              <p>Seasonal patterns should be considered alongside other forms of analysis. While history often rhymes, it doesn't always repeat exactly. Use these insights to:</p>
+              <ul className={styles.infoList}>
+                <li>Plan entry and exit points for longer-term positions</li>
+                <li>Adjust position sizing based on seasonal strength or weakness</li>
+                <li>Identify periods that may require hedging strategies</li>
+                <li>Complement your existing technical and fundamental analysis</li>
+              </ul>
+              
+              <div className={styles.infoDisclaimer}>
+                <p><strong>Note:</strong> Past performance is not indicative of future results. Seasonal analysis works best when combined with other market indicators and risk management strategies.</p>
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.modernPrimaryButton} onClick={closeInfoModal}>
+                Got It
               </button>
             </div>
           </div>
