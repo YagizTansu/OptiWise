@@ -2458,4 +2458,45 @@
   box-shadow: 0 2px 5px rgba(2,136,209,0.15);
 }
 
+/* Add these styles to your Analyses.module.css file */
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.infoBox {
+  background-color: rgba(240, 240, 240, 0.95);
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.infoBox p {
+  margin: 5px 0;
+}
+
+.modernIconButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modernIconButton:hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
 /* ...existing code... */
