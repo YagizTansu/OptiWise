@@ -11,6 +11,7 @@ interface FinancialData {
   labels: string[];
   revenue: number[];
   netIncome: number[];
+  lynchRatio?: number[]; // Add Lynch ratio array
 }
 
 const RevenueAnalysis = ({ symbol }: RevenueAnalysisProps) => {
@@ -18,7 +19,8 @@ const RevenueAnalysis = ({ symbol }: RevenueAnalysisProps) => {
   const [financialData, setFinancialData] = useState<FinancialData>({
     labels: [],
     revenue: [],
-    netIncome: []
+    netIncome: [],
+    lynchRatio: []
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,15 +36,24 @@ const RevenueAnalysis = ({ symbol }: RevenueAnalysisProps) => {
           ? 'incomeStatementHistory' 
           : 'incomeStatementHistoryQuarterly';
         
+        // We need additional data for Lynch ratio calculation
         const response = await axios.get(`http://localhost:3001/api/finance/quoteSummary`, {
           params: {
             symbol: symbol,
-            modules: module
+            modules: `${module},defaultKeyStatistics,price`
           }
         });
         
         // Extract the appropriate data based on timeframe
         const statements = response.data?.incomeStatementHistory?.incomeStatementHistory || [];
+        
+        // Get PE ratio from defaultKeyStatistics
+        const peRatio = response.data?.defaultKeyStatistics?.forwardPE?.raw || 0;
+        // Get EPS growth rate
+        const growthRate = response.data?.defaultKeyStatistics?.earningsGrowth?.raw * 100 || 0;
+        
+        // Calculate Lynch ratio: Growth Rate / PE Ratio
+        const lynchRatio = growthRate > 0 && peRatio > 0 ? Number((growthRate / peRatio).toFixed(2)) : 0;
         
         if (statements.length === 0) {
           throw new Error('No financial data available');
@@ -52,14 +63,15 @@ const RevenueAnalysis = ({ symbol }: RevenueAnalysisProps) => {
         const processedData: FinancialData = {
           labels: [],
           revenue: [],
-          netIncome: []
+          netIncome: [],
+          lynchRatio: []
         };
         
         // Yahoo Finance data is in reverse chronological order (newest first)
         // We'll reverse it to show oldest to newest
         const orderedStatements = [...statements].reverse();
         
-        orderedStatements.forEach(statement => {
+        orderedStatements.forEach((statement, index) => {
           // Format date based on timeframe - endDate is already in ISO format
           const date = new Date(statement.endDate);
           const label = timeframe === 'annual' 
@@ -79,6 +91,11 @@ const RevenueAnalysis = ({ symbol }: RevenueAnalysisProps) => {
             
           processedData.revenue.push(Number(totalRevenue.toFixed(2)));
           processedData.netIncome.push(Number(netIncome.toFixed(2)));
+          
+          // Add Lynch ratio for the most recent period only
+          if (index === orderedStatements.length - 1) {
+            processedData.lynchRatio = [lynchRatio];
+          }
         });
         
         setFinancialData(processedData);
@@ -136,6 +153,17 @@ const RevenueAnalysis = ({ symbol }: RevenueAnalysisProps) => {
             Quarterly
           </button> */}
         </div>
+        {financialData.lynchRatio && financialData.lynchRatio[0] > 0 && (
+          <div className={styles.lynchRatio}>
+            <span className={styles.lynchLabel}>Lynch Ratio:</span>
+            <span className={`${styles.lynchValue} ${financialData.lynchRatio[0] < 1 ? styles.goodValue : styles.badValue}`}>
+              {financialData.lynchRatio[0].toFixed(2)}
+              <span className={styles.interpretation}>
+                {financialData.lynchRatio[0] < 1 ? ' (Good)' : ' (Overvalued)'}
+              </span>
+            </span>
+          </div>
+        )}
       </div>
       <div className={styles.trendChart}>
         {isLoading ? (
