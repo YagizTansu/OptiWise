@@ -2383,3 +2383,79 @@
 }
 
 /* ...existing code... */
+
+/* Overbought/Oversold Tab Styles */
+.overboughtOversoldTab {
+  animation: fadeIn 0.3s;
+}
+
+.chartTitleAndControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timeframeControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.timeframeButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.navigationControls {
+  display: flex;
+  gap: 6px;
+}
+
+.indicatorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.indicatorTabs {
+  display: flex;
+  gap: 6px;
+}
+
+.chartFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #eaeaea;
+}
+
+.disclaimerText {
+  font-size: 12px;
+  color: #777;
+}
+
+/* ...existing code... */
+
+/* Volume toggle button styles */
+.volumeToggle {
+  background-color: #f0f9ff;
+  border: 1px solid #bbdefb;
+}
+
+.volumeToggle.active {
+  background-color: #e1f5fe;
+  color: #0288d1;
+  box-shadow: 0 1px 3px rgba(2,136,209,0.3);
+}
+
+.volumeToggle:hover {
+  background-color: #e1f5fe;
+  box-shadow: 0 2px 5px rgba(2,136,209,0.15);
+}
+
+/* ...existing code... */

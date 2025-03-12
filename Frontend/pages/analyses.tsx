@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout'
 import styles from '../styles/Analyses.module.css';
-import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers } from 'react-icons/fa';
+import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaBalanceScale } from 'react-icons/fa';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, 
   Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import Overview from '../components/analyses/Overview';
 import Seasonality from '../components/analyses/Seasonality';
 import COTReport from '../components/analyses/COTReport';
+import OverboughtOversold from '../components/analyses/OverboughtOversold';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -50,6 +51,12 @@ export default function Analyses() {
           >
             <FaUsers /> COT Report
           </button>
+          <button 
+            className={`${styles.tabButton} ${activeTab === 'overbought-oversold' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('overbought-oversold')}
+          >
+            <FaBalanceScale /> Overbought/Oversold
+          </button>
         </div>
 
         {/* Tab Content */}
@@ -67,6 +74,13 @@ export default function Analyses() {
           {/* COT Report Tab */}
           {activeTab === 'cot' && (
             <COTReport 
+              symbol={symbol as string}
+            />
+          )}
+
+          {/* Overbought/Oversold Tab */}
+          {activeTab === 'overbought-oversold' && (
+            <OverboughtOversold 
               symbol={symbol as string}
             />
           )}
