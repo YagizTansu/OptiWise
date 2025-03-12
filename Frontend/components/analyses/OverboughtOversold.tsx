@@ -1,6 +1,6 @@
 import styles from '../../styles/Analyses.module.css';
-import PriceVolumeChart from './PriceVolumeChart';
-import IndicatorChart from './IndicatorChart';
+import PriceVolumeChart from './OverboughtOversold/PriceVolumeChart';
+import IndicatorChart from './OverboughtOversold/IndicatorChart';
 
 interface OverboughtOversoldProps {
   symbol: string;

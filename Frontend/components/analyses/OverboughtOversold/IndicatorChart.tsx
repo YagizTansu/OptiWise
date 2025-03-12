@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import styles from '../../styles/Analyses.module.css';
+import styles from '../../../styles/Analyses.module.css';
 import { FaInfoCircle, FaExpand, FaDownload } from 'react-icons/fa';
 import { Chart } from 'chart.js';
 import axios from 'axios';

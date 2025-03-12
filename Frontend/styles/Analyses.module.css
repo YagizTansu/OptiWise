@@ -2500,3 +2500,673 @@
 }
 
 /* ...existing code... */
+
+/* Fundamental Analysis Tab Specific Styles */
+.fundamentalTab {
+  animation: fadeIn 0.3s;
+}
+
+/* Key Metrics Section */
+.keyMetricsSection {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metricItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.metricLabel {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metricValue {
+  color: #1e293b;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Analysis Methods Section */
+.analysisMethodsSection {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.viewToggle {
+  display: flex;
+  gap: 6px;
+}
+
+.valuationMethodology {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.methodologyTitle {
+  font-weight: 500;
+  color: #64748b;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.methodologyOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.methodButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.methodButton:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Charts Section */
+.chartsSection {
+  margin-top: 24px;
+}
+
+.chartRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.chartContainer {
+  flex: 1;
+  min-width: 300px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.chartContainer h3, .chartContainer h4 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.trendChart {
+  height: 280px;
+  position: relative;
+}
+
+.chartFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+/* Valuation Metrics */
+.valuationMetricsSection {
+  margin-bottom: 24px;
+}
+
+.valuationMetricsSection h3 {
+  margin-bottom: 16px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.valuationCard {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.valuationCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.valuationCard h4 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.valuationValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.undervaluedText {
+  color: #16a34a;
+  font-size: 1.2rem;
+}
+
+/* Financial Health Section */
+.financialHealthSection {
+  margin-bottom: 24px;
+}
+
+.financialHealthSection h3 {
+  margin-bottom: 16px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.tabHeader {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.scoreIndicator {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.currentScore {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.riskLevel {
+  color: #16a34a;
+}
+
+/* Capital Structure Section */
+.capitalStructureSection {
+  margin-bottom: 24px;
+}
+
+.capitalStructureSection h3 {
+  margin-bottom: 16px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.trendSummary {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.trendIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.trendLabel {
+  font-weight: 500;
+}
+
+.trendValue {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trendUp {
+  color: #16a34a;
+}
+
+.trendDown {
+  color: #ef4444;
+}
+
+.companySummary {
+  background-color: #f0f9ff;
+  border-left: 4px solid #0ea5e9;
+  padding: 16px;
+  border-radius: 6px;
+  margin-top: 24px;
+}
+
+.companyRatingTitle {
+  margin: 0 0 8px 0;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.resilientRating {
+  color: #0ea5e9;
+  font-weight: 700;
+}
+
+.companyRatingDesc {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+/* Revenue by Products Section */
+.revenueProductsSection {
+  margin-bottom: 24px;
+}
+
+.revenueProductsSection h3 {
+  margin-bottom: 16px;
+  color: #334155;
+  font-weight: 600;
+}
+
+.productRevenueChart {
+  flex: 2;
+}
+
+.productPieChart {
+  flex: 1;
+  min-width: 350px;
+}
+
+.pieChartContainer {
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pieChartLegend {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.legendColor {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.legendLabel {
+  flex: 1;
+  color: #475569;
+}
+
+.legendValue {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+/* Responsive Adjustments for Fundamental Tab */
+@media (max-width: 992px) {
+  .chartRow {
+    flex-direction: column;
+  }
+  
+  .analysisMethodsSection {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .viewToggle, .methodologyOptions, .timeframeToggle {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .valuationMethodology {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* If this file doesn't exist or you need to create/modify it */
+
+/* ...existing code... */
+
+.fairValueBoxesContainer {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  gap: 15px;
+}
+
+.fairValueBox {
+  flex: 1;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.fairValueBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fairValueBox h4 {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.fairValueAmount {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #212529;
+}
+
+/* Average Fair Value Section */
+.averageFairValueContainer {
+  margin: 30px 0;
+  border: 1px solid #dfeaf2;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #f8fbfd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.averageFairValueHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.averageFairValueHeader h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+  text-align: center;
+}
+
+.infoIconContainer {
+  margin-left: 8px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.infoIcon {
+  font-size: 16px;
+}
+
+.infoIcon:hover {
+  color: #0ea5e9;
+}
+
+.averageFairValueContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.averageValueBox {
+  text-align: center;
+}
+
+.averageFairValueAmount {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.currentPriceComparison {
+  margin-top: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.undervalued {
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.overvalued {
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.averageExplanation {
+  background-color: #ffffff;
+  border-left: 4px solid #0ea5e9;
+  padding: 15px;
+  border-radius: 6px;
+  max-width: 90%;
+}
+
+.averageExplanation p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .averageFairValueContent {
+    flex-direction: column;
+  }
+  
+  .averageExplanation {
+    max-width: 100%;
+  }
+}
+
+/* ...existing code... */
+
+.methodologyContainer {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+.methodologyOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.methodButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.methodButton:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.fairValueBoxesContainer {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  gap: 15px;
+}
+
+.fairValueBox {
+  flex: 1;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.fairValueBox h4 {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.fairValueAmount {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #212529;
+}
+
+.averageFairValueContainer {
+  margin: 20px 0;
+  border: 1px solid #dfeaf2;
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #f8fbfd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.averageFairValueHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.averageFairValueHeader h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.infoIcon {
+  color: #64748b;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.infoIcon:hover {
+  color: #0ea5e9;
+}
+
+.averageFairValueContent {
+  text-align: center;
+}
+
+.averageFairValueAmount {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.currentPriceComparison {
+  margin-top: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.undervalued {
+  color: #16a34a;
+}
+
+.overvalued {
+  color: #dc2626;
+}
+
+.chartFooter {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 576px) {
+  .fairValueBoxesContainer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .fairValueBox {
+    flex: none;
+  }
+}
