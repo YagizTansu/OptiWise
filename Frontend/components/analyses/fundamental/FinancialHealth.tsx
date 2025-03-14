@@ -246,7 +246,7 @@ const FinancialHealth = ({ symbol }: FinancialHealthProps) => {
           const marketCap = keyStats.marketCap || 0;
           const totalLiabilities = balanceSheet.totalLiab|| 1;
           
-          debugger
+          
           // This is a very simplified calculation and not accurate for real analysis
           const zScore = (1.2 * (workingCapital / totalAssets)) + 
                           (1.4 * ((balanceSheet.retainedEarnings || 0) / totalAssets)) + 
