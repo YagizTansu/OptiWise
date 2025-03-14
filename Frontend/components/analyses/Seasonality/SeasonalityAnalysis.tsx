@@ -1,8 +1,9 @@
-import { FaChartLine, FaCircle, FaDownload, FaExpand, FaQuestion } from 'react-icons/fa';
+import { FaChartLine, FaCircle, FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
 import { Line, Bar } from 'react-chartjs-2';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
+import html2canvas from 'html2canvas';
 
 // Define types for our data
 interface SeasonalityDataPoint {
@@ -36,6 +37,12 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
   // State for data loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Add new state variables for fullscreen and info modal
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const chartRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   // State for API data
   const [seasonalityData, setSeasonalityData] = useState<{
@@ -475,6 +482,71 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     return data;
   };
 
+  // Handle fullscreen toggle
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      // Enter fullscreen
+      if (containerRef.current?.requestFullscreen) {
+        containerRef.current.requestFullscreen()
+          .then(() => {
+            setIsFullscreen(true);
+          })
+          .catch(err => {
+            console.error(`Error attempting to enable fullscreen: ${err.message}`);
+          });
+      }
+    } else {
+      // Exit fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+          .then(() => {
+            setIsFullscreen(false);
+          })
+          .catch(err => {
+            console.error(`Error attempting to exit fullscreen: ${err.message}`);
+          });
+      }
+    }
+  };
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  // Download chart as image
+  const downloadChart = async () => {
+    if (!chartRef.current) return;
+    
+    try {
+      // Set loading indicator or cursor if needed
+      document.body.style.cursor = 'wait';
+      
+      const canvas = await html2canvas(chartRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2, // Higher scale for better quality
+      });
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `${symbol}-seasonality-${activeTimeframe}-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (error) {
+      console.error('Failed to download chart:', error);
+      alert('Failed to download chart. Please try again.');
+    } finally {
+      document.body.style.cursor = 'default';
+    }
+  };
+
   // Get chart title based on timeframe
   const getChartTitle = () => {
     switch(activeTimeframe) {
@@ -491,129 +563,164 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
   };
 
   return (
-    <>
-      <div className={styles.seasonalityControls}>
-        <div className={styles.viewControls}>
-          <button 
-            className={`${styles.modernButton} ${viewMode === 'line' ? styles.activeMod : ''}`}
-            title="Line Chart View" 
-            onClick={() => setViewMode('line')}
-          >
-            <FaChartLine className={styles.buttonIcon} /> 
-            <span>Line</span>
-          </button>
-          <button 
-            className={`${styles.modernButton} ${viewMode === 'bar' ? styles.activeMod : ''}`}
-            title="Bar Chart View"
-            onClick={() => setViewMode('bar')}
-          >
-            <FaChartLine className={styles.buttonIcon} /> 
-            <span>Bar</span>
-          </button>
-          <button 
-            className={`${styles.modernButton} ${showDataPoints ? styles.activeMod : ''}`}
-            title="Toggle Data Points"
-            onClick={() => setShowDataPoints(!showDataPoints)}
-          >
-            <FaCircle className={styles.buttonIcon} /> 
-            <span>Points</span>
-          </button>
+    <div className={styles.cardContainer}>
+      <div className={styles.analysisCard} ref={containerRef}>
+        {/* Header Section */}
+        <div className={styles.seasonalityHeader}>
+          <h2>Seasonality Analysis for {symbol}</h2>
+          <p className={styles.seasonalityDescription}>
+            <FaInfoCircle className={styles.infoIcon} /> 
+            Analyze how the asset performs during different time periods to identify recurring patterns and seasonal trends.
+          </p>
         </div>
         
-        <div className={styles.comparisonSelector}>
-          <div className={styles.periodSelectorWrapper}>
-            <label htmlFor="firstPeriod">Primary Period:</label>
-            <select 
-              id="firstPeriod"
-              className={styles.periodSelect}
-              value={comparisonPeriods.first}
-              onChange={(e) => setComparisonPeriods({...comparisonPeriods, first: e.target.value})}
-            >
-              <option value="3 Years">3 Years</option>
-              <option value="5 Years">5 Years</option>
-              <option value="7 Years">7 Years</option>
-              <option value="10 Years">10 Years</option>
-              <option value="15 Years">15 Years</option>
-              <option value="20 Years">20 Years</option>
-              <option value="25 Years">25 Years</option>
-              <option value="30 Years">30 Years</option>
-            </select>
-          </div>
-          
-          <div className={styles.vsIndicator}>vs</div>
-          
-          <div className={styles.periodSelectorWrapper}>
-            <label htmlFor="secondPeriod">Compare With:</label>
-            <select 
-              id="secondPeriod"
-              className={styles.periodSelect}
-              value={comparisonPeriods.second}
-              onChange={(e) => setComparisonPeriods({...comparisonPeriods, second: e.target.value})}
-            >
-              <option value="3 Years">3 Years</option>
-              <option value="5 Years">5 Years</option>
-              <option value="7 Years">7 Years</option>
-              <option value="10 Years">10 Years</option>
-              <option value="15 Years">15 Years</option>
-              <option value="20 Years">20 Years</option>
-              <option value="25 Years">25 Years</option>
-              <option value="30 Years">30 Years</option>
-            </select>
-          </div>
-        </div>
-        
-        <div className={styles.seasonalityTimeframeSelector}>
-          <button 
-            className={`${styles.modernTabButton} ${activeTimeframe === 'daily' ? styles.activeTab : ''}`}
-            title="Daily View"
-            onClick={() => setActiveTimeframe('daily')}
-          >
-            <span>Daily</span>
-          </button>
-          <button 
-            className={`${styles.modernTabButton} ${activeTimeframe === 'weekly' ? styles.activeTab : ''}`}
-            title="Weekly View"
-            onClick={() => setActiveTimeframe('weekly')}
-          >
-            <span>Weekly</span>
-          </button>
-          <button 
-            className={`${styles.modernTabButton} ${activeTimeframe === 'monthly' ? styles.activeTab : ''}`}
-            title="Monthly View"
-            onClick={() => setActiveTimeframe('monthly')}
-          >
-            <span>Monthly</span>
-          </button>
-          <button 
-            className={`${styles.modernTabButton} ${activeTimeframe === 'yearly' ? styles.activeTab : ''}`}
-            title="Yearly View"
-            onClick={() => setActiveTimeframe('yearly')}
-          >
-            <span>Yearly</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Primary Comparison Chart */}
-      <div className={styles.chartCard}>
+        {/* Chart Controls */}
         <div className={styles.chartHeader}>
-          <h2>{getChartTitle()} Comparison</h2>
+          <h3>{getChartTitle()} Comparison</h3>
           <div className={styles.chartControls}>
-            <button className={styles.modernActionButton} title="Download Chart">
+            <button 
+              className={styles.modernActionButton} 
+              title="Download Chart"
+              onClick={downloadChart}
+            >
               <FaDownload className={styles.buttonIcon} /> 
               <span>Download</span>
             </button>
-            <button className={styles.modernActionButton} title="Fullscreen">
-              <FaExpand className={styles.buttonIcon} /> 
-              <span>Fullscreen</span>
+            <button 
+              className={styles.modernActionButton} 
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <>
+                  <FaCompress className={styles.buttonIcon} /> 
+                  <span>Exit Fullscreen</span>
+                </>
+              ) : (
+                <>
+                  <FaExpand className={styles.buttonIcon} /> 
+                  <span>Fullscreen</span>
+                </>
+              )}
             </button>
-            <button className={styles.modernIconButton} title="Learn About Seasonality">
+            <button 
+              className={styles.modernIconButton} 
+              title="Learn More"
+              onClick={() => setShowInfoModal(true)}
+            >
               <FaQuestion />
             </button>
           </div>
         </div>
         
-        <div className={styles.comparisonChart}>
+        {/* Settings Controls */}
+        <div className={styles.seasonalityControls}>
+          <div className={styles.viewControls}>
+            <button 
+              className={`${styles.modernButton} ${viewMode === 'line' ? styles.activeMod : ''}`}
+              title="Line Chart View" 
+              onClick={() => setViewMode('line')}
+            >
+              <FaChartLine className={styles.buttonIcon} /> 
+              <span>Line</span>
+            </button>
+            <button 
+              className={`${styles.modernButton} ${viewMode === 'bar' ? styles.activeMod : ''}`}
+              title="Bar Chart View"
+              onClick={() => setViewMode('bar')}
+            >
+              <FaChartLine className={styles.buttonIcon} /> 
+              <span>Bar</span>
+            </button>
+            <button 
+              className={`${styles.modernButton} ${showDataPoints ? styles.activeMod : ''}`}
+              title="Toggle Data Points"
+              onClick={() => setShowDataPoints(!showDataPoints)}
+            >
+              <FaCircle className={styles.buttonIcon} /> 
+              <span>Points</span>
+            </button>
+          </div>
+          
+          <div className={styles.comparisonSelector}>
+            <div className={styles.periodSelectorWrapper}>
+              <label htmlFor="firstPeriod">Primary Period:</label>
+              <select 
+                id="firstPeriod"
+                className={styles.periodSelect}
+                value={comparisonPeriods.first}
+                onChange={(e) => setComparisonPeriods({...comparisonPeriods, first: e.target.value})}
+              >
+                <option value="3 Years">3 Years</option>
+                <option value="5 Years">5 Years</option>
+                <option value="7 Years">7 Years</option>
+                <option value="10 Years">10 Years</option>
+                <option value="15 Years">15 Years</option>
+                <option value="20 Years">20 Years</option>
+                <option value="25 Years">25 Years</option>
+                <option value="30 Years">30 Years</option>
+              </select>
+            </div>
+            
+            <div className={styles.vsIndicator}>vs</div>
+            
+            <div className={styles.periodSelectorWrapper}>
+              <label htmlFor="secondPeriod">Compare With:</label>
+              <select 
+                id="secondPeriod"
+                className={styles.periodSelect}
+                value={comparisonPeriods.second}
+                onChange={(e) => setComparisonPeriods({...comparisonPeriods, second: e.target.value})}
+              >
+                <option value="3 Years">3 Years</option>
+                <option value="5 Years">5 Years</option>
+                <option value="7 Years">7 Years</option>
+                <option value="10 Years">10 Years</option>
+                <option value="15 Years">15 Years</option>
+                <option value="20 Years">20 Years</option>
+                <option value="25 Years">25 Years</option>
+                <option value="30 Years">30 Years</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className={styles.seasonalityTimeframeSelector}>
+            <button 
+              className={`${styles.modernTabButton} ${activeTimeframe === 'daily' ? styles.activeTab : ''}`}
+              title="Daily View"
+              onClick={() => setActiveTimeframe('daily')}
+            >
+              <span>Daily</span>
+            </button>
+            <button 
+              className={`${styles.modernTabButton} ${activeTimeframe === 'weekly' ? styles.activeTab : ''}`}
+              title="Weekly View"
+              onClick={() => setActiveTimeframe('weekly')}
+            >
+              <span>Weekly</span>
+            </button>
+            <button 
+              className={`${styles.modernTabButton} ${activeTimeframe === 'monthly' ? styles.activeTab : ''}`}
+              title="Monthly View"
+              onClick={() => setActiveTimeframe('monthly')}
+            >
+              <span>Monthly</span>
+            </button>
+            <button 
+              className={`${styles.modernTabButton} ${activeTimeframe === 'yearly' ? styles.activeTab : ''}`}
+              title="Yearly View"
+              onClick={() => setActiveTimeframe('yearly')}
+            >
+              <span>Yearly</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Chart */}
+        <div 
+          className={`${styles.comparisonChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
+          ref={chartRef}
+        >
           {isLoading && <div className={styles.loadingOverlay}>Loading seasonality data...</div>}
           
           {error && <div className={styles.errorMessage}>{error}</div>}
@@ -632,8 +739,55 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
             />
           )}
         </div>
+        
+        {/* Info Modal */}
+        {showInfoModal && (
+          <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <button 
+                  className={styles.closeButton}
+                  onClick={() => setShowInfoModal(false)}
+                >
+                  &times;
+                </button>
+              </div>
+              <div className={styles.modalBody}>
+                <h4>Understanding Seasonality:</h4>
+
+                <ul className={styles.infoList}>
+                  <li><strong>Daily:</strong> Performance trends by day of month</li>
+                  <li><strong>Weekly:</strong> Performance by day of the week (Mon-Fri)</li>
+                  <li><strong>Monthly:</strong> Performance patterns across months of the year</li>
+                  <li><strong>Yearly:</strong> Year-to-year performance comparison</li>
+                </ul>
+                
+                <h4>How to use this chart:</h4>
+                <ul className={styles.infoList}>
+                  <li>Select different time periods to compare historical performance patterns</li>
+                  <li>Toggle between line and bar chart views for different visualizations</li>
+                  <li>Show or hide data points for clearer reading</li>
+                  <li>Download the chart as an image using the download button</li>
+                </ul>
+                
+                <p>
+                  Seasonal patterns can help inform trading and investment decisions, particularly for assets 
+                  that show consistent performance during specific periods.
+                </p>
+              </div>
+              <div className={styles.modalFooter}>
+                <button 
+                  className={styles.applyButton}
+                  onClick={() => setShowInfoModal(false)}
+                >
+                  Got It
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

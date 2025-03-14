@@ -19,15 +19,7 @@ const Seasonality: React.FC<SeasonalityProps> = ({ symbol }) => {
 
   return (
     <div className={styles.seasonalityTab}>
-      <div className={styles.seasonalityHeader}>
-        <h1>Seasonality Analysis for {assetInfo.name}</h1>
-        <p className={styles.seasonalityDescription}>
-          <FaInfoCircle className={styles.infoIcon} /> 
-          Seasonality analysis helps identify recurring patterns in asset price movements during specific 
-          time periods. Use this data to optimize your entry and exit points.
-        </p>
-      </div>
-      
+   
       <SeasonalityAnalysis symbol={symbol} />
 
       <PatternCorrelation symbol={symbol} />

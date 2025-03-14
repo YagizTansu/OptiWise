@@ -438,354 +438,356 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
   };
 
   return (
-    <>
-      {/* Overview Header Section */}
-      <div className={styles.seasonalityHeader}>
-        <h1>Performance Overview for {assetInfo.name}</h1>
-        <p className={styles.seasonalityDescription}>
-          <FaInfoCircle className={styles.infoIcon} /> 
-          Track historical performance trends and compare returns across different timeframes to make 
-          informed investment decisions.
-        </p>
-      </div>
-
-      {/* Time Period & Interval Selection */}
-      <div className={styles.periodSelectionBar}>
-        <div className={styles.selectionGroup}>
-          <h2>Time Period</h2>
-          <div className={styles.periodToggle}>
-            {performancePeriods.map((period) => (
-              <button 
-                key={period.label}
-                className={`${styles.modernTabButton} ${selectedPeriod === period.label ? styles.activeTab : ''}`}
-                onClick={() => handlePeriodChange(period.label)}
-              >
-                {period.label}
-              </button>
-            ))}
-            <button 
-              className={`${styles.modernTabButton} ${selectedPeriod === 'custom' ? styles.activeTab : ''}`}
-              onClick={() => handlePeriodChange('custom')}
-            >
-              Custom
-            </button>
-          </div>
+    <div className={styles.cardContainer}>
+      <div className={styles.analysisCard}>
+        {/* Overview Header Section */}
+        <div className={styles.seasonalityHeader}>
+          <h1>Performance Overview for {assetInfo.name}</h1>
+          <p className={styles.seasonalityDescription}>
+            <FaInfoCircle className={styles.infoIcon} /> 
+            Track historical performance trends and compare returns across different timeframes to make 
+            informed investment decisions.
+          </p>
         </div>
-        
-        <div className={styles.selectionGroup}>
-          <h2>Interval</h2>
-          <div className={styles.periodToggle}>
-            {availableIntervals.map((interval) => (
-              <button 
-                key={interval.value}
-                className={`${styles.modernTabButton} ${selectedInterval === interval.value ? styles.activeTab : ''}`}
-                onClick={() => setSelectedInterval(interval.value)}
-              >
-                {interval.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* Custom Date Range Panel - Enhanced UI */}
-      {showCustomDateRange && (
-        <div className={styles.customDatePanel}>
-          <form onSubmit={handleCustomDateSubmit}>
-            <div className={styles.dateRangeHeader}>
-              <h3>Select Custom Date Range</h3>
-              <button 
-                type="button" 
-                className={styles.closeButton}
-                onClick={() => setShowCustomDateRange(false)}
-              >
-                &times;
-              </button>
-            </div>
-            
-            <div className={styles.dateInputGroup}>
-              <div className={styles.dateInputWrapper}>
-                <label>Start Date</label>
-                <div className={styles.dateInputContainer}>
-                  <input 
-                    type="date" 
-                    value={dateRange.startDate.toISOString().substring(0, 10)}
-                    onChange={(e) => setDateRange(prev => ({ 
-                      ...prev, 
-                      startDate: new Date(e.target.value) 
-                    }))}
-                    required
-                    max={dateRange.endDate.toISOString().substring(0, 10)}
-                    className={styles.dateInput}
-                  />
-                </div>
-              </div>
-              
-              <div className={styles.dateSeparator}>to</div>
-              
-              <div className={styles.dateInputWrapper}>
-                <label>End Date</label>
-                <div className={styles.dateInputContainer}>
-                  <input 
-                    type="date" 
-                    value={dateRange.endDate.toISOString().substring(0, 10)}
-                    onChange={(e) => setDateRange(prev => ({ 
-                      ...prev, 
-                      endDate: new Date(e.target.value) 
-                    }))}
-                    required
-                    min={dateRange.startDate.toISOString().substring(0, 10)}
-                    max={new Date().toISOString().substring(0, 10)}
-                    className={styles.dateInput}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.dateRangeFeedback}>
-              {dateRange.endDate.getTime() - dateRange.startDate.getTime() > 0 ? (
-                <span className={styles.validRange}>
-                  {Math.ceil((dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 60 * 60 * 24))} days selected
-                </span>
-              ) : (
-                <span className={styles.invalidRange}>
-                  End date must be after start date
-                </span>
-              )}
-            </div>
-            
-            <div className={styles.dateQuickOptions}>
-              <button 
-                type="button" 
-                className={styles.quickOptionButton}
-                onClick={() => {
-                  const end = new Date();
-                  const start = new Date();
-                  start.setMonth(end.getMonth() - 3);
-                  setDateRange({ startDate: start, endDate: end });
-                }}
-              >
-                Last 3 months
-              </button>
-              <button 
-                type="button" 
-                className={styles.quickOptionButton}
-                onClick={() => {
-                  const end = new Date();
-                  const start = new Date();
-                  start.setFullYear(end.getFullYear() - 1);
-                  setDateRange({ startDate: start, endDate: end });
-                }}
-              >
-                Last year
-              </button>
-              <button 
-                type="button" 
-                className={styles.quickOptionButton}
-                onClick={() => {
-                  const end = new Date();
-                  const start = new Date();
-                  start.setFullYear(end.getFullYear() - 5);
-                  setDateRange({ startDate: start, endDate: end });
-                }}
-              >
-                Last 5 years
-              </button>
-            </div>
-            
-            <div className={styles.buttonGroup}>
-              <button 
-                type="submit" 
-                className={styles.applyButton}
-                disabled={dateRange.endDate.getTime() <= dateRange.startDate.getTime()}
-              >
-                Apply Range
-              </button>
-              <button 
-                type="button" 
-                className={styles.cancelButton}
-                onClick={() => setShowCustomDateRange(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Main Trend Chart */}
-      <div className={styles.chartCard} ref={chartContainerRef}>
-        <div className={styles.chartHeader}>
-          <h2>
-            {selectedPeriod === 'custom' 
-              ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
-              : selectedPeriod} 
-            Price Trend for {assetInfo.symbol}
-          </h2>
-          <div className={styles.chartControls}>
-            <button 
-              className={styles.modernActionButton} 
-              title="Download Chart"
-              onClick={downloadChart}
-            >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
-            </button>
-            <button 
-              className={styles.modernActionButton} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
-            </button>
-            <button 
-              className={styles.modernIconButton} 
-              title="Learn More"
-              onClick={() => setShowInfoModal(true)}
-            >
-              <FaQuestion />
-            </button>
-          </div>
-        </div>
-        <div 
-          className={`${styles.trendChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
-          ref={chartRef}
-        >
-          {isLoading ? (
-            <div className={styles.loadingContainer}>
-              <div className={styles.loadingSpinner}></div>
-              <p>Loading chart data...</p>
-            </div>
-          ) : error ? (
-            <div className={styles.errorContainer}>
-              <p>{error}</p>
-              <button 
-                className={styles.retryButton} 
-                onClick={() => window.location.reload()}
-              >
-                Retry
-              </button>
-            </div>
-          ) : (!chartData || chartData.length === 0) ? (
-            <div className={styles.noDataContainer}>
-              <p>No data available for the selected time period and interval.</p>
-              <p>Try adjusting your selection or check if the symbol has data for this range.</p>
-              <div className={styles.noDataSuggestions}>
-                <p>Suggestions:</p>
-                <ul>
-                  <li>Use daily interval (1d) for longer time periods</li>
-                  <li>Use minute intervals (15m, 30m, 1h) only for recent data (less than 7 days)</li>
-                  <li>Check that the symbol is valid and has historical data</li>
-                  <li>Some exchanges may have limited historical data</li>
-                </ul>
+        {/* Time Period & Interval Selection */}
+        <div className={styles.periodSelectionBar}>
+          <div className={styles.selectionGroup}>
+            <h2>Time Period</h2>
+            <div className={styles.periodToggle}>
+              {performancePeriods.map((period) => (
                 <button 
-                  className={styles.suggestedPeriodButton}
-                  onClick={() => {
-                    setSelectedPeriod('1Y');
-                    setSelectedInterval('1d');
-                  }}
+                  key={period.label}
+                  className={`${styles.modernTabButton} ${selectedPeriod === period.label ? styles.activeTab : ''}`}
+                  onClick={() => handlePeriodChange(period.label)}
                 >
-                  Try 1 Year Daily Data
+                  {period.label}
+                </button>
+              ))}
+              <button 
+                className={`${styles.modernTabButton} ${selectedPeriod === 'custom' ? styles.activeTab : ''}`}
+                onClick={() => handlePeriodChange('custom')}
+              >
+                Custom
+              </button>
+            </div>
+          </div>
+          
+          <div className={styles.selectionGroup}>
+            <h2>Interval</h2>
+            <div className={styles.periodToggle}>
+              {availableIntervals.map((interval) => (
+                <button 
+                  key={interval.value}
+                  className={`${styles.modernTabButton} ${selectedInterval === interval.value ? styles.activeTab : ''}`}
+                  onClick={() => setSelectedInterval(interval.value)}
+                >
+                  {interval.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Custom Date Range Panel - Enhanced UI */}
+        {showCustomDateRange && (
+          <div className={styles.customDatePanel}>
+            <form onSubmit={handleCustomDateSubmit}>
+              <div className={styles.dateRangeHeader}>
+                <h3>Select Custom Date Range</h3>
+                <button 
+                  type="button" 
+                  className={styles.closeButton}
+                  onClick={() => setShowCustomDateRange(false)}
+                >
+                  &times;
                 </button>
               </div>
+              
+              <div className={styles.dateInputGroup}>
+                <div className={styles.dateInputWrapper}>
+                  <label>Start Date</label>
+                  <div className={styles.dateInputContainer}>
+                    <input 
+                      type="date" 
+                      value={dateRange.startDate.toISOString().substring(0, 10)}
+                      onChange={(e) => setDateRange(prev => ({ 
+                        ...prev, 
+                        startDate: new Date(e.target.value) 
+                      }))}
+                      required
+                      max={dateRange.endDate.toISOString().substring(0, 10)}
+                      className={styles.dateInput}
+                    />
+                  </div>
+                </div>
+                
+                <div className={styles.dateSeparator}>to</div>
+                
+                <div className={styles.dateInputWrapper}>
+                  <label>End Date</label>
+                  <div className={styles.dateInputContainer}>
+                    <input 
+                      type="date" 
+                      value={dateRange.endDate.toISOString().substring(0, 10)}
+                      onChange={(e) => setDateRange(prev => ({ 
+                        ...prev, 
+                        endDate: new Date(e.target.value) 
+                      }))}
+                      required
+                      min={dateRange.startDate.toISOString().substring(0, 10)}
+                      max={new Date().toISOString().substring(0, 10)}
+                      className={styles.dateInput}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.dateRangeFeedback}>
+                {dateRange.endDate.getTime() - dateRange.startDate.getTime() > 0 ? (
+                  <span className={styles.validRange}>
+                    {Math.ceil((dateRange.endDate.getTime() - dateRange.startDate.getTime()) / (1000 * 60 * 60 * 24))} days selected
+                  </span>
+                ) : (
+                  <span className={styles.invalidRange}>
+                    End date must be after start date
+                  </span>
+                )}
+              </div>
+              
+              <div className={styles.dateQuickOptions}>
+                <button 
+                  type="button" 
+                  className={styles.quickOptionButton}
+                  onClick={() => {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setMonth(end.getMonth() - 3);
+                    setDateRange({ startDate: start, endDate: end });
+                  }}
+                >
+                  Last 3 months
+                </button>
+                <button 
+                  type="button" 
+                  className={styles.quickOptionButton}
+                  onClick={() => {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setFullYear(end.getFullYear() - 1);
+                    setDateRange({ startDate: start, endDate: end });
+                  }}
+                >
+                  Last year
+                </button>
+                <button 
+                  type="button" 
+                  className={styles.quickOptionButton}
+                  onClick={() => {
+                    const end = new Date();
+                    const start = new Date();
+                    start.setFullYear(end.getFullYear() - 5);
+                    setDateRange({ startDate: start, endDate: end });
+                  }}
+                >
+                  Last 5 years
+                </button>
+              </div>
+              
+              <div className={styles.buttonGroup}>
+                <button 
+                  type="submit" 
+                  className={styles.applyButton}
+                  disabled={dateRange.endDate.getTime() <= dateRange.startDate.getTime()}
+                >
+                  Apply Range
+                </button>
+                <button 
+                  type="button" 
+                  className={styles.cancelButton}
+                  onClick={() => setShowCustomDateRange(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Main Trend Chart */}
+        <div className={styles.chartCard} ref={chartContainerRef}>
+          <div className={styles.chartHeader}>
+            <h2>
+              {selectedPeriod === 'custom' 
+                ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
+                : selectedPeriod} 
+              Price Trend for {assetInfo.symbol}
+            </h2>
+            <div className={styles.chartControls}>
+              <button 
+                className={styles.modernActionButton} 
+                title="Download Chart"
+                onClick={downloadChart}
+              >
+                <FaDownload className={styles.buttonIcon} /> 
+                <span>Download</span>
+              </button>
+              <button 
+                className={styles.modernActionButton} 
+                title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                onClick={toggleFullscreen}
+              >
+                {isFullscreen ? (
+                  <>
+                    <FaCompress className={styles.buttonIcon} /> 
+                    <span>Exit Fullscreen</span>
+                  </>
+                ) : (
+                  <>
+                    <FaExpand className={styles.buttonIcon} /> 
+                    <span>Fullscreen</span>
+                  </>
+                )}
+              </button>
+              <button 
+                className={styles.modernIconButton} 
+                title="Learn More"
+                onClick={() => setShowInfoModal(true)}
+              >
+                <FaQuestion />
+              </button>
             </div>
-          ) : (
-            <Line 
-              data={realTrendData!}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                  mode: 'index',
-                  intersect: false,
-                },
-                elements: {
-                  line: {
-                    tension: 0.2
+          </div>
+          <div 
+            className={`${styles.trendChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
+            ref={chartRef}
+          >
+            {isLoading ? (
+              <div className={styles.loadingContainer}>
+                <div className={styles.loadingSpinner}></div>
+                <p>Loading chart data...</p>
+              </div>
+            ) : error ? (
+              <div className={styles.errorContainer}>
+                <p>{error}</p>
+                <button 
+                  className={styles.retryButton} 
+                  onClick={() => window.location.reload()}
+                >
+                  Retry
+                </button>
+              </div>
+            ) : (!chartData || chartData.length === 0) ? (
+              <div className={styles.noDataContainer}>
+                <p>No data available for the selected time period and interval.</p>
+                <p>Try adjusting your selection or check if the symbol has data for this range.</p>
+                <div className={styles.noDataSuggestions}>
+                  <p>Suggestions:</p>
+                  <ul>
+                    <li>Use daily interval (1d) for longer time periods</li>
+                    <li>Use minute intervals (15m, 30m, 1h) only for recent data (less than 7 days)</li>
+                    <li>Check that the symbol is valid and has historical data</li>
+                    <li>Some exchanges may have limited historical data</li>
+                  </ul>
+                  <button 
+                    className={styles.suggestedPeriodButton}
+                    onClick={() => {
+                      setSelectedPeriod('1Y');
+                      setSelectedInterval('1d');
+                    }}
+                  >
+                    Try 1 Year Daily Data
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Line 
+                data={realTrendData!}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  interaction: {
+                    mode: 'index',
+                    intersect: false,
                   },
-                  point: {
-                    radius: chartData.length > 100 ? 0 : 2,
-                    hoverRadius: 5
-                  }
-                },
-                scales: {
-                  y: {
-                    beginAtZero: false,
-                    grid: {
-                      color: 'rgba(200, 200, 200, 0.1)'
+                  elements: {
+                    line: {
+                      tension: 0.2
                     },
-                    ticks: {
-                      callback: function(value) {
-                        return '$' + value;
+                    point: {
+                      radius: chartData.length > 100 ? 0 : 2,
+                      hoverRadius: 5
+                    }
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: false,
+                      grid: {
+                        color: 'rgba(200, 200, 200, 0.1)'
+                      },
+                      ticks: {
+                        callback: function(value) {
+                          return '$' + value;
+                        }
+                      }
+                    },
+                    x: {
+                      grid: {
+                        display: false
+                      },
+                      ticks: {
+                        maxTicksLimit: Math.min(12, chartData.length),
+                        autoSkip: true
                       }
                     }
                   },
-                  x: {
-                    grid: {
+                  plugins: {
+                    legend: {
                       display: false
                     },
-                    ticks: {
-                      maxTicksLimit: Math.min(12, chartData.length),
-                      autoSkip: true
-                    }
-                  }
-                },
-                plugins: {
-                  legend: {
-                    display: false
-                  },
-                  tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
-                    titleFont: {
-                      size: 14,
-                      weight: 'bold'
-                    },
-                    bodyFont: {
-                      size: 13
-                    },
-                    callbacks: {
-                      title: function(tooltipItems) {
-                        return chartData[tooltipItems[0].dataIndex].date;
+                    tooltip: {
+                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                      padding: 12,
+                      titleFont: {
+                        size: 14,
+                        weight: 'bold'
                       },
-                      label: function(context) {
-                        const dataPoint = chartData[context.dataIndex];
-                        let label = [];
-                        
-                        label.push(`Price: $${dataPoint.close.toFixed(2)}`);
-                        
-                        if (dataPoint.open !== undefined) {
-                          label.push(`Open: $${dataPoint.open.toFixed(2)}`);
+                      bodyFont: {
+                        size: 13
+                      },
+                      callbacks: {
+                        title: function(tooltipItems) {
+                          return chartData[tooltipItems[0].dataIndex].date;
+                        },
+                        label: function(context) {
+                          const dataPoint = chartData[context.dataIndex];
+                          let label = [];
+                          
+                          label.push(`Price: $${dataPoint.close.toFixed(2)}`);
+                          
+                          if (dataPoint.open !== undefined) {
+                            label.push(`Open: $${dataPoint.open.toFixed(2)}`);
+                          }
+                          
+                          if (dataPoint.high !== undefined && dataPoint.low !== undefined) {
+                            label.push(`High: $${dataPoint.high.toFixed(2)}`);
+                            label.push(`Low: $${dataPoint.low.toFixed(2)}`);
+                          }
+                          
+                          if (dataPoint.volume !== undefined) {
+                            label.push(`Volume: ${new Intl.NumberFormat().format(dataPoint.volume)}`);
+                          }
+                          
+                          return label;
                         }
-                        
-                        if (dataPoint.high !== undefined && dataPoint.low !== undefined) {
-                          label.push(`High: $${dataPoint.high.toFixed(2)}`);
-                          label.push(`Low: $${dataPoint.low.toFixed(2)}`);
-                        }
-                        
-                        if (dataPoint.volume !== undefined) {
-                          label.push(`Volume: ${new Intl.NumberFormat().format(dataPoint.volume)}`);
-                        }
-                        
-                        return label;
                       }
                     }
                   }
-                }
-              }}
-              height={400}
-            />
-          )}
+                }}
+                height={400}
+              />
+            )}
+          </div>
         </div>
       </div>
       
@@ -834,7 +836,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

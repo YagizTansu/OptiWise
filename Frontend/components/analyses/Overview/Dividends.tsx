@@ -254,60 +254,59 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
   };
 
   return (
-    <>
-      {/* Header Section */}
-      <div className={styles.seasonalityHeader}>
-        <h1>Dividend History for {symbol}</h1>
-        <p className={styles.seasonalityDescription}>
-          <FaInfoCircle className={styles.infoIcon} /> 
-          Track dividend payment trends and income potential over time to assess the stock's consistency in 
-          delivering shareholder returns.
-        </p>
-      </div>
+    <div className={styles.cardContainer}>
+      <div className={styles.analysisCard} ref={chartContainerRef}>
+        {/* Header Section */}
+        <div className={styles.seasonalityHeader}>
+          <h2>Dividend History</h2>
+          <p className={styles.seasonalityDescription}>
+            <FaInfoCircle className={styles.infoIcon} /> 
+            Track dividend payment trends and income potential over time to assess the stock's consistency in 
+            delivering shareholder returns.
+          </p>
+        </div>
 
-      {/* Dividend Summary Section */}
-      {!isLoading && dividendSummary && (
-        <div className={styles.dividendSummary}>
-          <h2 className={styles.sectionTitle}>Dividend Summary</h2>
-          <div className={styles.summaryGrid}>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Dividend Rate:</span>
-              <span className={styles.summaryValue}>
-                {dividendSummary.dividendRate ? `$${dividendSummary.dividendRate.toFixed(2)}` : 'N/A'}
-              </span>
-            </div>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Dividend Yield:</span>
-              <span className={styles.summaryValue}>
-                {formatPercent(dividendSummary.dividendYield)}
-              </span>
-            </div>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Payout Ratio:</span>
-              <span className={styles.summaryValue}>
-                {formatPercent(dividendSummary.payoutRatio)}
-              </span>
-            </div>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>Ex-Dividend Date:</span>
-              <span className={styles.summaryValue}>
-                {dividendSummary.exDividendDate || 'N/A'}
-              </span>
-            </div>
-            <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel}>5Y Avg Dividend Yield:</span>
-              <span className={styles.summaryValue}>
-                {formatPercent(dividendSummary.fiveYearAvgDividendYield)}
-              </span>
+        {/* Dividend Summary Section */}
+        {!isLoading && dividendSummary && (
+          <div className={styles.dividendSummaryContainer}>
+            <div className={styles.summaryGrid}>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Dividend Rate:</span>
+                <span className={styles.summaryValue}>
+                  {dividendSummary.dividendRate ? `$${dividendSummary.dividendRate.toFixed(2)}` : 'N/A'}
+                </span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Dividend Yield:</span>
+                <span className={styles.summaryValue}>
+                  {formatPercent(dividendSummary.dividendYield)}
+                </span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Payout Ratio:</span>
+                <span className={styles.summaryValue}>
+                  {formatPercent(dividendSummary.payoutRatio)}
+                </span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Ex-Dividend Date:</span>
+                <span className={styles.summaryValue}>
+                  {dividendSummary.exDividendDate || 'N/A'}
+                </span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>5Y Avg Dividend Yield:</span>
+                <span className={styles.summaryValue}>
+                  {formatPercent(dividendSummary.fiveYearAvgDividendYield)}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       
-      {/* Dividend Chart Section */}
-      <div className={styles.chartCard} ref={chartContainerRef}>
+        {/* Chart Controls */}
         <div className={styles.chartHeader}>
-          <h2>Dividend Payment History (5 Years)</h2>
+          <h3>Payment History (5 Years)</h3>
           <div className={styles.chartControls}>
             <button 
               className={styles.modernActionButton} 
@@ -343,6 +342,7 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
             </button>
           </div>
         </div>
+        
         <div 
           className={`${styles.trendChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
           ref={chartRef}
@@ -447,52 +447,52 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
             </div>
           )}
         </div>
-      </div>
-      
-      {/* Info Modal */}
-      {showInfoModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3>About Dividend Chart</h3>
-              <button 
-                className={styles.closeButton}
-                onClick={() => setShowInfoModal(false)}
-              >
-                &times;
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <h4>Understanding Dividend Data:</h4>
-              <ul className={styles.infoList}>
-                <li><b>Dividend Rate:</b> The annual dividend payment per share</li>
-                <li><b>Dividend Yield:</b> Annual dividend as a percentage of current stock price</li>
-                <li><b>Payout Ratio:</b> Percentage of earnings paid as dividends</li>
-                <li><b>Ex-Dividend Date:</b> Date when stock begins trading without dividend value</li>
-                <li><b>5Y Avg Dividend Yield:</b> Average yield over the past 5 years</li>
-              </ul>
-              
-              <h4>Reading the Chart:</h4>
-              <p>
-                The chart displays dividend payments over time. Each point represents a dividend distribution.
-                Hover over points to see payment details including the amount and quarterly growth rate.
-              </p>
-              <p>
-                An upward trend indicates increasing dividend payments, which is generally considered positive for income investors.
-              </p>
-            </div>
-            <div className={styles.modalFooter}>
-              <button 
-                className={styles.applyButton}
-                onClick={() => setShowInfoModal(false)}
-              >
-                Got It
-              </button>
+        
+        {/* Info Modal */}
+        {showInfoModal && (
+          <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <h3>About Dividend Chart</h3>
+                <button 
+                  className={styles.closeButton}
+                  onClick={() => setShowInfoModal(false)}
+                >
+                  &times;
+                </button>
+              </div>
+              <div className={styles.modalBody}>
+                <h4>Understanding Dividend Data:</h4>
+                <ul className={styles.infoList}>
+                  <li><b>Dividend Rate:</b> The annual dividend payment per share</li>
+                  <li><b>Dividend Yield:</b> Annual dividend as a percentage of current stock price</li>
+                  <li><b>Payout Ratio:</b> Percentage of earnings paid as dividends</li>
+                  <li><b>Ex-Dividend Date:</b> Date when stock begins trading without dividend value</li>
+                  <li><b>5Y Avg Dividend Yield:</b> Average yield over the past 5 years</li>
+                </ul>
+                
+                <h4>Reading the Chart:</h4>
+                <p>
+                  The chart displays dividend payments over time. Each point represents a dividend distribution.
+                  Hover over points to see payment details including the amount and quarterly growth rate.
+                </p>
+                <p>
+                  An upward trend indicates increasing dividend payments, which is generally considered positive for income investors.
+                </p>
+              </div>
+              <div className={styles.modalFooter}>
+                <button 
+                  className={styles.applyButton}
+                  onClick={() => setShowInfoModal(false)}
+                >
+                  Got It
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 };
 

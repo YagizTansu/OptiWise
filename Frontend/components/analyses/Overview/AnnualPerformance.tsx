@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bar } from 'react-chartjs-2';
-import { FaExpand, FaQuestion, FaDownload, FaCompress } from 'react-icons/fa';
+import { FaExpand, FaQuestion, FaDownload, FaCompress, FaInfoCircle } from 'react-icons/fa';
 import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
 import html2canvas from 'html2canvas';
@@ -247,161 +247,172 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
   };
 
   return (
-    
-    <div className={styles.chartCard} ref={chartContainerRef}>
-      <div className={styles.chartHeader}>
-        <h2>Annual Performance</h2>
-        <div className={styles.chartControls}>
-          <button 
-            className={styles.modernActionButton} 
-            title="Download Chart"
-            onClick={downloadChart}
-          >
-            <FaDownload className={styles.buttonIcon} /> 
-            <span>Download</span>
-          </button>
-          <button 
-            className={styles.modernActionButton} 
-            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-            onClick={toggleFullscreen}
-          >
-            {isFullscreen ? (
-              <>
-                <FaCompress className={styles.buttonIcon} /> 
-                <span>Exit Fullscreen</span>
-              </>
-            ) : (
-              <>
-                <FaExpand className={styles.buttonIcon} /> 
-                <span>Fullscreen</span>
-              </>
-            )}
-          </button>
-          <button 
-            className={styles.modernIconButton} 
-            title="Learn More"
-            onClick={() => setShowInfoModal(true)}
-          >
-            <FaQuestion />
-          </button>
+    <div className={styles.cardContainer}>
+      <div className={styles.analysisCard} ref={chartContainerRef}>
+        {/* Header Section */}
+        <div className={styles.seasonalityHeader}>
+          <h2>Annual Performance</h2>
+          <p className={styles.seasonalityDescription}>
+            <FaInfoCircle className={styles.infoIcon} /> 
+            Analyze yearly returns to understand historical performance patterns over time.
+          </p>
         </div>
-      </div>
-      <div 
-        className={`${styles.annualChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
-        ref={chartRef}
-      >
-        {isLoading ? (
-          <div className={styles.loadingContainer}>
-            <div className={styles.loadingSpinner}></div>
-            <p>Loading annual data...</p>
+        
+        {/* Chart Controls */}
+        <div className={styles.chartHeader}>
+          <h3>Yearly Returns</h3>
+          <div className={styles.chartControls}>
+            <button 
+              className={styles.modernActionButton} 
+              title="Download Chart"
+              onClick={downloadChart}
+            >
+              <FaDownload className={styles.buttonIcon} /> 
+              <span>Download</span>
+            </button>
+            <button 
+              className={styles.modernActionButton} 
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <>
+                  <FaCompress className={styles.buttonIcon} /> 
+                  <span>Exit Fullscreen</span>
+                </>
+              ) : (
+                <>
+                  <FaExpand className={styles.buttonIcon} /> 
+                  <span>Fullscreen</span>
+                </>
+              )}
+            </button>
+            <button 
+              className={styles.modernIconButton} 
+              title="Learn More"
+              onClick={() => setShowInfoModal(true)}
+            >
+              <FaQuestion />
+            </button>
           </div>
-        ) : error ? (
-          <div className={styles.errorContainer}>
-            <p>{error}</p>
-            <button onClick={() => window.location.reload()}>Retry</button>
-          </div>
-        ) : (
-          <Bar 
-            data={annualData}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                y: {
-                  grid: {
-                    color: 'rgba(200, 200, 200, 0.1)'
+        </div>
+        <div 
+          className={`${styles.annualChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
+          ref={chartRef}
+        >
+          {isLoading ? (
+            <div className={styles.loadingContainer}>
+              <div className={styles.loadingSpinner}></div>
+              <p>Loading annual data...</p>
+            </div>
+          ) : error ? (
+            <div className={styles.errorContainer}>
+              <p>{error}</p>
+              <button onClick={() => window.location.reload()}>Retry</button>
+            </div>
+          ) : (
+            <Bar 
+              data={annualData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    grid: {
+                      color: 'rgba(200, 200, 200, 0.1)'
+                    },
+                    title: {
+                      display: true,
+                      text: 'Annual Return (%)',
+                      font: {
+                        size: 14,
+                        weight: 'bold'
+                      }
+                    }
                   },
-                  title: {
-                    display: true,
-                    text: 'Annual Return (%)',
-                    font: {
-                      size: 14,
-                      weight: 'bold'
+                  x: {
+                    grid: {
+                      display: false
                     }
                   }
                 },
-                x: {
-                  grid: {
+                plugins: {
+                  legend: {
                     display: false
-                  }
-                }
-              },
-              plugins: {
-                legend: {
-                  display: false
-                },
-                tooltip: {
-                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                  padding: 12,
-                  titleFont: {
-                    size: 14,
-                    weight: 'bold'
                   },
-                  bodyFont: {
-                    size: 13
+                  tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                      size: 14,
+                      weight: 'bold'
+                    },
+                    bodyFont: {
+                      size: 13
+                    }
                   }
                 }
-              }
-            }}
-            height={300}
-          />
-        )}
-      </div>
-      <div className={styles.chartSummary}>
-        <div className={styles.summaryItem}>
-          <span className={styles.summaryLabel}>Best Year:</span>
-          <span className={styles.summaryValue}>{statistics.bestYear}</span>
+              }}
+              height={300}
+            />
+          )}
         </div>
-        <div className={styles.summaryItem}>
-          <span className={styles.summaryLabel}>Worst Year:</span>
-          <span className={styles.summaryValue}>{statistics.worstYear}</span>
-        </div>
-        <div className={styles.summaryItem}>
-          <span className={styles.summaryLabel}>Average:</span>
-          <span className={styles.summaryValue}>{statistics.average}</span>
-        </div>
-      </div>
-      
-      {/* Info Modal */}
-      {showInfoModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h3>About Annual Performance</h3>
-              <button 
-                className={styles.closeButton}
-                onClick={() => setShowInfoModal(false)}
-              >
-                &times;
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <h4>How to use this chart:</h4>
-              <ul className={styles.infoList}>
-                <li>Each bar represents the annual return percentage for a specific year</li>
-                <li>Green bars indicate positive returns, red bars indicate negative returns</li>
-                <li>Hover over any bar to see the exact percentage return for that year</li>
-                <li>Download the chart as an image using the download button</li>
-                <li>View the chart in fullscreen for a larger display</li>
-              </ul>
-              
-              <h4>Understanding the summary:</h4>
-              <p>
-                At the bottom of the chart, you can see key statistics including the best and worst 
-                performing years, as well as the average annual return across all displayed years.
-              </p>
-            </div>
-            <div className={styles.modalFooter}>
-              <button 
-                className={styles.applyButton}
-                onClick={() => setShowInfoModal(false)}
-              >
-                Got It
-              </button>
-            </div>
+        <div className={styles.chartSummary}>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryLabel}>Best Year:</span>
+            <span className={styles.summaryValue}>{statistics.bestYear}</span>
+          </div>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryLabel}>Worst Year:</span>
+            <span className={styles.summaryValue}>{statistics.worstYear}</span>
+          </div>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryLabel}>Average:</span>
+            <span className={styles.summaryValue}>{statistics.average}</span>
           </div>
         </div>
-      )}
+        
+        {/* Info Modal */}
+        {showInfoModal && (
+          <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <h3>About Annual Performance</h3>
+                <button 
+                  className={styles.closeButton}
+                  onClick={() => setShowInfoModal(false)}
+                >
+                  &times;
+                </button>
+              </div>
+              <div className={styles.modalBody}>
+                <h4>How to use this chart:</h4>
+                <ul className={styles.infoList}>
+                  <li>Each bar represents the annual return percentage for a specific year</li>
+                  <li>Green bars indicate positive returns, red bars indicate negative returns</li>
+                  <li>Hover over any bar to see the exact percentage return for that year</li>
+                  <li>Download the chart as an image using the download button</li>
+                  <li>View the chart in fullscreen for a larger display</li>
+                </ul>
+                
+                <h4>Understanding the summary:</h4>
+                <p>
+                  At the bottom of the chart, you can see key statistics including the best and worst 
+                  performing years, as well as the average annual return across all displayed years.
+                </p>
+              </div>
+              <div className={styles.modalFooter}>
+                <button 
+                  className={styles.applyButton}
+                  onClick={() => setShowInfoModal(false)}
+                >
+                  Got It
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

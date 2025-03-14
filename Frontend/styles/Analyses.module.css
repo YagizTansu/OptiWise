@@ -4034,7 +4034,29 @@
   .reportContainer {
     padding: 16px;
   }
+  
+  .reportHeader h2 {
+    font-size: 1.5rem;
+  }
+  
+  .metricsGrid, .companySnapshotGrid {
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  }
+  
+  .eventCards {
+    grid-template-columns: 1fr;
+  }
+  
+  .sigDevsList li {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .sigDevDate {
+    margin-right: 0;
+  }
 }
+
 /* ...existing code... */
 
 /* Section heading with info button */
@@ -4389,3 +4411,181 @@
 }
 
 /* ...existing code... */
+
+/* Company Profile Component Styles */
+.companyProfileContainer {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+}
+
+.companyProfileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  padding-bottom: 5px;
+}
+
+.companyProfileHeader h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.expandIcon {
+  color: #64748b;
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.profileContent {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e6e9f0;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.profileSummary {
+  padding-right: 24px;
+}
+
+.profileSummary h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.industryInfo {
+  display: inline-flex;
+  align-items: center;
+  background-color: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.businessSummary {
+  margin-top: 16px;
+  line-height: 1.6;
+}
+
+.businessSummary p {
+  color: #475569;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.profileDetails {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.detailsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detailLabel {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.detailItem a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.detailItem a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.detailItem span:not(.detailLabel) {
+  font-size: 1rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+/* Responsive adjustments for CompanyProfile */
+@media (max-width: 1024px) {
+  .profileContent {
+    grid-template-columns: 1.5fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .profileContent {
+    grid-template-columns: 1fr;
+  }
+  
+  .profileSummary {
+    padding-right: 0;
+    order: 2;
+  }
+  
+  .profileDetails {
+    order: 1;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .companyProfileContainer {
+    padding: 16px;
+  }
+  
+  .profileSummary h3 {
+    font-size: 1.5rem;
+  }
+  
+  .industryInfo {
+    display: flex;
+    padding: 4px 8px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ...existing code... */
+
+/* Add these styles if they don't exist */
+.cardContainer {
+  width: 100%;
+  margin: 20px 0;
+}
+
+.analysisCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import styles from '../../styles/Analyses.module.css';
 
 // Import new components
+import CompanyProfile from './Overview/CompanyProfile'; // Add this new import
 import PerformanceOverview from './Overview/PerformanceOverview';
 import PerformanceMetrics from './Overview/PerformanceMetrics';
 import AnnualPerformance from './Overview/AnnualPerformance';
@@ -15,6 +16,9 @@ interface OverviewProps {
 const Overview: React.FC<OverviewProps> = ({ symbol }) => {
   return (
     <div className={styles.overviewTab}>
+      {/* Company Profile Component */}
+      <CompanyProfile symbol={symbol} />
+      
       {/* Performance Overview Component */}
       <PerformanceOverview symbol={symbol} />
 

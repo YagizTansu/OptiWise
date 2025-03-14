@@ -48,7 +48,7 @@ type QuoteSummaryModule =
   | 'industryTrend' | 'insiderHolders' | 'insiderTransactions' | 'institutionOwnership'
   | 'majorDirectHolders' | 'majorHoldersBreakdown' | 'netSharePurchaseActivity'
   | 'price' | 'quoteType' | 'recommendationTrend' | 'secFilings' | 'sectorTrend'
-  | 'summaryDetail' | 'summaryProfile' | 'topHoldings' | 'upgradeDowngradeHistory';
+  | 'summaryDetail' | 'summaryProfile' | 'symbol' | 'topHoldings' | 'upgradeDowngradeHistory';
 
 // Interface for Yahoo Finance quoteSummary options with proper typing
 interface QuoteSummaryOptions {

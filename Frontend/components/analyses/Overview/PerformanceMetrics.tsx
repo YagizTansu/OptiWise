@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaArrowUp, FaArrowDown, FaQuestionCircle, FaDownload, FaExpand, FaCompress } from 'react-icons/fa';
+import { FaArrowUp, FaArrowDown, FaQuestionCircle, FaDownload, FaExpand, FaCompress, FaInfoCircle } from 'react-icons/fa';
 import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
 import html2canvas from 'html2canvas';
@@ -209,67 +209,81 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
   }
 
   return (
-    <div className={styles.overviewSection} ref={containerRef}>
-      <div className={styles.sectionHeader}>
-        <h2>Performance Metrics</h2>
-        <div className={styles.chartControls}>
-          <button 
-            className={styles.modernActionButton} 
-            title="Download Metrics"
-            onClick={downloadMetrics}
-          >
-            <FaDownload className={styles.buttonIcon} /> 
-            <span>Download</span>
-          </button>
-          <button 
-            className={styles.modernActionButton} 
-            title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-            onClick={toggleFullscreen}
-          >
-            {isFullscreen ? (
-              <>
-                <FaCompress className={styles.buttonIcon} /> 
-                <span>Exit Fullscreen</span>
-              </>
-            ) : (
-              <>
-                <FaExpand className={styles.buttonIcon} /> 
-                <span>Fullscreen</span>
-              </>
-            )}
-          </button>
-          <button 
-            className={styles.modernIconButton} 
-            title="Learn More"
-            onClick={() => setShowInfoModal(true)}
-          >
-            <FaQuestionCircle />
-          </button>
+    <div className={styles.cardContainer}>
+      <div className={styles.analysisCard} ref={containerRef}>
+        {/* Header Section */}
+        <div className={styles.seasonalityHeader}>
+          <h2>Performance Metrics</h2>
+          <p className={styles.seasonalityDescription}>
+            <FaInfoCircle className={styles.infoIcon} /> 
+            Compare returns across different time periods to track investment performance.
+          </p>
         </div>
-      </div>
-      <div 
-        className={`${styles.metricsGrid} ${isFullscreen ? styles.fullscreenMetrics : ''}`}
-        ref={metricsRef}
-      >
-        {metrics.map((period) => (
-          <div 
-            key={period.label} 
-            className={`${styles.metricCard} ${period.value >= 0 ? styles.positive : styles.negative} ${selectedPeriod === period.label ? styles.selectedPeriod : ''}`}
-            onClick={() => handlePeriodChange(period.label)}
-          >
-            <div className={styles.metricHeader}>
-              <span className={styles.periodLabel}>{period.label}</span>
-              {selectedPeriod === period.label && <span className={styles.activeBadge}>Active</span>}
-            </div>
-            <div className={styles.returnValue}>
-              {period.value >= 0 ? <FaArrowUp className={styles.upIcon} /> : <FaArrowDown className={styles.downIcon} />}
-              <span>{Math.abs(period.value).toFixed(1)}%</span>
-            </div>
-            <div className={styles.metricFooter}>
-              <span>vs. previous</span>
-            </div>
+        
+        {/* Chart Controls */}
+        <div className={styles.chartHeader}>
+          <h3>Time Period Returns</h3>
+          <div className={styles.chartControls}>
+            <button 
+              className={styles.modernActionButton} 
+              title="Download Metrics"
+              onClick={downloadMetrics}
+            >
+              <FaDownload className={styles.buttonIcon} /> 
+              <span>Download</span>
+            </button>
+            <button 
+              className={styles.modernActionButton} 
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <>
+                  <FaCompress className={styles.buttonIcon} /> 
+                  <span>Exit Fullscreen</span>
+                </>
+              ) : (
+                <>
+                  <FaExpand className={styles.buttonIcon} /> 
+                  <span>Fullscreen</span>
+                </>
+              )}
+            </button>
+            <button 
+              className={styles.modernIconButton} 
+              title="Learn More"
+              onClick={() => setShowInfoModal(true)}
+            >
+              <FaQuestionCircle />
+            </button>
           </div>
-        ))}
+        </div>
+        
+        {/* Metrics Grid */}
+        <div 
+          className={`${styles.metricsGrid} ${isFullscreen ? styles.fullscreenMetrics : ''}`}
+          ref={metricsRef}
+        >
+          {metrics.map((period) => (
+            <div 
+              key={period.label} 
+              className={`${styles.metricCard} ${period.value >= 0 ? styles.positive : styles.negative} ${selectedPeriod === period.label ? styles.selectedPeriod : ''}`}
+              onClick={() => handlePeriodChange(period.label)}
+            >
+              <div className={styles.metricHeader}>
+                <span className={styles.periodLabel}>{period.label}</span>
+                {selectedPeriod === period.label && <span className={styles.activeBadge}>Active</span>}
+              </div>
+              <div className={styles.returnValue}>
+                {period.value >= 0 ? <FaArrowUp className={styles.upIcon} /> : <FaArrowDown className={styles.downIcon} />}
+                <span>{Math.abs(period.value).toFixed(1)}%</span>
+              </div>
+              <div className={styles.metricFooter}>
+                <span>vs. previous</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
       
       {/* Info Modal */}

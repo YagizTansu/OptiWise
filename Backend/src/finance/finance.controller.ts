@@ -77,7 +77,7 @@ export class QuoteFieldsValidationPipe implements PipeTransform {
 
 /**
  * Valid modules for the quoteSummary endpoint
- * Note: Removed "symbol" which is causing type errors
+ * Note: Previously omitted "symbol" which is now added back
  */
 const VALID_QUOTE_SUMMARY_MODULES = [
   'assetProfile', 'balanceSheetHistory', 'balanceSheetHistoryQuarterly',
@@ -88,7 +88,7 @@ const VALID_QUOTE_SUMMARY_MODULES = [
   'industryTrend', 'insiderHolders', 'insiderTransactions', 'institutionOwnership',
   'majorDirectHolders', 'majorHoldersBreakdown', 'netSharePurchaseActivity',
   'price', 'quoteType', 'recommendationTrend', 'secFilings', 'sectorTrend',
-  'summaryDetail', 'summaryProfile', 'topHoldings', 'upgradeDowngradeHistory'
+  'summaryDetail', 'summaryProfile', 'symbol', 'topHoldings', 'upgradeDowngradeHistory'
 ];
 
 /**
