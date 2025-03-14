@@ -91,7 +91,6 @@ const KeyMetrics = ({ symbol }: KeyMetricsProps) => {
           }
         });
       } catch (err) {
-        console.error('Error fetching financial data:', err);
         setError('Failed to load financial data');
       } finally {
         setLoading(false);

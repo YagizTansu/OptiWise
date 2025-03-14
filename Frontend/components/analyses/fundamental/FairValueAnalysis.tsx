@@ -328,7 +328,6 @@ const FairValueAnalysis = ({ symbol }: FairValueAnalysisProps) => {
         const quoteResponse = await axios.get(`http://localhost:3001/api/finance/quote?symbol=${symbol}`);
         const quoteResult = Array.isArray(quoteResponse.data) ? quoteResponse.data[0] : quoteResponse.data;
         setQuoteData(quoteResult);
-        console.log('Quote data:', quoteResult);
 
         // Fetch historical data (2 years)
         const today = new Date();
@@ -339,14 +338,11 @@ const FairValueAnalysis = ({ symbol }: FairValueAnalysisProps) => {
           `http://localhost:3001/api/finance/historical?symbol=${symbol}&from=${twoYearsAgo.toISOString()}&to=${today.toISOString()}&interval=1d`
         );
         setHistoricalData(historicalResponse.data);
-        console.log('Historical data sample:', historicalResponse.data?.slice(0, 2));
 
         // Fetch detailed company financials
         const summaryResponse = await axios.get(
           `http://localhost:3001/api/finance/quoteSummary?symbol=${symbol}&modules=financialData,earnings,defaultKeyStatistics,summaryDetail`
         );
-        
-        console.log('Quote summary data:', summaryResponse.data);
         
         const financialsData = summaryResponse.data.financialData || {};
         setCompanyFinancials(financialsData);
@@ -383,8 +379,6 @@ const FairValueAnalysis = ({ symbol }: FairValueAnalysisProps) => {
         }
         
         const dcfValue = calculateDCF(currentPrice, freeCashFlow, growthRate);
-        console.log('DCF inputs:', { freeCashFlow, growthRate, currentPrice });
-        console.log('DCF value:', dcfValue);
         
         // 2. Peter Lynch Calculation
         const epsValue = quoteResult.epsTrailingTwelveMonths || quoteResult.epsForward || 0;
@@ -395,8 +389,6 @@ const FairValueAnalysis = ({ symbol }: FairValueAnalysisProps) => {
           growthRate,
           dividendYield
         );
-        console.log('Lynch inputs:', { epsValue, growthRate, dividendYield });
-        console.log('Lynch value:', lynchValue);
         
         // 3. EVA Calculation
         let roe = financialsData.returnOnEquity || 0; 
@@ -413,8 +405,6 @@ const FairValueAnalysis = ({ symbol }: FairValueAnalysisProps) => {
           roe,
           bookValue
         );
-        console.log('EVA inputs:', { roe, bookValue, currentPrice });
-        console.log('EVA value:', evaValue);
         
         // Update fair values
         setFairValues({

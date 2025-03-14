@@ -28,7 +28,8 @@ export default function Navbar() {
       <div className={styles.navContainer}>
         <div className={styles.navLogo}>
           <Link href="/">
-            OptiWise
+            <span className={styles.logoPrefix}>Opti</span>
+            <span className={styles.logoSuffix}>Wise</span>
           </Link>
         </div>
         

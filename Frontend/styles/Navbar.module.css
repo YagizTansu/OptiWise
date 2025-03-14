@@ -23,14 +23,25 @@
 
 .navLogo a {
   font-size: 1.7rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #4361ee, #7209b7);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-weight: 600;
   text-decoration: none;
   transition: all 0.3s ease;
   letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.logoPrefix {
+  background: linear-gradient(120deg, #2563eb, #2563eb);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 600;
+}
+
+.logoSuffix {
+  color: #333;
+  font-weight: 300;
 }
 
 .navLogo a:hover {

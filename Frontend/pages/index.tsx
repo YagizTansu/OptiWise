@@ -95,8 +95,11 @@ export default function Home() {
     <Layout title="OptiWise - Smart Investment Platform">
       <main className={styles.main}>
         <div className={styles.logoContainer}>
-          <h1 className={styles.title}>OptiWise</h1>
-          <p className={styles.tagline}>Smart decisions, optimal results</p>
+          <h1 className={styles.title}>
+            <span className={styles.titlePrefix}>Opti</span>
+            <span className={styles.titleSuffix}>Wise</span>
+          </h1>
+          <p className={styles.tagline}>smart decisions, optimal results</p>
         </div>
         
         <div className={styles.searchSection} ref={searchSectionRef}>

@@ -100,7 +100,6 @@ const RevenueAnalysis = ({ symbol }: RevenueAnalysisProps) => {
         
         setFinancialData(processedData);
       } catch (err) {
-        console.error('Error fetching financial data:', err);
         setError('Failed to load financial data. Please try again later.');
       } finally {
         setIsLoading(false);
