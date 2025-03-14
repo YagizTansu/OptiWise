@@ -255,8 +255,8 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         <p className={styles.sectionDescription}></p>
         <div className={styles.metricsGrid}>
           <div className={`${styles.metricCard} ${
-            insightsData.instrumentInfo.valuation.description === 'Overvalued' ? styles.negative : 
-            insightsData.instrumentInfo.valuation.description === 'Undervalued' ? styles.positive : 
+            insightsData?.instrumentInfo?.valuation?.description === 'Overvalued' ? styles.negative : 
+            insightsData?.instrumentInfo?.valuation?.description === 'Undervalued' ? styles.positive : 
             styles.neutral
           }`}>
             <div className={styles.metricHeader}>
@@ -266,8 +266,8 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
                 content="This indicates whether a stock is currently trading above (overvalued) or below (undervalued) its estimated fair value based on various financial metrics, historical data, and market comparisons." 
               />
             </div>
-            <p className={styles.metricValue}>{insightsData.instrumentInfo.valuation.description}</p>
-            <p className={styles.metricSubtitle}>{insightsData.instrumentInfo.valuation.relativeValue} {insightsData.instrumentInfo.valuation.discount}</p>
+            <p className={styles.metricValue}>{insightsData?.instrumentInfo?.valuation?.description}</p>
+            <p className={styles.metricSubtitle}>{insightsData?.instrumentInfo?.valuation?.relativeValue} {insightsData?.instrumentInfo?.valuation?.discount}</p>
           </div>
 
           <div className={styles.metricCard}>
@@ -278,7 +278,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
                 content="Support represents a price level where buying interest is strong enough to overcome selling pressure, preventing the price from falling further. It's often based on historical price reactions and can act as a 'floor' for the stock price." 
               />
             </div>
-            <p className={styles.metricValue}>${insightsData.instrumentInfo.keyTechnicals.support.toFixed(2)}</p>
+            <p className={styles.metricValue}>${insightsData?.instrumentInfo?.keyTechnicals?.support?.toFixed(2) || 'N/A'}</p>
           </div>
 
           <div className={styles.metricCard}>
@@ -289,7 +289,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
                 content="Resistance is a price level where selling pressure is expected to overcome buying interest, preventing the price from rising further. It acts as a 'ceiling' for the stock price and is based on historical price movements." 
               />
             </div>
-            <p className={styles.metricValue}>${insightsData.instrumentInfo.keyTechnicals.resistance.toFixed(2)}</p>
+            <p className={styles.metricValue}>${insightsData?.instrumentInfo?.keyTechnicals?.resistance?.toFixed(2) || 'N/A'}</p>
           </div>
 
           <div className={styles.metricCard}>
@@ -300,7 +300,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
                 content="A recommended price at which investors might consider selling to minimize potential losses. If the stock falls to or below this level, it could indicate a change in trend or increased downside risk." 
               />
             </div>
-            <p className={styles.metricValue}>${insightsData.instrumentInfo.keyTechnicals.stopLoss.toFixed(2)}</p>
+            <p className={styles.metricValue}>${insightsData?.instrumentInfo?.keyTechnicals?.stopLoss?.toFixed(2) || 'N/A'}</p>
           </div>
         </div>
 
@@ -314,31 +314,31 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               />
             </div>
             {renderScoreIndicator(
-              insightsData.instrumentInfo.technicalEvents.shortTermOutlook.score,
-              insightsData.instrumentInfo.technicalEvents.shortTermOutlook.direction
+              insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.score || 0,
+              insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.direction || 'Neutral'
             )}
             <p className={styles.outlookDescription}>
-              {insightsData.instrumentInfo.technicalEvents.shortTermOutlook.stateDescription}
+              {insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.stateDescription}
             </p>
             <div className={styles.comparisonData}>
               <div className={styles.comparisonItem}>
                 <span className={styles.comparisonLabel}>Sector:</span>
                 <span className={
-                  insightsData.instrumentInfo.technicalEvents.shortTermOutlook.sectorDirection === 'Bullish' ? styles.positive :
-                  insightsData.instrumentInfo.technicalEvents.shortTermOutlook.sectorDirection === 'Bearish' ? styles.negative :
+                  insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.sectorDirection === 'Bullish' ? styles.positive :
+                  insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.sectorDirection === 'Bearish' ? styles.negative :
                   styles.neutral
                 }>
-                  {insightsData.instrumentInfo.technicalEvents.shortTermOutlook.sectorDirection}
+                  {insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.sectorDirection}
                 </span>
               </div>
               <div className={styles.comparisonItem}>
                 <span className={styles.comparisonLabel}>Index:</span>
                 <span className={
-                  insightsData.instrumentInfo.technicalEvents.shortTermOutlook.indexDirection === 'Bullish' ? styles.positive :
-                  insightsData.instrumentInfo.technicalEvents.shortTermOutlook.indexDirection === 'Bearish' ? styles.negative :
+                  insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.indexDirection === 'Bullish' ? styles.positive :
+                  insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.indexDirection === 'Bearish' ? styles.negative :
                   styles.neutral
                 }>
-                  {insightsData.instrumentInfo.technicalEvents.shortTermOutlook.indexDirection}
+                  {insightsData?.instrumentInfo?.technicalEvents?.shortTermOutlook?.indexDirection}
                 </span>
               </div>
             </div>
@@ -353,31 +353,31 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               />
             </div>
             {renderScoreIndicator(
-              insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.score,
-              insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.direction
+              insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.score || 0,
+              insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.direction || 'Neutral'
             )}
             <p className={styles.outlookDescription}>
-              {insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.stateDescription}
+              {insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.stateDescription}
             </p>
             <div className={styles.comparisonData}>
               <div className={styles.comparisonItem}>
                 <span className={styles.comparisonLabel}>Sector:</span>
                 <span className={
-                  insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.sectorDirection === 'Bullish' ? styles.positive :
-                  insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.sectorDirection === 'Bearish' ? styles.negative :
+                  insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.sectorDirection === 'Bullish' ? styles.positive :
+                  insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.sectorDirection === 'Bearish' ? styles.negative :
                   styles.neutral
                 }>
-                  {insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.sectorDirection}
+                  {insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.sectorDirection}
                 </span>
               </div>
               <div className={styles.comparisonItem}>
                 <span className={styles.comparisonLabel}>Index:</span>
                 <span className={
-                  insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.indexDirection === 'Bullish' ? styles.positive :
-                  insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.indexDirection === 'Bearish' ? styles.negative :
+                  insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.indexDirection === 'Bullish' ? styles.positive :
+                  insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.indexDirection === 'Bearish' ? styles.negative :
                   styles.neutral
                 }>
-                  {insightsData.instrumentInfo.technicalEvents.intermediateTermOutlook.indexDirection}
+                  {insightsData?.instrumentInfo?.technicalEvents?.intermediateTermOutlook?.indexDirection}
                 </span>
               </div>
             </div>
@@ -392,31 +392,31 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               />
             </div>
             {renderScoreIndicator(
-              insightsData.instrumentInfo.technicalEvents.longTermOutlook.score,
-              insightsData.instrumentInfo.technicalEvents.longTermOutlook.direction
+              insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.score || 0,
+              insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.direction || 'Neutral'
             )}
             <p className={styles.outlookDescription}>
-              {insightsData.instrumentInfo.technicalEvents.longTermOutlook.stateDescription}
+              {insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.stateDescription}
             </p>
             <div className={styles.comparisonData}>
               <div className={styles.comparisonItem}>
                 <span className={styles.comparisonLabel}>Sector:</span>
                 <span className={
-                  insightsData.instrumentInfo.technicalEvents.longTermOutlook.sectorDirection === 'Bullish' ? styles.positive :
-                  insightsData.instrumentInfo.technicalEvents.longTermOutlook.sectorDirection === 'Bearish' ? styles.negative :
+                  insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.sectorDirection === 'Bullish' ? styles.positive :
+                  insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.sectorDirection === 'Bearish' ? styles.negative :
                   styles.neutral
                 }>
-                  {insightsData.instrumentInfo.technicalEvents.longTermOutlook.sectorDirection}
+                  {insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.sectorDirection}
                 </span>
               </div>
               <div className={styles.comparisonItem}>
                 <span className={styles.comparisonLabel}>Index:</span>
                 <span className={
-                  insightsData.instrumentInfo.technicalEvents.longTermOutlook.indexDirection === 'Bullish' ? styles.positive :
-                  insightsData.instrumentInfo.technicalEvents.longTermOutlook.indexDirection === 'Bearish' ? styles.negative :
+                  insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.indexDirection === 'Bullish' ? styles.positive :
+                  insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.indexDirection === 'Bearish' ? styles.negative :
                   styles.neutral
                 }>
-                  {insightsData.instrumentInfo.technicalEvents.longTermOutlook.indexDirection}
+                  {insightsData?.instrumentInfo?.technicalEvents?.longTermOutlook?.indexDirection}
                 </span>
               </div>
             </div>
@@ -434,13 +434,13 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
           />
         </div>
         <p className={styles.sectionDescription}>
-          Key metrics comparison between {insightsData.symbol} and {insightsData.companySnapshot.sectorInfo} sector average
+          Key metrics comparison between {insightsData?.symbol} and {insightsData?.companySnapshot?.sectorInfo} sector average
         </p>
 
         <div className={styles.companySnapshotGrid}>
-          {Object.entries(insightsData.companySnapshot.company).map(([key, value]) => {
-            const sectorValue = insightsData.companySnapshot.sector[key as keyof typeof insightsData.companySnapshot.sector];
-            const percentValue = Math.round(value * 100);
+          {Object.entries(insightsData?.companySnapshot?.company || {}).map(([key, value]) => {
+            const sectorValue = insightsData?.companySnapshot?.sector?.[key as keyof typeof insightsData.companySnapshot.sector] || 0;
+            const percentValue = Math.round((value as number) * 100);
             const sectorPercentValue = Math.round(sectorValue * 100);
             const isHigherThanSector = percentValue > sectorPercentValue;
             
@@ -499,14 +499,14 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         <div className={styles.recommendationCard}>
           <div className={styles.recommendationHeader}>
             <div className={`${styles.recommendationBadge} ${
-              insightsData.recommendation.rating === 'BUY' ? styles.positive :
-              insightsData.recommendation.rating === 'SELL' ? styles.negative :
+              insightsData?.recommendation?.rating === 'BUY' ? styles.positive :
+              insightsData?.recommendation?.rating === 'SELL' ? styles.negative :
               styles.neutral
             }`}>
-              {insightsData.recommendation.rating}
+              {insightsData?.recommendation?.rating}
             </div>
             <div className={styles.recommendationProvider}>
-              {insightsData.recommendation.provider}
+              {insightsData?.recommendation?.provider}
             </div>
           </div>
           <div className={styles.recommendationPrice}>
@@ -517,7 +517,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
                 content="The predicted stock price for the next 12 months, based on analysts' estimates. This represents where professional analysts expect the stock to trade within a year based on their financial models." 
               />
             </div>
-            <p className={styles.targetPrice}>${insightsData.recommendation.targetPrice}</p>
+            <p className={styles.targetPrice}>${insightsData?.recommendation?.targetPrice}</p>
           </div>
         </div>
 
@@ -531,7 +531,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               />
             </div>
             <ul className={styles.bullBearList}>
-              {insightsData.upsell?.msBullishSummary?.map((point, index) => (
+              {insightsData?.upsell?.msBullishSummary?.map((point, index) => (
                 <li key={`bullish-${index}`} className={styles.bullPoint}>{point}</li>
               )) || <li>No bullish factors available</li>}
             </ul>
@@ -545,7 +545,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               />
             </div>
             <ul className={styles.bullBearList}>
-              {insightsData.upsell?.msBearishSummary?.map((point, index) => (
+              {insightsData?.upsell?.msBearishSummary?.map((point, index) => (
                 <li key={`bearish-${index}`} className={styles.bearPoint}>{point}</li>
               )) || <li>No bearish factors available</li>}
             </ul>
@@ -574,7 +574,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               </tr>
             </thead>
             <tbody>
-              {insightsData.reports.slice(0, 5).map((report) => (
+              {insightsData?.reports?.slice(0, 5).map((report) => (
                 <tr key={report.id}>
                   <td>{formatDate(report.reportDate)}</td>
                   <td className={styles.reportTitle}>{report.title}</td>
@@ -604,7 +604,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
           />
         </div>
         
-        {insightsData.events.length > 0 && (
+        {insightsData?.events?.length > 0 && (
           <div className={styles.eventsContainer}>
             <div className={styles.metricHeader}>
               <h4>Technical Events</h4>
@@ -614,7 +614,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               />
             </div>
             <div className={styles.eventCards}>
-              {insightsData.events.map((event, index) => (
+              {insightsData?.events?.map((event, index) => (
                 <div className={styles.eventCard} key={`event-${index}`}>
                   <div className={styles.eventType}>{event.eventType}</div>
                   <div className={styles.eventDetails}>
@@ -628,7 +628,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
           </div>
         )}
         
-        {insightsData.sigDevs.length > 0 && (
+        {insightsData?.sigDevs?.length > 0 && (
           <div className={styles.sigDevsContainer}>
             <div className={styles.metricHeader}>
               <h4>Significant Developments</h4>
@@ -638,7 +638,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               />
             </div>
             <ul className={styles.sigDevsList}>
-              {insightsData.sigDevs.map((dev, index) => (
+              {insightsData?.sigDevs?.map((dev, index) => (
                 <li key={`dev-${index}`}>
                   <span className={styles.sigDevDate}>{formatDate(dev.date)}</span>
                   <span className={styles.sigDevHeadline}>{dev.headline}</span>
@@ -669,7 +669,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
               </tr>
             </thead>
             <tbody>
-              {insightsData.secReports.slice(0, 8).map((filing) => (
+              {insightsData?.secReports?.slice(0, 8).map((filing) => (
                 <tr key={filing.id}>
                   <td>{formatDate(filing.filingDate)}</td>
                   <td>{filing.formType}</td>

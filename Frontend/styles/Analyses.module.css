@@ -4105,7 +4105,7 @@
 .infoButton:hover {
   background-color: rgba(59, 130, 246, 0.15);
   color: #2563eb;
-  transform: translateY(-1px);
+  transform: translateY(1px);
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
@@ -4594,3 +4594,538 @@
 .analysisCard:hover {
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
 }
+
+
+.fundamentalContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+}
+
+.cardTitle {
+  padding: 16px 20px;
+  margin: 0;
+  background: #f5f5f5;
+  font-size: 18px;
+  border-bottom: 1px solid #eee;
+}
+
+.cardContent {
+  padding: 20px;
+}
+
+/* Common Styles for Analysis Components */
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.loader::after {
+  content: '';
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.error {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 20px 0;
+  font-weight: 500;
+}
+
+.noData {
+  background-color: #f8fafc;
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
+  border-radius: 8px;
+  margin: 15px 0;
+  font-style: italic;
+}
+
+/* Stock Dashboard Styles */
+.stockDashboard {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.priceContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.mainInfo {
+  flex: 1;
+}
+
+.mainInfo h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.change {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.change.positive {
+  color: #10b981;
+}
+
+.change.negative {
+  color: #ef4444;
+}
+
+.tradingInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: #f8fafc;
+  padding: 16px;
+  border-radius: 10px;
+}
+
+.tradingInfo > div {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.label {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+/* Key Metrics Section Styles - Consistent with KeyMetrics component */
+.keyMetricsSection {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  width: 100%;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metricItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.metricLabel {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metricValue {
+  color: #1e293b;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .priceContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .tradingInfo {
+    width: 100%;
+  }
+  
+  .metricsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .stockDashboard {
+    padding: 16px;
+  }
+  
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .price {
+    font-size: 1.8rem;
+  }
+}
+/* ...existing code... */
+
+/* Updated Stock Dashboard Styles */
+.priceDisplay {
+  margin-bottom: 16px;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.change {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.change.positive {
+  color: #10b981;
+}
+
+.change.negative {
+  color: #ef4444;
+}
+
+.change.positive::before {
+  content: '';
+  display: inline-block;
+  margin-right: 6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 8px solid #10b981;
+}
+
+.change.negative::before {
+  content: '';
+  display: inline-block;
+  margin-right: 6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #ef4444;
+}
+
+.tradingDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background-color: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.tradingInfoItem {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  padding: 8px;
+  background-color: white;
+  border-radius: 6px;
+}
+
+.metricsHeader {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.2rem;
+  color: #334155;
+  font-weight: 600;
+}
+
+/* ...existing code... */
+
+/* Financial Statement Card Styles */
+.financialStatementCard {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.financialStatementCard:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.cardHeader {
+  background: #ffffff;
+  padding: 20px 24px;
+}
+
+.cardHeader h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.statementDescription {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.cardContent {
+  padding: 24px;
+}
+
+/* Controls Styling */
+.statementControls {
+  margin-bottom: 24px;
+}
+
+.controlsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.statementTypeControls, .periodTypeControls {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+.statementTypeButton, .periodButton {
+  padding: 10px 16px;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.statementTypeButton:hover, .periodButton:hover {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+.activeStatementType, .activePeriod {
+  background-color: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.activeStatementType:hover, .activePeriod:hover {
+  background-color: #2563eb;
+  color: white;
+}
+
+/* Table Styling */
+.financialTableContainer {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  width: 100%;
+}
+
+.financialTable {
+  width: 100%;
+  min-width: 900px; /* Ensure table has a good minimum width */
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.financialTable thead tr {
+  background-color: #f1f5f9;
+}
+
+.financialTable th {
+  padding: 16px 24px; /* Increased horizontal padding */
+  text-align: left;
+  color: #334155;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.financialTable td {
+  padding: 14px 24px; /* Increased horizontal padding */
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.financialTable tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.financialTable tr:last-child td {
+  border-bottom: none;
+}
+
+.metricLabel {
+  font-weight: 500;
+  color: #475569;
+}
+
+.metricValue {
+  font-weight: 500;
+  color: #1e293b;
+  text-align: right;
+  min-width: 120px; /* Ensure columns have minimum width */
+}
+
+.metricValue.negative {
+  color: #ef4444;
+}
+
+/* States styling */
+.statementLoading, .statementError, .noStatementData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #64748b;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.statementError {
+  color: #dc2626;
+  text-align: center;
+}
+
+.retryButton {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.retryButton:hover {
+  background-color: #dc2626;
+}
+
+.noStatementData {
+  font-style: italic;
+}
+
+.statementFooter {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.statementDisclaimer {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .controlsRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .statementTypeControls, .periodTypeControls {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  
+  .statementTypeControls {
+    margin-bottom: 8px;
+  }
+  
+  .cardContent {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .financialTable th, .financialTable td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+  }
+}
+
+/* ...existing code... */

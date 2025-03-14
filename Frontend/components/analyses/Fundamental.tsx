@@ -1,11 +1,7 @@
-import { useState } from 'react';
 import styles from '../../styles/Analyses.module.css';
-
-// Import modular components
-import KeyMetrics from './fundamental/KeyMetrics';
-import FinancialHealth from './fundamental/FinancialHealth';
-import RevenueAnalysis from './fundamental/RevenueAnalysis';
-import FairValueAnalysis from './fundamental/FairValueAnalysis';
+import StockDashboard from './fundamental/StockDashboard';
+import FinancialStatements from './fundamental/FinancialStatements';
+import AnalysisTools from './fundamental/AnalysisTools';
 
 interface FundamentalProps {
   symbol: string;
@@ -13,12 +9,13 @@ interface FundamentalProps {
 
 const Fundamental = ({ symbol }: FundamentalProps) => {
   return (
-    <div className={styles.fundamentalTab}>
-      <KeyMetrics symbol={symbol} />
-      {/* <AnalysisMethods symbol={symbol}/> */}
-      <RevenueAnalysis symbol={symbol} />
-      <FairValueAnalysis symbol={symbol} />
-      <FinancialHealth symbol={symbol} />
+    <div className={styles.fundamentalContent}>
+        
+        <StockDashboard symbol={symbol} />
+        <FinancialStatements symbol={symbol} />
+        <AnalysisTools symbol={symbol} />
+
+    
     </div>
   );
 };
