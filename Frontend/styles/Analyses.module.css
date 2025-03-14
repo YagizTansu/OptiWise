@@ -2509,7 +2509,7 @@
 
 /* Key Metrics Section */
 .keyMetricsSection {
-  background-color: #f8fafc;
+  background-color: #ffffff;
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 24px;
@@ -4588,4 +4588,9 @@
   padding: 24px;
   overflow: hidden;
   transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.analysisCard:hover {
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
 }

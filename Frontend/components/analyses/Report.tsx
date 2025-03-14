@@ -242,17 +242,9 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
   }
 
   return (
-    <div className={styles.reportContainer}>
-      {/* Header Card */}
-      <div className={styles.reportHeaderCard}>
-        <div className={styles.reportHeader}>
-          <h2>{insightsData.symbol} - {insightsData.upsell?.companyName || 'Company'} Insights Report</h2>
-          <p className={styles.sectorInfo}>Sector: {insightsData.companySnapshot?.sectorInfo || 'N/A'}</p>
-        </div>
-      </div>
-
+    <div>
       {/* Technical Analysis Card */}
-      <div className={styles.reportSection}>
+      <div className={styles.analysisCard}>
         <div className={styles.sectionHeadingWithInfo}>
           <h3>Technical Analysis</h3>
           <InfoButton 
@@ -432,8 +424,8 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         </div>
       </div>
 
-      {/* Company Snapshot Section */}
-      <div className={styles.reportSection}>
+      {/* Company Snapshot Card */}
+      <div className={styles.analysisCard}>
         <div className={styles.sectionHeadingWithInfo}>
           <h3>Company Snapshot</h3>
           <InfoButton 
@@ -495,8 +487,8 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         </div>
       </div>
 
-      {/* Analyst Recommendation Section */}
-      <div className={styles.reportSection}>
+      {/* Analyst Recommendation Card */}
+      <div className={styles.analysisCard}>
         <div className={styles.sectionHeadingWithInfo}>
           <h3>Analyst Recommendation</h3>
           <InfoButton 
@@ -561,8 +553,8 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         </div>
       </div>
 
-      {/* Reports Section */}
-      <div className={styles.reportSection}>
+      {/* Reports Card */}
+      <div className={styles.analysisCard}>
         <div className={styles.sectionHeadingWithInfo}>
           <h3>Analyst Reports</h3>
           <InfoButton 
@@ -602,8 +594,8 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         </div>
       </div>
 
-      {/* Events and Developments Section */}
-      <div className={styles.reportSection}>
+      {/* Events and Developments Card */}
+      <div className={styles.analysisCard}>
         <div className={styles.sectionHeadingWithInfo}>
           <h3>Recent Events and Developments</h3>
           <InfoButton 
@@ -657,8 +649,8 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         )}
       </div>
 
-      {/* SEC Filings Section */}
-      <div className={styles.reportSection}>
+      {/* SEC Filings Card */}
+      <div className={styles.analysisCard}>
         <div className={styles.sectionHeadingWithInfo}>
           <h3>Recent SEC Filings</h3>
           <InfoButton 
@@ -688,11 +680,6 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
             </tbody>
           </table>
         </div>
-      </div>
-
-      <div className={styles.reportFooter}>
-        <p>Data provided by various sources including {insightsData.instrumentInfo.technicalEvents.provider} and {insightsData.recommendation.provider}</p>
-        <p>Report generated on {new Date().toLocaleDateString()}</p>
       </div>
     </div>
   );

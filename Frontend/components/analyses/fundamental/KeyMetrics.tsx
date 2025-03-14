@@ -169,6 +169,7 @@ const KeyMetrics = ({ symbol }: KeyMetricsProps) => {
 
   return (
     <div className={styles.keyMetricsSection} style={{ width: '100%' }}>
+      <h3>Key Metrics</h3>
       <div className={styles.metricsGrid} style={{ 
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
