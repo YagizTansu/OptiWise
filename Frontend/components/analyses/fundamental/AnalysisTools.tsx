@@ -50,6 +50,25 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
     return date ? new Date(date).toLocaleDateString() : 'N/A';
   };
 
+  // Format recommendation period to be more descriptive
+  const formatRecommendationPeriod = (period: string) => {
+    // Yahoo Finance typically returns periods like "0m", "+1m", "-1m" etc.
+    if (period === "0m") return "Current Month";
+    if (period === "-1m") return "Last Month";
+    if (period === "-2m") return "Two Months Ago";
+    if (period === "-3m") return "Three Months Ago";
+    
+    // For other formats, try to parse and provide better description
+    if (period.endsWith('m')) {
+      const num = parseInt(period);
+      if (!isNaN(num)) {
+        return num > 0 ? `${num} Months Ahead` : `${Math.abs(num)} Months Ago`;
+      }
+    }
+    
+    return period; // Return original if we can't parse it
+  };
+
   // Get section description based on active section
   const getSectionDescription = () => {
     switch(activeSection) {
@@ -76,7 +95,7 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
         <table className={styles.financialTable}>
           <thead>
             <tr>
-              <th>Period</th>
+              <th>Time Period</th>
               <th>Strong Buy</th>
               <th>Buy</th>
               <th>Hold</th>
@@ -87,7 +106,7 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
           <tbody>
             {recommendations.map((rec: any, index: number) => (
               <tr key={index}>
-                <td className={styles.metricLabel}>{rec.period}</td>
+                <td className={styles.metricLabel}>{formatRecommendationPeriod(rec.period)}</td>
                 <td className={styles.metricValue}>{rec.strongBuy}</td>
                 <td className={styles.metricValue}>{rec.buy}</td>
                 <td className={styles.metricValue}>{rec.hold}</td>
@@ -346,8 +365,12 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
           </div>
         ) : (
           <div className={styles.analysisContent}>
-            {activeSection === 'recommendations' && renderRecommendations()}lt AnalysisTools;
-            {activeSection === 'earningsHistory' && renderEarningsHistory()}            {activeSection === 'earningsForecast' && renderEarningsForecast()}            {activeSection === 'calendarEvents' && renderCalendarEvents()}          </div>        )}        
+            {activeSection === 'recommendations' && renderRecommendations()}
+            {activeSection === 'earningsHistory' && renderEarningsHistory()}            
+            {activeSection === 'earningsForecast' && renderEarningsForecast()}            
+            {activeSection === 'calendarEvents' && renderCalendarEvents()}         
+             </div>       
+             )}        
       </div>
     </div>
   );
