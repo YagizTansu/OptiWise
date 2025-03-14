@@ -12,7 +12,6 @@ interface FinancialData {
   eps: string;
   pe: string;
   lastClose: string;
-  shareholdersYield: string;
   dividend: {
     exDate: string;
     paymentDate: string;
@@ -39,16 +38,16 @@ const KeyMetrics = ({ symbol }: KeyMetricsProps) => {
         const quoteData = await quoteResponse.json();
         
         // Fetch quote summary for detailed metrics including earnings dates and dividends
-        const summaryResponse = await fetch(`http://localhost:3001/api/finance/quoteSummary?symbol=${symbol}&modules=calendarEvents,defaultKeyStatistics,summaryDetail`);
+        const summaryResponse = await fetch(`http://localhost:3001/api/finance/quoteSummary?symbol=${symbol}&modules=calendarEvents,defaultKeyStatistics,summaryDetail,earnings`);
         const summaryData = await summaryResponse.json();
-        
+  
         // Extract and format quote data
         const quote = Array.isArray(quoteData) ? quoteData[0] : quoteData;
         
-        // Extract data from summary response
-        const calendarEvents = summaryData?.quoteSummary?.result?.[0]?.calendarEvents || {};
-        const summaryDetail = summaryData?.quoteSummary?.result?.[0]?.summaryDetail || {};
-        
+        // Extract data from summary response - updated paths based on actual structure
+        const calendarEvents = summaryData.calendarEvents || {};
+        const summaryDetail = summaryData.summaryDetail || {};
+
         // Format market cap (convert from raw number to billions/millions)
         const formatMarketCap = (marketCap: number) => {
           if (!marketCap) return '-';
@@ -58,31 +57,39 @@ const KeyMetrics = ({ symbol }: KeyMetricsProps) => {
           return `${marketCap.toFixed(2)}`;
         };
 
-        // Format date from timestamp
-        const formatDate = (timestamp: number) => {
-          if (!timestamp) return '-';
-          return new Date(timestamp * 1000).toLocaleDateString('en-US', { 
-            month: '2-digit', 
-            day: '2-digit', 
-            year: 'numeric' 
-          });
+        // Format date from timestamp or ISO string
+        const formatDate = (dateValue: number | string) => {
+          if (!dateValue) return '-';
+          
+          try {
+            // If it's a string in ISO format
+            if (typeof dateValue === 'string') {
+              return new Date(dateValue).toLocaleDateString('en-US', { 
+                month: '2-digit', 
+                day: '2-digit', 
+                year: 'numeric' 
+              });
+            }
+            // If it's a Unix timestamp (seconds)
+            return new Date(dateValue * 1000).toLocaleDateString('en-US', { 
+              month: '2-digit', 
+              day: '2-digit', 
+              year: 'numeric' 
+            });
+          } catch (e) {
+            console.error('Date formatting error:', e);
+            return '-';
+          }
         };
 
-        // Calculate shareholders yield (dividend yield + buyback yield)
-        const dividendYield = summaryDetail?.dividendYield?.raw || 0;
-        // Buyback yield would require additional API data, using 0 as placeholder
-        const buybackYield = 0;
-        const shareholdersYield = (dividendYield + buybackYield) * 100;
-
         setFinancialData({
-          nextEarnings: calendarEvents?.earnings?.earningsDate?.[0]?.raw 
-            ? formatDate(calendarEvents.earnings.earningsDate[0].raw)
+          nextEarnings: calendarEvents?.earnings?.earningsDate?.[0]
+            ? formatDate(calendarEvents.earnings.earningsDate[0])
             : '-',
           marketCap: formatMarketCap(quote?.marketCap || 0),
           eps: quote?.epsTrailingTwelveMonths?.toFixed(2) || '-',
           pe: quote?.trailingPE?.toFixed(2) || '-',
           lastClose: quote?.regularMarketPrice?.toFixed(2) || '-',
-          shareholdersYield: shareholdersYield.toFixed(2),
           dividend: {
             exDate: summaryDetail?.exDividendDate?.raw ? formatDate(summaryDetail.exDividendDate.raw) : '-',
             paymentDate: '-', // Not typically available in the API
@@ -91,6 +98,7 @@ const KeyMetrics = ({ symbol }: KeyMetricsProps) => {
           }
         });
       } catch (err) {
+        console.error('Error fetching financial data:', err);
         setError('Failed to load financial data');
       } finally {
         setLoading(false);
@@ -176,17 +184,6 @@ const KeyMetrics = ({ symbol }: KeyMetricsProps) => {
         }}>
           <span className={styles.metricLabel}>Last Close</span>
           <span className={styles.metricValue}>${financialData.lastClose}</span>
-        </div>
-        <div className={styles.metricItem} style={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          padding: '1rem',
-          backgroundColor: '#f7f7f7',
-          borderRadius: '8px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-        }}>
-          <span className={styles.metricLabel}>Shareholders Yield</span>
-          <span className={styles.metricValue}>{financialData.shareholdersYield}%</span>
         </div>
         {financialData.dividend.dividendYield !== '-' && (
           <div className={styles.metricItem} style={{ 

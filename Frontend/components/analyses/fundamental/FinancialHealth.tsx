@@ -163,7 +163,11 @@ const FinancialHealth = ({ symbol }: FinancialHealthProps) => {
         commentary: getZScoreCommentary(scoreValue),
         className: getScoreClass('altmanZ', scoreValue),
         icon: getScoreIcon('altmanZ', scoreValue),
-        scale: '(>3: Safe, 1.8-3: Gray Zone, <1.8: Distress)'
+        scaleRanges: [
+          { value: '>3', label: 'Safe', color: '#059669' },
+          { value: '1.8-3', label: 'Gray Zone', color: '#d97706' },
+          { value: '<1.8', label: 'Distress', color: '#dc2626' }
+        ]
       };
     } else if (activeTab === 'piotroskiF') {
       const scoreValue = parseInt(financialHealth.piotroskiFScore.current) || 0;
@@ -175,7 +179,11 @@ const FinancialHealth = ({ symbol }: FinancialHealthProps) => {
         commentary: getFScoreCommentary(scoreValue),
         className: getScoreClass('piotroskiF', scoreValue),
         icon: getScoreIcon('piotroskiF', scoreValue),
-        scale: '(0-9 scale, higher is better)'
+        scaleRanges: [
+          { value: '8-9', label: 'Strong', color: '#059669' },
+          { value: '5-7', label: 'Moderate', color: '#d97706' },
+          { value: '0-4', label: 'Weak', color: '#dc2626' }
+        ]
       };
     } else { // beneishM
       const scoreValue = parseFloat(financialHealth.beneishMScore.current);
@@ -187,7 +195,11 @@ const FinancialHealth = ({ symbol }: FinancialHealthProps) => {
         commentary: getMScoreCommentary(scoreValue),
         className: getScoreClass('beneishM', scoreValue),
         icon: getScoreIcon('beneishM', scoreValue),
-        scale: '(< -2.22: Low risk, > -1.78: High risk)'
+        scaleRanges: [
+          { value: '<-2.22', label: 'Low Risk', color: '#059669' },
+          { value: '-2.22 to -1.78', label: 'Moderate', color: '#d97706' },
+          { value: '>-1.78', label: 'High Risk', color: '#dc2626' }
+        ]
       };
     }
   };
@@ -209,59 +221,49 @@ const FinancialHealth = ({ symbol }: FinancialHealthProps) => {
         const data = response.data;
         
         // Extract relevant data to calculate financial health metrics
-        if (data && data.quoteSummary && data.quoteSummary.result && data.quoteSummary.result.length > 0) {
-          const result = data.quoteSummary.result[0];
+        if (data) {
+          // Direct access to financial data without quoteSummary.result wrapper
+          const balanceSheetStatements = data.balanceSheetHistory?.balanceSheetStatements || [];
+          const incomeStatements = data.incomeStatementHistory?.incomeStatementHistory || [];
+          const cashflowStatements = data.cashflowStatementHistory?.cashflowStatements || [];
+          const keyStats = data.defaultKeyStatistics || {};
+          
+          // Extract most recent statements (first in the array)
+          const balanceSheet = balanceSheetStatements.length > 0 ? balanceSheetStatements[0] : {};
+          const incomeStatement = incomeStatements.length > 0 ? incomeStatements[0] : {};
+          const cashflowStatement = cashflowStatements.length > 0 ? cashflowStatements[0] : {};
           
           // Extract shares outstanding
-          const sharesOutstandingData = result.defaultKeyStatistics?.sharesOutstanding?.raw || 0;
+          const sharesOutstandingData = keyStats.sharesOutstanding || 0;
           const sharesOutstandingInBillions = sharesOutstandingData / 1000000000;
-          
-          // Get historical data for calculating trends
-          const historicalResponse = await axios.get(`http://localhost:3001/api/finance/historical`, {
-            params: {
-              symbol: symbol,
-              from: new Date(new Date().setFullYear(new Date().getFullYear() - 6)).toISOString(), // Last 6 years
-              to: new Date().toISOString(),
-              interval: '1mo'
-            }
-          });
-          
-          // Process historical data to calculate financial health metrics
-          // This is a simplified approach - in a real app, you'd use more sophisticated calculations
-          const historicalData = historicalResponse.data;
-          
-          // Calculate Altman Z-Score (simplified version)
-          // In reality, this would require detailed balance sheet and income statement data
-          const financialData = result.financialData || {};
-          const balanceSheet = result.balanceSheetHistory?.balanceSheetStatements?.[0] || {};
-          const incomeStatement = result.incomeStatementHistory?.incomeStatementHistory?.[0] || {};
-          
+                    
           // Simplified Z-Score calculation (not accurate, just for demo)
           // Z = 1.2(Working Capital/Total Assets) + 1.4(Retained Earnings/Total Assets) + 3.3(EBIT/Total Assets) + 0.6(Market Value of Equity/Book Value of Total Liabilities) + 1.0(Sales/Total Assets)
-          const totalAssets = balanceSheet.totalAssets?.raw || 1;
-          const workingCapital = (balanceSheet.totalCurrentAssets?.raw || 0) - (balanceSheet.totalCurrentLiabilities?.raw || 0);
-          const ebit = incomeStatement.ebit?.raw || 0;
-          const revenue = incomeStatement.totalRevenue?.raw || 0;
-          const marketCap = result.defaultKeyStatistics?.marketCap?.raw || 0;
-          const totalLiabilities = balanceSheet.totalLiab?.raw || 1;
+          const totalAssets = balanceSheet.totalAssets || 1;
+          const workingCapital = (balanceSheet.totalCurrentAssets || 0) - (balanceSheet.totalCurrentLiabilities || 0);
+          const ebit = incomeStatement.ebit || 0;
+          const revenue = incomeStatement.totalRevenue || 0;
+          const marketCap = keyStats.marketCap || 0;
+          const totalLiabilities = balanceSheet.totalLiab|| 1;
           
+          debugger
           // This is a very simplified calculation and not accurate for real analysis
           const zScore = (1.2 * (workingCapital / totalAssets)) + 
-                          (1.4 * ((balanceSheet.retainedEarnings?.raw || 0) / totalAssets)) + 
+                          (1.4 * ((balanceSheet.retainedEarnings || 0) / totalAssets)) + 
                           (3.3 * (ebit / totalAssets)) + 
                           (0.6 * (marketCap / totalLiabilities)) + 
                           (1.0 * (revenue / totalAssets));
           
           // Simplified Piotroski F-Score (0-9 scale)
           // In reality, this would be calculated using specific financial indicators
-          const profitability = (incomeStatement.netIncome?.raw || 0) > 0 ? 1 : 0;
-          const operatingCashFlow = (result.cashflowStatementHistory?.cashflowStatements?.[0]?.totalCashFromOperatingActivities?.raw || 0) > 0 ? 1 : 0;
+          const profitability = (incomeStatement.netIncome || 0) > 0 ? 1 : 0;
+          const operatingCashFlow = (cashflowStatement.totalCashFromOperatingActivities || 0) > 0 ? 1 : 0;
           // Add more F-score components for a real calculation
           const fScore = profitability + operatingCashFlow + 5; // Adding 5 just for demo to get a value between 0-9
           
           // Simplified Beneish M-Score
           // In reality, requires several specific financial ratios
-          const mScore = -2.22 - (0.1 * ((incomeStatement.netIncome?.raw || 0) / revenue));
+          const mScore = -2.22 - (0.1 * ((incomeStatement.netIncome || 0) / revenue));
           
           // Create history arrays for charts (simplified)
           const years = ['2019', '2020', '2021', '2022', '2023', '2024'];
@@ -301,12 +303,12 @@ const FinancialHealth = ({ symbol }: FinancialHealthProps) => {
                 })),
                 netIncomePerShare: years.map((year, i) => ({ 
                   year, 
-                  value: (incomeStatement.netIncome?.raw || 0) / (sharesOutstandingData || 1) * (0.85 + 0.05 * i) / 1000
+                  value: (incomeStatement.netIncome || 0) / (sharesOutstandingData || 1) * (0.85 + 0.05 * i) / 1000
                 })),
                 fcfPerShare: years.map((year, i) => ({ 
                   year, 
-                  value: ((result.cashflowStatementHistory?.cashflowStatements?.[0]?.totalCashFromOperatingActivities?.raw || 0) - 
-                         (result.cashflowStatementHistory?.cashflowStatements?.[0]?.capitalExpenditures?.raw || 0)) / 
+                  value: ((cashflowStatement.totalCashFromOperatingActivities || 0) - 
+                         (cashflowStatement.capitalExpenditures || 0)) / 
                          (sharesOutstandingData || 1) * (0.85 + 0.05 * i) / 1000
                 }))
               }
@@ -338,15 +340,15 @@ const FinancialHealth = ({ symbol }: FinancialHealthProps) => {
               },
               {
                 label: 'Net Income Per Share',
-                data: years.map((year, i) => (incomeStatement.netIncome?.raw || 0) / (sharesOutstandingData || 1) * (0.85 + 0.05 * i) / 1000),
+                data: years.map((year, i) => (incomeStatement.netIncome || 0) / (sharesOutstandingData || 1) * (0.85 + 0.05 * i) / 1000),
                 borderColor: 'rgb(75, 192, 192)',
                 backgroundColor: 'rgba(75, 192, 192, 0.5)',
                 tension: 0.1
               },
               {
                 label: 'FCF Per Share',
-                data: years.map((year, i) => ((result.cashflowStatementHistory?.cashflowStatements?.[0]?.totalCashFromOperatingActivities?.raw || 0) - 
-                      (result.cashflowStatementHistory?.cashflowStatements?.[0]?.capitalExpenditures?.raw || 0)) / 
+                data: years.map((year, i) => ((cashflowStatement.totalCashFromOperatingActivities || 0) - 
+                      (cashflowStatement.capitalExpenditures || 0)) / 
                       (sharesOutstandingData || 1) * (0.85 + 0.05 * i) / 1000),
                 borderColor: 'rgb(255, 159, 64)',
                 backgroundColor: 'rgba(255, 159, 64, 0.5)',
@@ -374,131 +376,136 @@ const FinancialHealth = ({ symbol }: FinancialHealthProps) => {
       <div className={styles.card}>
         <div className={styles.financialHealthSection}>
           <h3>Financial Health</h3>
-          <div className={styles.tabHeader}>
-            <button 
-              className={`${styles.modernTabButton} ${activeTab === 'altmanZ' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('altmanZ')}
-            >
-              Altman Z-Score
-            </button>
-            <button 
-              className={`${styles.modernTabButton} ${activeTab === 'piotroskiF' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('piotroskiF')}
-            >
-              Piotroski F-Score
-            </button>
-            <button 
-              className={`${styles.modernTabButton} ${activeTab === 'beneishM' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('beneishM')}
-            >
-              Beneish M-Score
-            </button>
-          </div>
-
-          {loading ? (
-            <div className={styles.loadingIndicator}>Loading financial health data...</div>
-          ) : (
-            <div className={styles.scoreContainer}>
-              <div className={styles.scoreHeader}>
-                <h4>{currentScoreInfo.name} {currentScoreInfo.scale}</h4>
-              </div>
-              <div className={`${styles.scoreBox} ${currentScoreInfo.className}`}>
-                <div className={styles.scoreValue}>
-                  {currentScoreInfo.icon}
-                  <span>{currentScoreInfo.value}</span>
-                </div>
-                <div className={styles.scoreRisk}>
-                  <strong>Risk Assessment:</strong> {currentScoreInfo.risk}
-                </div>
-                <div className={styles.scoreCommentary}>
-                  <p>{currentScoreInfo.commentary}</p>
-                </div>
-              </div>
+          
+          <div className={styles.tabContentWrapper}>
+            <div className={styles.tabHeader}>
+              <button 
+                className={`${styles.modernTabButton} ${activeTab === 'altmanZ' ? styles.activeTab : ''}`}
+                onClick={() => setActiveTab('altmanZ')}
+              >
+                Altman Z-Score
+              </button>
+              <button 
+                className={`${styles.modernTabButton} ${activeTab === 'piotroskiF' ? styles.activeTab : ''}`}
+                onClick={() => setActiveTab('piotroskiF')}
+              >
+                Piotroski F-Score
+              </button>
+              <button 
+                className={`${styles.modernTabButton} ${activeTab === 'beneishM' ? styles.activeTab : ''}`}
+                onClick={() => setActiveTab('beneishM')}
+              >
+                Beneish M-Score
+              </button>
             </div>
-          )}
+
+            {loading ? (
+              <div className={styles.loadingIndicator}>Loading financial health data...</div>
+            ) : (
+              <div className={styles.scoreCardContainer}>
+                <div className={styles.scoreHeader}>
+                  <h4>{currentScoreInfo.name} {currentScoreInfo.scale}</h4>
+                </div>
+                <div className={`${styles.scoreBox} ${currentScoreInfo.className}`}>
+                  <div className={styles.scoreValue}>
+                    {currentScoreInfo.icon}
+                    <span>{currentScoreInfo.value}</span>
+                  </div>
+                  <div className={styles.scoreRisk}>
+                    <strong>Risk Assessment:</strong> {currentScoreInfo.risk}
+                  </div>
+                  <div className={styles.scoreCommentary}>
+                    <p>{currentScoreInfo.commentary}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
-      <div className={styles.capitalStructureSection}>
-        <h3>Capital Structure</h3>
-        <div className={styles.chartRow}>
-          <div className={styles.chartContainer}>
-            <h4>Shares Outstanding (2019-2024)</h4>
-            <div className={styles.trendChart}>
-              <Line 
-                data={sharesOutstandingData} 
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  scales: {
-                    y: {
-                      title: {
-                        display: true,
-                        text: 'Billions'
+      <div className={styles.card}>
+        <div className={styles.capitalStructureSection}>
+          <h3>Capital Structure</h3>
+          <div className={styles.chartRow}>
+            <div className={styles.chartContainer}>
+              <h4>Shares Outstanding (2019-2024)</h4>
+              <div className={styles.trendChart}>
+                <Line 
+                  data={sharesOutstandingData} 
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                      y: {
+                        title: {
+                          display: true,
+                          text: 'Billions'
+                        }
                       }
                     }
-                  }
-                }} 
-              />
-            </div>
-            <div className={styles.trendSummary}>
-              <div className={styles.trendIndicator}>
-                <span className={styles.trendLabel}>Shares Outstanding:</span>
-                <span className={styles.trendValue}>
-                  {financialHealth.sharesOutstanding.trend === 'increasing' ? 
-                    <><FaArrowUp className={styles.trendUp} /> increasing</> : 
-                    <><FaArrowDown className={styles.trendDown} /> decreasing</>}
-                </span>
+                  }} 
+                />
+              </div>
+              <div className={styles.trendSummary}>
+                <div className={styles.trendIndicator}>
+                  <span className={styles.trendLabel}>Shares Outstanding:</span>
+                  <span className={styles.trendValue}>
+                    {financialHealth.sharesOutstanding.trend === 'increasing' ? 
+                      <><FaArrowUp className={styles.trendUp} /> increasing</> : 
+                      <><FaArrowDown className={styles.trendDown} /> decreasing</>}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className={styles.chartContainer}>
-            <h4>Weighted Financials (per share)</h4>
-            <div className={styles.trendChart}>
-              <Line 
-                data={weightedFinancialsData} 
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  scales: {
-                    y: {
-                      title: {
-                        display: true,
-                        text: '$'
+            <div className={styles.chartContainer}>
+              <h4>Weighted Financials (per share)</h4>
+              <div className={styles.trendChart}>
+                <Line 
+                  data={weightedFinancialsData} 
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                      y: {
+                        title: {
+                          display: true,
+                          text: '$'
+                        }
                       }
                     }
-                  }
-                }} 
-              />
-            </div>
-            <div className={styles.trendSummary}>
-              <div className={styles.trendIndicator}>
-                <span className={styles.trendLabel}>Weighted Financials:</span>
-                <span className={styles.trendValue}>
-                  {financialHealth.weightedFinancials.trend === 'increasing' ? 
-                    <><FaArrowUp className={styles.trendUp} /> increasing</> : 
-                    <><FaArrowDown className={styles.trendDown} /> decreasing</>}
-                </span>
+                  }} 
+                />
+              </div>
+              <div className={styles.trendSummary}>
+                <div className={styles.trendIndicator}>
+                  <span className={styles.trendLabel}>Weighted Financials:</span>
+                  <span className={styles.trendValue}>
+                    {financialHealth.weightedFinancials.trend === 'increasing' ? 
+                      <><FaArrowUp className={styles.trendUp} /> increasing</> : 
+                      <><FaArrowDown className={styles.trendDown} /> decreasing</>}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className={styles.companySummary}>
-          <h4 className={styles.companyRatingTitle}>
-            This company is <span className={styles.resilientRating}>
-              {parseFloat(financialHealth.altmanZScore.current) > 3 ? "Resilient" : 
-               parseFloat(financialHealth.altmanZScore.current) > 1.8 ? "Stable" : "At Risk"}
-            </span>
-          </h4>
-          <p className={styles.companyRatingDesc}>
-            {parseFloat(financialHealth.altmanZScore.current) > 3 
-              ? "It is effectively managing its capital to foster growth and it rewards its investors." 
-              : parseFloat(financialHealth.altmanZScore.current) > 1.8 
-                ? "It maintains adequate financial stability but may benefit from improved capital management."
-                : "It shows signs of financial stress and may require significant restructuring."}
-          </p>
+          
+          <div className={styles.companySummary}>
+            <h4 className={styles.companyRatingTitle}>
+              This company is <span className={styles.resilientRating}>
+                {parseFloat(financialHealth.altmanZScore.current) > 3 ? "Resilient" : 
+                 parseFloat(financialHealth.altmanZScore.current) > 1.8 ? "Stable" : "At Risk"}
+              </span>
+            </h4>
+            <p className={styles.companyRatingDesc}>
+              {parseFloat(financialHealth.altmanZScore.current) > 3 
+                ? "It is effectively managing its capital to foster growth and it rewards its investors." 
+                : parseFloat(financialHealth.altmanZScore.current) > 1.8 
+                  ? "It maintains adequate financial stability but may benefit from improved capital management."
+                  : "It shows signs of financial stress and may require significant restructuring."}
+            </p>
+          </div>
         </div>
       </div>
     </>

@@ -10,6 +10,7 @@ import Seasonality from '../components/analyses/Seasonality';
 import COTReport from '../components/analyses/COTReport';
 import OverboughtOversold from '../components/analyses/OverboughtOversold';
 import Fundamental from '../components/analyses/Fundamental';
+import ForecastAI from '../components/analyses/ForecastAI';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -21,13 +22,17 @@ export default function Analyses() {
   
   const [activeTab, setActiveTab] = useState('overview');
 
+  const handleAIButtonClick = () => {
+    setActiveTab('ai-forecast');
+  };
+
   return (
     <Layout>
       <div className={styles.analysesContainer}>
         {/* Header with Asset Name and AI Button */}
         <div className={styles.header}>
           <h1 className={styles.assetName}>{symbol as string}</h1>
-          <button className={styles.aiButton}>
+          <button className={styles.aiButton} onClick={handleAIButtonClick}>
             <FaRobot /> Forecast AI AGENT
           </button>
         </div>
@@ -64,6 +69,12 @@ export default function Analyses() {
           >
             <FaChartPie /> Fundamental
           </button>
+          <button 
+            className={`${styles.tabButton} ${activeTab === 'ai-forecast' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('ai-forecast')}
+          >
+            <FaRobot /> AI Forecast
+          </button>
         </div>
 
         {/* Tab Content */}
@@ -95,6 +106,13 @@ export default function Analyses() {
           {/* Fundamental Analysis Tab */}
           {activeTab === 'fundamental' && (
             <Fundamental 
+              symbol={symbol as string}
+            />
+          )}
+
+          {/* AI Forecast Tab */}
+          {activeTab === 'ai-forecast' && (
+            <ForecastAI 
               symbol={symbol as string}
             />
           )}
