@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout'
 import styles from '../styles/Analyses.module.css';
-import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaBalanceScale, FaChartPie } from 'react-icons/fa';
+import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaBalanceScale, FaChartPie, FaFileAlt } from 'react-icons/fa';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, 
   Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import Overview from '../components/analyses/Overview';
@@ -11,6 +11,7 @@ import COTReport from '../components/analyses/COTReport';
 import OverboughtOversold from '../components/analyses/OverboughtOversold';
 import Fundamental from '../components/analyses/Fundamental';
 import ForecastAI from '../components/analyses/ForecastAI';
+import Report from '../components/analyses/Report';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -52,11 +53,17 @@ export default function Analyses() {
             <FaCalendarAlt /> Seasonality
           </button>
           <button 
+            className={`${styles.tabButton} ${activeTab === 'report' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('report')}
+          >
+            <FaFileAlt /> Report
+          </button>
+          {/* <button 
             className={`${styles.tabButton} ${activeTab === 'cot' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('cot')}
           >
             <FaUsers /> COT Report
-          </button>
+          </button> */}
           <button 
             className={`${styles.tabButton} ${activeTab === 'overbought-oversold' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('overbought-oversold')}
@@ -69,6 +76,7 @@ export default function Analyses() {
           >
             <FaChartPie /> Fundamental
           </button>
+
           <button 
             className={`${styles.tabButton} ${activeTab === 'ai-forecast' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('ai-forecast')}
@@ -106,6 +114,13 @@ export default function Analyses() {
           {/* Fundamental Analysis Tab */}
           {activeTab === 'fundamental' && (
             <Fundamental 
+              symbol={symbol as string}
+            />
+          )}
+
+          {/* Report Tab */}
+          {activeTab === 'report' && (
+            <Report 
               symbol={symbol as string}
             />
           )}
