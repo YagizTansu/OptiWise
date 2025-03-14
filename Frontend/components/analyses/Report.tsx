@@ -165,7 +165,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
     const fetchInsights = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3001/api/finance/insights?symbol=${symbol}`);
+        const response = await axios.get(`http://localhost:3001/api/finance/insights?symbol=${symbol}&reportsCount=10`);
         setInsightsData(response.data);
         setError(null);
       } catch (err) {
@@ -626,9 +626,19 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
                 <div className={styles.eventCard} key={`event-${index}`}>
                   <div className={styles.eventType}>{event.eventType}</div>
                   <div className={styles.eventDetails}>
-                    <p>Period: {event.pricePeriod} | Horizon: {event.tradingHorizon}</p>
-                    <p>Trade Type: {event.tradeType}</p>
-                    <p>Date Range: {formatDate(event.startDate)} - {formatDate(event.endDate)}</p>
+                    <p>
+                      <span className={styles.eventLabel}>Period:</span>
+                      <span className={styles.eventValue}>{event.pricePeriod}</span>
+                      <span className={styles.eventLabel} style={{marginLeft: '10px'}}>Horizon:</span>
+                      <span className={styles.eventValue}>{event.tradingHorizon}</span>
+                    </p>
+                    <p>
+                      <span className={styles.eventLabel}>Trade Type:</span>
+                      <span className={styles.eventValue}>{event.tradeType}</span>
+                    </p>
+                    <p className={styles.dateRange}>
+                      {formatDate(event.startDate)} - {formatDate(event.endDate)}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -636,7 +646,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
           </div>
         )}
         
-        {insightsData.sigDevs.length > 0 && (
+        {insightsData.sigDevs.length > 0 ? (
           <div className={styles.sigDevsContainer}>
             <div className={styles.metricHeader}>
               <h4>Significant Developments</h4>
@@ -648,11 +658,27 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
             <ul className={styles.sigDevsList}>
               {insightsData.sigDevs.map((dev, index) => (
                 <li key={`dev-${index}`}>
-                  <span className={styles.sigDevDate}>{formatDate(dev.date)}</span>
+                  <span className={styles.sigDevDate}>
+                    {formatDate(dev.date)}
+                  </span>
                   <span className={styles.sigDevHeadline}>{dev.headline}</span>
                 </li>
               ))}
             </ul>
+          </div>
+        ) : (
+          <div className={styles.sigDevsContainer}>
+            <div className={styles.metricHeader}>
+              <h4>Significant Developments</h4>
+              <InfoButton 
+                title="Significant Developments" 
+                content="Major announcements or news that could significantly impact the company's business operations or stock performance, such as earnings surprises, management changes, or strategic shifts." 
+              />
+            </div>
+            <div className={styles.emptyDevelopments}>
+              <span>📌</span>
+              <p>No significant developments found for this period</p>
+            </div>
           </div>
         )}
       </div>
