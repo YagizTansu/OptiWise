@@ -33,7 +33,7 @@ export default function Home() {
       setIsLoading(true);
       const response = await fetch(`http://localhost:3001/api/finance/search?query=${encodeURIComponent(query)}&limit=100`);
       const data = await response.json();
-      debugger
+      
       if (data.length > 0) {
         setSearchResults(data.map((quote: any) => ({
           symbol: quote.symbol,
