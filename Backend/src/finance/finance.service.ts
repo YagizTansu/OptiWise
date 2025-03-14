@@ -80,6 +80,13 @@ interface FundamentalsTimeSeriesOptions {
   padTimeSeries?: boolean;
 }
 
+// Interface for Yahoo Finance insights options
+interface InsightsOptions {
+  reportsCount?: number;
+  lang?: string;
+  region?: string;
+}
+
 @Injectable()
 export class FinanceService implements OnModuleInit {
   private readonly logger = new Logger(FinanceService.name);
@@ -245,6 +252,33 @@ export class FinanceService implements OnModuleInit {
       return await yahooFinance.fundamentalsTimeSeries(symbol, queryOptions);
     } catch (error) {
       this.logger.error(`Failed to fetch fundamentals time series for ${symbol}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get insights for a symbol
+   * 
+   * @param symbol - Yahoo Finance symbol
+   * @param options - Options for insights query
+   * 
+   * This API provides comprehensive insights about a stock including:
+   * - Technical analysis (short-term, intermediate-term, long-term outlooks)
+   * - Company snapshot with sector comparison
+   * - Analyst recommendations and price targets
+   * - Significant events and reports
+   */
+  async getInsights(symbol: string, options: InsightsOptions = {}) {
+    try {
+      const queryOptions = {
+        reportsCount: options.reportsCount || 5,
+        lang: options.lang || 'en-US',
+        region: options.region || 'US'
+      };
+
+      return await yahooFinance.insights(symbol, queryOptions);
+    } catch (error) {
+      this.logger.error(`Failed to fetch insights for ${symbol}`, error);
       throw error;
     }
   }

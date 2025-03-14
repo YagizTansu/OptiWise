@@ -301,6 +301,26 @@ export class FinanceController {
   }
 
   /**
+   * Get insights for a symbol
+   * This includes technical analysis, company snapshot, analyst recommendations, and news
+   */
+  @Get('insights')
+  async getInsights(
+    @Query('symbol', new DefaultValuePipe('AAPL')) symbol: string,
+    @Query('reportsCount', new DefaultValuePipe(5), ParseIntPipe) reportsCount: number,
+    @Query('lang', new DefaultValuePipe('en-US')) lang: string,
+    @Query('region', new DefaultValuePipe('US')) region: string,
+  ) {
+    const options = {
+      reportsCount,
+      lang,
+      region
+    };
+    
+    return this.financeService.getInsights(symbol, options);
+  }
+
+  /**
    * Get daily gainers - stocks with biggest percentage gains
    */
   @Get('daily-gainers')
@@ -374,4 +394,9 @@ Example test URLs:
    http://localhost:3001/api/finance/fundamentals-time-series?symbol=AAPL&period1=2022-01-01
    http://localhost:3001/api/finance/fundamentals-time-series?symbol=MSFT&period1=2022-01-01&module=balance-sheet&type=annual
    http://localhost:3001/api/finance/fundamentals-time-series?symbol=GOOGL&period1=2022-01-01&period2=2023-12-31&module=financials&type=quarterly
+
+9. Get insights for a symbol:
+   http://localhost:3001/api/finance/insights              (uses default symbol AAPL)
+   http://localhost:3001/api/finance/insights?symbol=MSFT
+   http://localhost:3001/api/finance/insights?symbol=GOOGL&reportsCount=10
 */
