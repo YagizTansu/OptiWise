@@ -110,6 +110,40 @@ export class QuoteSummaryModulesValidationPipe implements PipeTransform {
   }
 }
 
+/**
+ * Validates modules for fundamentalsTimeSeries endpoint
+ */
+@Injectable()
+export class FundamentalsModuleValidationPipe implements PipeTransform {
+  private readonly allowedModules = ['financials', 'balance-sheet', 'cash-flow', 'all'];
+
+  transform(value: any, metadata: ArgumentMetadata) {
+    if (!this.allowedModules.includes(value)) {
+      throw new BadRequestException(
+        `Invalid module: ${value}. Allowed values are: ${this.allowedModules.join(', ')}`
+      );
+    }
+    return value;
+  }
+}
+
+/**
+ * Validates period type for fundamentalsTimeSeries endpoint
+ */
+@Injectable()
+export class FundamentalsPeriodTypeValidationPipe implements PipeTransform {
+  private readonly allowedTypes = ['quarterly', 'annual', 'trailing'];
+
+  transform(value: any, metadata: ArgumentMetadata) {
+    if (!this.allowedTypes.includes(value)) {
+      throw new BadRequestException(
+        `Invalid period type: ${value}. Allowed values are: ${this.allowedTypes.join(', ')}`
+      );
+    }
+    return value;
+  }
+}
+
 @Controller('finance')
 export class FinanceController {
   constructor(private readonly financeService: FinanceService) {}
@@ -237,6 +271,36 @@ export class FinanceController {
   }
 
   /**
+   * Get fundamentals time series data for a symbol
+   * This includes financial data over time (quarterly, annual, or trailing)
+   */
+  @Get('fundamentals-time-series')
+  async getFundamentalsTimeSeries(
+    @Query('symbol', new DefaultValuePipe('AAPL')) symbol: string,
+    @Query('period1', new ParseDatePipe()) period1: Date,
+    @Query('period2', new DefaultValuePipe(new Date().toISOString()), ParseDatePipe) period2: Date,
+    @Query('type', new DefaultValuePipe('quarterly'), new FundamentalsPeriodTypeValidationPipe()) type: 'quarterly' | 'annual' | 'trailing',
+    @Query('module', new DefaultValuePipe('all'), new FundamentalsModuleValidationPipe()) module: 'financials' | 'balance-sheet' | 'cash-flow' | 'all',
+    @Query('lang', new DefaultValuePipe('en-US')) lang: string,
+    @Query('region', new DefaultValuePipe('US')) region: string,
+    @Query('merge', new DefaultValuePipe('false'), ParseBoolPipe) merge: boolean,
+    @Query('padTimeSeries', new DefaultValuePipe('false'), ParseBoolPipe) padTimeSeries: boolean,
+  ) {
+    const options = {
+      period1,
+      period2,
+      type,
+      module, // Now this will always have a value because of the DefaultValuePipe
+      lang,
+      region,
+      merge,
+      padTimeSeries
+    };
+    
+    return this.financeService.getFundamentalsTimeSeries(symbol, options);
+  }
+
+  /**
    * Get daily gainers - stocks with biggest percentage gains
    */
   @Get('daily-gainers')
@@ -305,4 +369,9 @@ Example test URLs:
    
    http://localhost:3001/api/finance/most-actives
    http://localhost:3001/api/finance/most-actives?count=10
+
+8. Get fundamentals time series:
+   http://localhost:3001/api/finance/fundamentals-time-series?symbol=AAPL&period1=2022-01-01
+   http://localhost:3001/api/finance/fundamentals-time-series?symbol=MSFT&period1=2022-01-01&module=balance-sheet&type=annual
+   http://localhost:3001/api/finance/fundamentals-time-series?symbol=GOOGL&period1=2022-01-01&period2=2023-12-31&module=financials&type=quarterly
 */

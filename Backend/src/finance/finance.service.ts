@@ -68,6 +68,18 @@ interface TrendingQueryOptions {
   region?: string;
 }
 
+// Interface for fundamentalsTimeSeries options
+interface FundamentalsTimeSeriesOptions {
+  period1: Date | string | number;
+  period2?: Date | string | number;
+  type?: 'quarterly' | 'annual' | 'trailing';
+  module: 'financials' | 'balance-sheet' | 'cash-flow' | 'all'; // Changed from optional to required
+  lang?: string;
+  region?: string;
+  merge?: boolean;
+  padTimeSeries?: boolean;
+}
+
 @Injectable()
 export class FinanceService implements OnModuleInit {
   private readonly logger = new Logger(FinanceService.name);
@@ -199,6 +211,40 @@ export class FinanceService implements OnModuleInit {
       } as any);
     } catch (error) {
       this.logger.error(`Failed to fetch quote summary for ${symbol}`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get fundamentals time series data for a symbol
+   * 
+   * @param symbol - Yahoo Finance symbol
+   * @param options - Options for fundamentals time series query
+   * 
+   * This API provides financial statement data over time periods:
+   * - Financial data (income statements)
+   * - Balance sheet data
+   * - Cash flow data
+   * 
+   * Available types: quarterly (default), annual, trailing
+   */
+  async getFundamentalsTimeSeries(symbol: string, options: FundamentalsTimeSeriesOptions) {
+    try {
+      // Ensure options object has required properties
+      const queryOptions = {
+        period1: options.period1,
+        period2: options.period2 || new Date(),
+        type: options.type || 'quarterly',
+        module: options.module, // This is now required in the interface
+        lang: options.lang || 'en-US',
+        region: options.region || 'US',
+        merge: options.merge !== undefined ? options.merge : false,
+        padTimeSeries: options.padTimeSeries !== undefined ? options.padTimeSeries : false
+      };
+
+      return await yahooFinance.fundamentalsTimeSeries(symbol, queryOptions);
+    } catch (error) {
+      this.logger.error(`Failed to fetch fundamentals time series for ${symbol}`, error);
       throw error;
     }
   }
