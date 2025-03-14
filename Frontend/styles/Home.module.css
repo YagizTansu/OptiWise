@@ -231,7 +231,7 @@
 
 /* Modern search button with icon */
 .searchBar button {
-  background: linear-gradient(90deg, #2563eb, #1e40af);
+  background: linear-gradient(135deg, #2563eb, #1e293b);
   color: white;
   border: none;
   width: 60px;
@@ -242,15 +242,18 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
 }
 
 .searchIcon {
   font-size: 1.2rem;
+  color: white;
 }
 
 .searchBar button:hover {
-  background: linear-gradient(90deg, #1e40af, #153e75);
-  box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+  background: linear-gradient(135deg, #3b82f6, #0f172a);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
   transform: scale(1.05);
 }
 

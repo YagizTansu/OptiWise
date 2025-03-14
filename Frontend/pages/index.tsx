@@ -103,7 +103,7 @@ export default function Home() {
         </div>
         
         <div className={styles.searchSection} ref={searchSectionRef}>
-          <h2>Let's get started...</h2>
+          <h2>Discover high-potential stocks</h2>
           <div className={styles.searchBar}>
             <input 
               type="text" 
@@ -112,7 +112,10 @@ export default function Home() {
               onChange={handleSearchChange}
               onFocus={() => searchQuery && setShowDropdown(true)}
             />
-            <button type="submit" className={styles.searchButton}>
+            <button 
+              type="submit" 
+              className={styles.searchButton}
+            >
               <FaSearch className={styles.searchIcon} />
             </button>
           </div>
