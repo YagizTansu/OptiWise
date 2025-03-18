@@ -349,6 +349,35 @@ export interface InsightsData {
   }>;
 }
 
+// Wyckoff Indicator types
+export interface WyckoffIndicatorDataPoint {
+  period: string;
+  value: number;
+}
+
+export interface WyckoffIndicatorData {
+  labels: string[];
+  indicators: number[];
+}
+
+// Price Volume Chart types
+export interface PriceVolumeData {
+  price: {
+    dates: string[];
+    values: number[];
+  };
+  volume: {
+    dates: string[];
+    values: number[];
+  };
+  priceChange: number;
+  percentChange: number;
+  minPrice: number;
+  maxPrice: number;
+  avgVolume: number;
+  volumeChange: number;
+}
+
 // =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
@@ -2082,5 +2111,360 @@ export async function fetchInsightsData(symbol: string): Promise<InsightsData> {
   } catch (error) {
     console.error('Error fetching insights data:', error);
     throw error;
+  }
+}
+
+// =============================================================================
+// WYCKOFF INDICATOR FUNCTIONS
+// =============================================================================
+
+/**
+ * Converts a timeframe string to a date range with appropriate interval
+ * 
+ * @param timeframe - String representation of the timeframe (e.g., '1y', '6m', '1w')
+ * @returns Object with from date, to date, and appropriate interval
+ */
+function timeframeToDateRange(timeframe: string): { from: string; to: string; interval: string } {
+  const now = new Date();
+  const endDate = now.toISOString();
+  let startDate;
+  let interval = '1d';
+  
+  switch (timeframe) {
+    case '1w':
+      startDate = new Date(now.setDate(now.getDate() - 7)).toISOString();
+      interval = '60m';
+      break;
+    case '3d':
+      startDate = new Date(now.setDate(now.getDate() - 3)).toISOString();
+      interval = '30m';
+      break;
+    case 'd':
+      startDate = new Date(now.setDate(now.getDate() - 1)).toISOString();
+      interval = '5m';
+      break;
+    case 'w':
+      startDate = new Date(now.setDate(now.getDate() - 7)).toISOString();
+      interval = '60m';
+      break;
+    case '1m':
+      startDate = new Date(now.setMonth(now.getMonth() - 1)).toISOString();
+      interval = '1d';
+      break;
+    case '6m':
+      startDate = new Date(now.setMonth(now.getMonth() - 6)).toISOString();
+      interval = '1d';
+      break;
+    case '1y':
+      startDate = new Date(now.setFullYear(now.getFullYear() - 1)).toISOString();
+      interval = '1d';
+      break;
+    case '3y':
+      startDate = new Date(now.setFullYear(now.getFullYear() - 3)).toISOString();
+      interval = '1wk';
+      break;
+    case '5y':
+      startDate = new Date(now.setFullYear(now.getFullYear() - 5)).toISOString();
+      interval = '1wk';
+      break;
+    default:
+      startDate = new Date(now.setFullYear(now.getFullYear() - 1)).toISOString();
+      interval = '1d';
+  }
+  
+  return { from: startDate, to: endDate, interval };
+}
+
+/**
+ * Calculate the Wyckoff Causes/Effects indicator based on price and volume data
+ * This combines momentum and supply/demand factors to create an oscillating indicator
+ * 
+ * @param timestamps - Array of timestamps
+ * @param quotes - Object containing price and volume data arrays
+ * @returns Processed Wyckoff indicator data
+ */
+function calculateWyckoffIndicator(timestamps: any[], quotes: any): WyckoffIndicatorData {
+  if (!timestamps.length || !quotes.close || !quotes.volume) {
+    return { labels: [], indicators: [] };
+  }
+  
+  const closes = quotes.close;
+  const volumes = quotes.volume;
+  const highs = quotes.high;
+  const lows = quotes.low;
+  
+  const labels: string[] = [];
+  const indicators: number[] = [];
+  
+  // We need at least 14 data points to calculate meaningful indicators
+  const lookback = Math.min(14, closes.length - 1);
+  
+  // Process the data
+  for (let i = lookback; i < closes.length; i++) {
+    // Format date from timestamp
+    // Handle both timestamp number and date string formats
+    const date = typeof timestamps[i] === 'number' 
+      ? new Date(timestamps[i] * 1000) 
+      : new Date(timestamps[i]);
+    labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    
+    // Calculate price momentum (rate of change over lookback period)
+    const priceChange = closes[i] / closes[i - lookback] - 1;
+    
+    // Calculate volume trend (is volume increasing or decreasing?)
+    let volumeSum = 0;
+    let prevVolumeSum = 0;
+    
+    for (let j = 0; j < lookback; j++) {
+      if (volumes[i - j]) volumeSum += volumes[i - j];
+      if (volumes[i - j - lookback]) prevVolumeSum += volumes[i - j - lookback];
+    }
+    
+    const volumeTrend = prevVolumeSum > 0 ? volumeSum / prevVolumeSum - 1 : 0;
+    
+    // Calculate price range volatility
+    let trueRange = 0;
+    for (let j = 0; j < lookback; j++) {
+      if (highs[i - j] && lows[i - j]) {
+        const prevClose = i - j - 1 >= 0 ? closes[i - j - 1] : closes[i - j];
+        const currentTR = Math.max(
+          highs[i - j] - lows[i - j],
+          Math.abs(highs[i - j] - prevClose),
+          Math.abs(lows[i - j] - prevClose)
+        );
+        trueRange += currentTR;
+      }
+    }
+    trueRange /= lookback;
+    
+    // Normalize the true range
+    const normalizedTrueRange = trueRange / closes[i] * 100;
+    
+    // Calculate Wyckoff Indicator combining price momentum, volume trend, and volatility
+    // This is a simplified interpretation of Wyckoff principles
+    const wyckoffIndicator = (priceChange * 10) * (1 + volumeTrend * 0.5) * (1 - normalizedTrueRange * 0.05);
+    
+    // Scale the indicator to fit within our chart range (-15 to 15)
+    const scaledIndicator = Math.max(Math.min(wyckoffIndicator * 100, 15), -15);
+    
+    indicators.push(scaledIndicator);
+  }
+  
+  return { labels, indicators };
+}
+
+/**
+ * Fetches chart data and calculates Wyckoff indicator values
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param timeframe - Time period to analyze (e.g., '1y', '6m', '1w')
+ * @returns Processed Wyckoff indicator data
+ */
+export async function fetchWyckoffIndicatorData(symbol: string, timeframe: string): Promise<WyckoffIndicatorData> {
+  try {
+    // Convert timeframe to date range parameters
+    const period = timeframeToDateRange(timeframe);
+
+    // Fetch the chart data
+    const params = {
+      symbol,
+      period1: period.from,
+      period2: period.to,
+      interval: period.interval,
+      includePrePost: true,
+      events: 'div|split|earn'
+    };
+    
+    const data = await makeApiRequest<any>('chart', params);
+    
+    // Extract data from response
+    if (data && data.quotes && data.quotes.length > 0) {
+      // Extract quotes array
+      const quotes = data.quotes;
+      
+      // Extract necessary data points for Wyckoff calculation
+      const timestamps = quotes.map((q: any) => q.date || q.timestamp);
+      const closes = quotes.map((q: any) => q.close || q.adjclose);
+      const volumes = quotes.map((q: any) => q.volume);
+      const highs = quotes.map((q: any) => q.high);
+      const lows = quotes.map((q: any) => q.low);
+      
+      // Create consolidated data structure for the calculation
+      const quoteData = {
+        close: closes,
+        volume: volumes,
+        high: highs,
+        low: lows
+      };
+      
+      // Process data for Wyckoff indicator
+      return calculateWyckoffIndicator(timestamps, quoteData);
+    } else {
+      throw new Error('Invalid data format received from API');
+    }
+  } catch (error) {
+    console.error('Failed to load Wyckoff indicator data:', error);
+    throw error;
+  }
+}
+
+// =============================================================================
+// PRICE VOLUME CHART FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches and processes price and volume data for a given symbol and time period
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param period - Time period to analyze (e.g., '1d', '5d', '1mo', '3mo', '6mo', '1y', '5y')
+ * @returns Processed price and volume data ready for charting
+ */
+export async function fetchPriceVolumeData(
+  symbol: string,
+  period: string = '3mo'
+): Promise<PriceVolumeData> {
+  try {
+    // Convert period to date range
+    const { from, to } = getPeriodDateRange(period);
+    
+    // Choose appropriate interval based on period
+    const interval = getIntervalForPeriod(period);
+    
+    // Fetch the data
+    const params = {
+      symbol,
+      period1: from,
+      period2: to,
+      interval,
+    };
+    
+    const data = await makeApiRequest<any>('chart', params);
+    
+    // Process the data
+    if (!data || !data.quotes || !Array.isArray(data.quotes) || data.quotes.length === 0) {
+      throw new Error('Invalid data received from API');
+    }
+    
+    const quotes = data.quotes;
+    
+    // Extract price and volume data
+    const prices: number[] = [];
+    const volumes: number[] = [];
+    const dates: string[] = [];
+    
+    quotes.forEach((quote: any) => {
+      if (quote.close !== null && quote.close !== undefined) {
+        prices.push(quote.close);
+        volumes.push(quote.volume || 0);
+        
+        // Format date
+        const timestamp = quote.timestamp || quote.date;
+        const date = new Date(typeof timestamp === 'number' ? timestamp * 1000 : timestamp);
+        dates.push(formatDate(date));
+      }
+    });
+    
+    // Calculate statistics
+    const firstPrice = prices[0];
+    const lastPrice = prices[prices.length - 1];
+    const priceChange = lastPrice - firstPrice;
+    const percentChange = (priceChange / firstPrice) * 100;
+    
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    
+    // Volume stats
+    const avgVolume = volumes.reduce((sum, vol) => sum + vol, 0) / volumes.length;
+    const firstVolume = volumes[0];
+    const lastVolume = volumes[volumes.length - 1];
+    const volumeChange = ((lastVolume - firstVolume) / firstVolume) * 100;
+    
+    return {
+      price: {
+        dates,
+        values: prices
+      },
+      volume: {
+        dates,
+        values: volumes
+      },
+      priceChange,
+      percentChange,
+      minPrice,
+      maxPrice,
+      avgVolume,
+      volumeChange
+    };
+  } catch (error) {
+    console.error('Error fetching price-volume data:', error);
+    throw error;
+  }
+}
+
+/**
+ * Converts a period string to start and end dates
+ */
+function getPeriodDateRange(period: string): { from: string; to: string } {
+  const now = new Date();
+  const to = now.toISOString();
+  let from: Date;
+  
+  switch (period) {
+    case '1d':
+      from = new Date(now.setDate(now.getDate() - 1));
+      break;
+    case '5d':
+      from = new Date(now.setDate(now.getDate() - 5));
+      break;
+    case '1mo':
+      from = new Date(now.setMonth(now.getMonth() - 1));
+      break;
+    case '3mo':
+      from = new Date(now.setMonth(now.getMonth() - 3));
+      break;
+    case '6mo':
+      from = new Date(now.setMonth(now.getMonth() - 6));
+      break;
+    case '1y':
+      from = new Date(now.setFullYear(now.getFullYear() - 1));
+      break;
+    case '2y':
+      from = new Date(now.setFullYear(now.getFullYear() - 2));
+      break;
+    case '5y':
+      from = new Date(now.setFullYear(now.getFullYear() - 5));
+      break;
+    case 'max':
+      from = new Date(now.setFullYear(1900)); // Arbitrary distant past date
+      break;
+    default:
+      from = new Date(now.setMonth(now.getMonth() - 3)); // Default to 3 months
+  }
+  
+  return { from: from.toISOString(), to };
+}
+
+/**
+ * Determines appropriate data interval based on the time period
+ */
+function getIntervalForPeriod(period: string): string {
+  switch (period) {
+    case '1d':
+      return '5m';  // 5-minute intervals for 1 day
+    case '5d':
+      return '30m'; // 30-minute intervals for 5 days
+    case '1mo':
+      return '1d';  // 1-day intervals for 1 month
+    case '3mo':
+    case '6mo':
+      return '1d';  // 1-day intervals for 3-6 months
+    case '1y':
+    case '2y':
+      return '1d';  // 1-day intervals for 1-2 years
+    case '5y':
+    case 'max':
+      return '1wk'; // 1-week intervals for 5+ years
+    default:
+      return '1d';  // Default to daily data
   }
 }
