@@ -1,134 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../styles/Analyses.module.css';
-import axios from 'axios';
+import { fetchInsightsData, InsightsData } from '../../services/api/finance';
 
 interface ReportProps {
   symbol: string;
-}
-
-interface InsightsData {
-  symbol: string;
-  instrumentInfo: {
-    technicalEvents: {
-      provider: string;
-      sector: string;
-      shortTermOutlook: {
-        stateDescription: string;
-        direction: string;
-        score: number;
-        scoreDescription: string;
-        sectorDirection: string;
-        sectorScore: number;
-        sectorScoreDescription: string;
-        indexDirection: string;
-        indexScore: number;
-        indexScoreDescription: string;
-      };
-      intermediateTermOutlook: {
-        stateDescription: string;
-        direction: string;
-        score: number;
-        scoreDescription: string;
-        sectorDirection: string;
-        sectorScore: number;
-        sectorScoreDescription: string;
-        indexDirection: string;
-        indexScore: number;
-        indexScoreDescription: string;
-      };
-      longTermOutlook: {
-        stateDescription: string;
-        direction: string;
-        score: number;
-        scoreDescription: string;
-        sectorDirection: string;
-        sectorScore: number;
-        sectorScoreDescription: string;
-        indexDirection: string;
-        indexScore: number;
-        indexScoreDescription: string;
-      };
-    };
-    keyTechnicals: {
-      provider: string;
-      support: number;
-      resistance: number;
-      stopLoss: number;
-    };
-    valuation: {
-      color: number;
-      description: string;
-      discount: string;
-      relativeValue: string;
-      provider: string;
-    };
-  };
-  companySnapshot: {
-    sectorInfo: string;
-    company: {
-      innovativeness: number;
-      hiring: number;
-      sustainability: number;
-      insiderSentiments: number;
-      earningsReports: number;
-      dividends: number;
-    };
-    sector: {
-      innovativeness: number;
-      hiring: number;
-      sustainability: number;
-      insiderSentiments: number;
-      earningsReports: number;
-      dividends: number;
-    };
-  };
-  recommendation: {
-    targetPrice: number;
-    provider: string;
-    rating: string;
-  };
-  upsell: {
-    msBullishSummary: string[];
-    msBearishSummary: string[];
-    companyName: string;
-    msBullishBearishSummariesPublishDate: string;
-    upsellReportType: string;
-  };
-  events: Array<{
-    eventType: string;
-    pricePeriod: string;
-    tradingHorizon: string;
-    tradeType: string;
-    imageUrl: string;
-    startDate: string;
-    endDate: string;
-  }>;
-  reports: Array<{
-    id: string;
-    headHtml: string;
-    provider: string;
-    reportDate: string;
-    reportTitle: string;
-    reportType: string;
-    targetPrice?: number;
-    targetPriceStatus?: string;
-    investmentRating?: string;
-    tickers: string[];
-    title: string;
-  }>;
-  sigDevs: Array<{
-    headline: string;
-    date: string;
-  }>;
-  secReports: Array<{
-    id: string;
-    type: string;
-    title: string;
-    description: string;
-    filingDate: string;
-    snapshotUrl: string;
-    formType: string;
-  }>;
 }
 
 // Add a new InfoButton component
@@ -162,21 +37,21 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchInsights = async () => {
+    const loadInsights = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3001/api/finance/insights?symbol=${symbol}`);
-        setInsightsData(response.data);
+        const data = await fetchInsightsData(symbol);
+        setInsightsData(data);
         setError(null);
       } catch (err) {
-        console.error('Error fetching insights:', err);
+        console.error('Error loading insights:', err);
         setError('Failed to load insights data. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchInsights();
+    loadInsights();
   }, [symbol]);
 
   // Helper function for rendering score indicators

@@ -223,6 +223,132 @@ export interface PatternCorrelationData {
   };
 }
 
+// Report Insights types
+export interface InsightsData {
+  symbol: string;
+  instrumentInfo: {
+    technicalEvents: {
+      provider: string;
+      sector: string;
+      shortTermOutlook: {
+        stateDescription: string;
+        direction: string;
+        score: number;
+        scoreDescription: string;
+        sectorDirection: string;
+        sectorScore: number;
+        sectorScoreDescription: string;
+        indexDirection: string;
+        indexScore: number;
+        indexScoreDescription: string;
+      };
+      intermediateTermOutlook: {
+        stateDescription: string;
+        direction: string;
+        score: number;
+        scoreDescription: string;
+        sectorDirection: string;
+        sectorScore: number;
+        sectorScoreDescription: string;
+        indexDirection: string;
+        indexScore: number;
+        indexScoreDescription: string;
+      };
+      longTermOutlook: {
+        stateDescription: string;
+        direction: string;
+        score: number;
+        scoreDescription: string;
+        sectorDirection: string;
+        sectorScore: number;
+        sectorScoreDescription: string;
+        indexDirection: string;
+        indexScore: number;
+        indexScoreDescription: string;
+      };
+    };
+    keyTechnicals: {
+      provider: string;
+      support: number;
+      resistance: number;
+      stopLoss: number;
+    };
+    valuation: {
+      color: number;
+      description: string;
+      discount: string;
+      relativeValue: string;
+      provider: string;
+    };
+  };
+  companySnapshot: {
+    sectorInfo: string;
+    company: {
+      innovativeness: number;
+      hiring: number;
+      sustainability: number;
+      insiderSentiments: number;
+      earningsReports: number;
+      dividends: number;
+    };
+    sector: {
+      innovativeness: number;
+      hiring: number;
+      sustainability: number;
+      insiderSentiments: number;
+      earningsReports: number;
+      dividends: number;
+    };
+  };
+  recommendation: {
+    targetPrice: number;
+    provider: string;
+    rating: string;
+  };
+  upsell: {
+    msBullishSummary: string[];
+    msBearishSummary: string[];
+    companyName: string;
+    msBullishBearishSummariesPublishDate: string;
+    upsellReportType: string;
+  };
+  events: Array<{
+    eventType: string;
+    pricePeriod: string;
+    tradingHorizon: string;
+    tradeType: string;
+    imageUrl: string;
+    startDate: string;
+    endDate: string;
+  }>;
+  reports: Array<{
+    id: string;
+    headHtml: string;
+    provider: string;
+    reportDate: string;
+    reportTitle: string;
+    reportType: string;
+    targetPrice?: number;
+    targetPriceStatus?: string;
+    investmentRating?: string;
+    tickers: string[];
+    title: string;
+  }>;
+  sigDevs: Array<{
+    headline: string;
+    date: string;
+  }>;
+  secReports: Array<{
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    filingDate: string;
+    snapshotUrl: string;
+    formType: string;
+  }>;
+}
+
 // =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
@@ -1936,4 +2062,25 @@ function calculateReliabilityScore(coefficient: number, dataSize: number): numbe
   // Adjust based on data size (more data = more reliable)
   const dataSizeFactor = Math.min(1, dataSize / 250); // 250 days (~1 trading year) is considered full reliability
   return Math.round(baseScore * (0.7 + 0.3 * dataSizeFactor));
+}
+
+// =============================================================================
+// REPORT INSIGHTS FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches comprehensive insights data for a financial symbol
+ * 
+ * @param symbol - Stock or asset symbol
+ * @returns Detailed insights data including technical analysis, company snapshot, and recommendations
+ */
+export async function fetchInsightsData(symbol: string): Promise<InsightsData> {
+  try {
+    const params = { symbol };
+    const data = await makeApiRequest<InsightsData>('insights', params);
+    return data;
+  } catch (error) {
+    console.error('Error fetching insights data:', error);
+    throw error;
+  }
 }
