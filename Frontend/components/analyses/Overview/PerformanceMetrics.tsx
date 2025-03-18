@@ -1,14 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaArrowUp, FaArrowDown, FaQuestionCircle, FaDownload, FaExpand, FaCompress, FaInfoCircle } from 'react-icons/fa';
-import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
 import html2canvas from 'html2canvas';
-
-interface PeriodData {
-  label: string;
-  value: number;
-  months: number;
-}
+import { PeriodData, fetchPerformanceMetrics } from '../../../services/api/finance';
 
 interface PerformanceMetricsProps {
   symbol: string;
@@ -53,70 +47,12 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
   useEffect(() => {
     if (!symbol) return;
     
-    const fetchPerformanceMetrics = async () => {
+    const getMetrics = async () => {
       setIsLoading(true);
       setError(null);
       
       try {
-        const today = new Date();
-        const results: PeriodData[] = [];
-        
-        // Fetch data for each period
-        for (const period of performancePeriodDefinitions) {
-          // Calculate the start date for this period
-          const startDate = new Date();
-          startDate.setMonth(today.getMonth() - period.months);
-          
-          // Format dates for API
-          const fromDate = startDate.toISOString().split('T')[0];
-          const toDate = today.toISOString().split('T')[0];
-          
-          // Determine appropriate interval based on period length
-          const interval = period.months > 60 ? '1mo' : period.months > 12 ? '1wk' : '1d';
-          
-          // Fetch historical data from port 3001
-          const response = await axios.get(`http://localhost:3001/api/finance/historical`, {
-            params: {
-              symbol,
-              from: fromDate,
-              to: toDate,
-              interval
-            }
-          });
-          
-          if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-            // Get first and last valid closing prices
-            const firstValidDataPoint = response.data.find(point => point.close !== null);
-            const lastValidDataPoint = [...response.data].reverse().find(point => point.close !== null);
-            
-            if (firstValidDataPoint && lastValidDataPoint) {
-              const startPrice = firstValidDataPoint.close;
-              const endPrice = lastValidDataPoint.close;
-              const performanceValue = ((endPrice - startPrice) / startPrice) * 100;
-              
-              results.push({
-                label: period.label,
-                value: performanceValue,
-                months: period.months
-              });
-            } else {
-              // Handle case where we don't have valid data points
-              results.push({
-                label: period.label,
-                value: 0,
-                months: period.months
-              });
-            }
-          } else {
-            // If no data returned, add a placeholder
-            results.push({
-              label: period.label,
-              value: 0,
-              months: period.months
-            });
-          }
-        }
-        
+        const results = await fetchPerformanceMetrics(symbol, performancePeriodDefinitions);
         setMetrics(results);
       } catch (error) {
         console.error('Error fetching performance metrics:', error);
@@ -126,7 +62,7 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
       }
     };
     
-    fetchPerformanceMetrics();
+    getMetrics();
   }, [symbol]);
   
   const handlePeriodChange = (period: string) => {

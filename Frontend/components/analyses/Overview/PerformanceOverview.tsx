@@ -1,20 +1,9 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
-import axios from 'axios';
-import { FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
 import styles from '../../../styles/Analyses.module.css';
 import html2canvas from 'html2canvas';
-
-interface ChartDataPoint {
-  timestamp: number;
-  close: number;
-  open?: number;
-  high?: number;
-  low?: number;
-  volume?: number;
-  date?: string;
-  fullDate?: Date;
-}
+import { FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
+import { fetchChartData, fetchQuoteData, ChartDataPoint } from '../../../services/api/finance';
 
 // Performance periods data
 const performancePeriods = [
@@ -82,7 +71,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
 
   // Fetch chart data based on the symbol, date range, and interval
   useEffect(() => {
-    const fetchChartData = async () => {
+    const loadChartData = async () => {
       if (!symbol) return;
       
       try {
@@ -93,155 +82,17 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
         const period1 = dateRange.startDate.toISOString();
         const period2 = dateRange.endDate.toISOString();
         
-        console.log('Fetching chart data with params:', {
+        // Get chart data from the API service
+        const data = await fetchChartData(
           symbol,
           period1,
           period2,
-          interval: selectedInterval
-        });
+          selectedInterval
+        );
         
-        // Make API call with all required parameters
-        const response = await axios.get('http://localhost:3001/api/finance/chart', {
-          params: {
-            symbol,
-            period1,
-            period2,
-            interval: selectedInterval,
-            includePrePost: true,
-            events: 'div|split|earn',
-            lang: 'en-US',
-            return: 'array',
-            useYfid: true
-          }
-        });
-        
-        console.log('API Response:', response.data);
-        
-        // Handle the direct meta/quotes format that the API is returning
-        if (response.data && response.data.meta && response.data.quotes && Array.isArray(response.data.quotes)) {
-          const { meta, quotes } = response.data;
-          
-          // Update asset info
-          setAssetInfo({
-            name: meta.symbol || symbol,
-            symbol: meta.symbol || symbol
-          });
-          
-          if (quotes.length === 0) {
-            setError('No data available for the selected period and interval');
-            setIsLoading(false);
-            return;
-          }
-          
-          // Format data for chart - with proper date processing for display
-          const formattedData = quotes
-            .map((quote: any) => {
-              // Check for essential data
-              if (quote.close === null || quote.close === undefined) {
-                return null;
-              }
-              
-              // Handle timestamp which might be provided in different formats
-              const timestamp = quote.timestamp || quote.date || quote.time;
-              if (!timestamp) {
-                return null;
-              }
-              
-              // Convert timestamp to Date object
-              const fullDate = typeof timestamp === 'number' 
-                ? new Date(timestamp * 1000)  // Unix timestamp in seconds 
-                : new Date(timestamp);        // ISO string or other date format
-              
-              const dateStr = fullDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-              });
-              
-              return {
-                timestamp: typeof timestamp === 'number' ? timestamp : fullDate.getTime() / 1000,
-                close: quote.close,
-                open: quote.open,
-                high: quote.high,
-                low: quote.low,
-                volume: quote.volume,
-                date: dateStr,
-                fullDate
-              };
-            })
-            .filter((point: any) => point !== null);
-          
-          console.log(`Processed ${formattedData.length} valid data points`);
-          
-          if (formattedData.length === 0) {
-            setError('No valid data points received for the selected range and interval');
-          } else {
-            setChartData(formattedData);
-          }
-        } 
-        // Try to handle the Yahoo Finance API format as a fallback
-        else if (response.data && response.data.chart && response.data.chart.result && 
-            response.data.chart.result[0] && response.data.chart.result[0].indicators) {
-          // ...existing code for handling the original format...
-          const result = response.data.chart.result[0];
-          const timestamps = result.timestamp || [];
-          const quotes = result.indicators.quote && result.indicators.quote.length > 0 ? 
-                         result.indicators.quote[0] : {};
-          const meta = result.meta || {};
-          
-          if (!timestamps || !timestamps.length || !quotes || !quotes.close) {
-            console.error('Invalid data structure in API response:', { timestamps, quotes });
-            setError('The API returned an invalid data structure');
-            setIsLoading(false);
-            return;
-          }
-          
-          // Update asset info
-          setAssetInfo({
-            name: meta.symbol || symbol,
-            symbol: meta.symbol || symbol
-          });
-          
-          // Format data for chart - with proper date processing for display and filter out invalid points
-          const formattedData = timestamps
-            .map((timestamp: number, index: number) => {
-              if (quotes.close[index] === null || quotes.close[index] === undefined) {
-                return null;
-              }
-              
-              const fullDate = new Date(timestamp * 1000);
-              const dateStr = fullDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-              });
-              
-              return {
-                timestamp,
-                close: quotes.close[index],
-                open: quotes.open ? quotes.open[index] : undefined,
-                high: quotes.high ? quotes.high[index] : undefined,
-                low: quotes.low ? quotes.low[index] : undefined,
-                volume: quotes.volume ? quotes.volume[index] : undefined,
-                date: dateStr,
-                fullDate
-              };
-            })
-            .filter((point: any) => point !== null);
-          
-          console.log(`Processed ${formattedData.length} valid data points`);
-          
-          if (formattedData.length === 0) {
-            setError('No valid data points received for the selected range and interval');
-          } else {
-            setChartData(formattedData);
-          }
-        } else {
-          console.error('Unrecognized response format:', response.data);
-          setError('The API returned an unrecognized data format');
-        }
+        setChartData(data);
       } catch (err) {
-        console.error('Error fetching chart data:', err);
+        console.error('Error loading chart data:', err);
         setError(`Failed to load chart data: ${err instanceof Error ? err.message : 'Unknown error'}`);
       } finally {
         setIsLoading(false);
@@ -249,18 +100,15 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
     };
     
     if (symbol) {
-      fetchChartData();
+      loadChartData();
       
-      // Also make a simple quote request to get the asset name
-      axios.get(`http://localhost:3001/api/finance/quote?symbol=${symbol}&fields=shortName,longName,regularMarketPrice`)
-        .then(response => {
-          if (response.data && response.data[0]) {
-            const quote = response.data[0];
-            setAssetInfo({
-              name: quote.shortName || quote.longName || symbol,
-              symbol: quote.symbol
-            });
-          }
+      // Also fetch quote data to get the asset name
+      fetchQuoteData(symbol)
+        .then(quote => {
+          setAssetInfo({
+            name: quote.shortName || quote.longName || symbol,
+            symbol: quote.symbol
+          });
         })
         .catch(err => console.error('Error fetching quote data:', err));
     }

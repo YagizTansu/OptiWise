@@ -11,9 +11,15 @@ import {
   Legend 
 } from 'chart.js';
 import styles from '../../../styles/Analyses.module.css';
-import axios from 'axios';
 import { FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
 import html2canvas from 'html2canvas';
+import { 
+  fetchDividendHistory, 
+  fetchDividendSummary, 
+  DividendSummary, 
+  DividendEvent,
+  DividendChartData 
+} from '../../../services/api/finance';
 
 // Register ChartJS components
 ChartJS.register(
@@ -30,17 +36,9 @@ interface DividendsProps {
   symbol: string;
 }
 
-interface DividendSummary {
-  dividendRate?: number;
-  dividendYield?: number;
-  payoutRatio?: number;
-  exDividendDate?: string;
-  fiveYearAvgDividendYield?: number;
-}
-
 const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
-  const [dividendData, setDividendData] = useState<any>(null);
-  const [dividendEvents, setDividendEvents] = useState<any[]>([]);
+  const [dividendData, setDividendData] = useState<DividendChartData | null>(null);
+  const [dividendEvents, setDividendEvents] = useState<DividendEvent[]>([]);
   const [dividendSummary, setDividendSummary] = useState<DividendSummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,119 +48,35 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchDividendData = async () => {
+    const loadDividendData = async () => {
       try {
         setIsLoading(true);
         setError(null);
         
-        // Calculate date range for past 5 years
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setFullYear(endDate.getFullYear() - 5);
+        // Fetch dividend history data
+        const historyResponse = await fetchDividendHistory(symbol, 5);
         
-        // Fetch historical dividend data using chart endpoint with div events
-        const chartResponse = await axios.get(`http://localhost:3001/api/finance/chart`, {
-          params: {
-            symbol: symbol,
-            period1: startDate.toISOString(),
-            period2: endDate.toISOString(),
-            interval: '1mo',
-            events: 'div'
-          }
-        });
-        
-        // Fetch current dividend information from quoteSummary
-        const summaryResponse = await axios.get(`http://localhost:3001/api/finance/quoteSummary`, {
-          params: {
-            symbol: symbol,
-            modules: 'summaryDetail,defaultKeyStatistics'
-          }
-        });
-        
-        // Process dividend events from chart data
-        let dividends: { date: string; timestamp: number; amount: any; }[] = [];
-        
-        if (chartResponse.data && 
-            chartResponse.data.events && 
-            chartResponse.data.events.dividends) {
-          
-          // Get the dividends array directly from the response
-          const dividendEvents = chartResponse.data.events.dividends;
-          
-          // Process each dividend event
-          dividends = dividendEvents.map((dividend: any) => {
-            const timestamp = dividend.date || dividend.timestamp;
-            const date = new Date(parseInt(timestamp) * 1000);
-            const formattedDate = `${date.getMonth() + 1}/${date.getFullYear()}`;
-            return {
-              date: formattedDate,
-              timestamp: parseInt(timestamp),
-              amount: dividend.amount,
-              fullDate: date
-            };
-          });
-          
-          // Sort dividends by timestamp (oldest first)
-          dividends.sort((a, b) => a.timestamp - b.timestamp);
-          
-          setDividendEvents(dividends);
+        if (historyResponse.error) {
+          setError(historyResponse.error);
         } else {
-          setError('No dividend data available for this stock');
+          setDividendEvents(historyResponse.events);
+          setDividendData(historyResponse.chartData);
         }
         
-        // Extract dividend summary from quoteSummary response
-        let summary = null;
-        if (summaryResponse.data && 
-            summaryResponse.data.quoteSummary && 
-            summaryResponse.data.quoteSummary.result && 
-            summaryResponse.data.quoteSummary.result[0]) {
-          
-          const details = summaryResponse.data.quoteSummary.result[0];
-          
-          summary = {
-            dividendRate: details.summaryDetail?.dividendRate?.raw,
-            dividendYield: details.summaryDetail?.dividendYield?.raw,
-            payoutRatio: details.summaryDetail?.payoutRatio?.raw,
-            exDividendDate: details.summaryDetail?.exDividendDate?.fmt,
-            fiveYearAvgDividendYield: details.defaultKeyStatistics?.fiveYearAvgDividendYield?.raw
-          };
-        }
-        
-        // Prepare chart data
-        if (dividends.length > 0) {
-          const chartData = {
-            labels: dividends.map(div => div.date),
-            datasets: [
-              {
-                label: 'Dividend Amount',
-                data: dividends.map(div => div.amount),
-                borderColor: '#4CAF50',
-                backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                fill: true,
-                tension: 0.2,
-                pointRadius: dividends.length > 20 ? 3 : 4,
-                pointHoverRadius: 6,
-                pointHoverBackgroundColor: '#4CAF50',
-                pointHoverBorderColor: '#fff',
-                pointHoverBorderWidth: 2
-              }
-            ]
-          };
-          
-          setDividendData(chartData);
-        }
-        
+        // Fetch dividend summary information
+        const summary = await fetchDividendSummary(symbol);
         setDividendSummary(summary);
+        
         setIsLoading(false);
       } catch (error) {
-        console.error('Error fetching dividend data:', error);
+        console.error('Error loading dividend data:', error);
         setError(`Failed to load dividend data: ${error instanceof Error ? error.message : 'Unknown error'}`);
         setIsLoading(false);
       }
     };
 
     if (symbol) {
-      fetchDividendData();
+      loadDividendData();
     } else {
       setIsLoading(false);
       setError('Please select a stock symbol to view dividend data');

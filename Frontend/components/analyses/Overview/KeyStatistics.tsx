@@ -1,28 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaArrowUp, FaArrowDown, FaChartLine, FaCalendarAlt, FaInfoCircle, FaDownload, FaExpand, FaCompress, FaQuestion } from 'react-icons/fa';
-import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
 import html2canvas from 'html2canvas';
+import { StatisticsData, fetchKeyStatistics } from '../../../services/api/finance';
 
 interface KeyStatisticsProps {
   symbol: string;
-}
-
-interface StatisticsData {
-  allTimeHigh: string;
-  allTimeLow: string;
-  profitDays: string;
-  avgHoldPeriod: string;
-}
-
-interface HistoricalDataPoint {
-  date: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-  adjClose?: number;
 }
 
 const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
@@ -41,104 +24,23 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchKeyStatistics = async () => {
+    const getKeyStatistics = async () => {
       if (!symbol) return;
       
       setIsLoading(true);
       
       try {
-        // Get maximum historical data (we'll use 20 years)
-        const twentyYearsAgo = new Date();
-        twentyYearsAgo.setFullYear(twentyYearsAgo.getFullYear() - 20);
-        
-        const response = await axios.get(`http://localhost:3001/api/finance/historical`, {
-          params: {
-            symbol: symbol,
-            from: twentyYearsAgo.toISOString(),
-            to: new Date().toISOString(),
-            interval: '1d'
-          }
-        });
-        
-        // Process the historical data to calculate statistics
-        if (response.data && Array.isArray(response.data)) {
-          const historicalData: HistoricalDataPoint[] = response.data;
-          
-          // Calculate All-Time High and All-Time Low
-          let allTimeHigh = Math.max(...historicalData.map(point => point.high));
-          let allTimeLow = Math.min(...historicalData.map(point => point.low));
-          
-          // Calculate Profit Days (days where close > open)
-          const profitDays = historicalData.filter(point => point.close > point.open).length;
-          const profitPercentage = (profitDays / historicalData.length) * 100;
-          
-          // Calculate Average Hold Period
-          // For this simplified version, we'll estimate based on profitable stretches
-          let totalHoldDays = 0;
-          let holdPeriods = 0;
-          let inProfitPeriod = false;
-          let currentHoldDays = 0;
-          
-          historicalData.forEach((point, index) => {
-            if (index > 0) {
-              const isUpDay = point.close > point.open;
-              
-              if (isUpDay && !inProfitPeriod) {
-                // Starting a new profit period
-                inProfitPeriod = true;
-                currentHoldDays = 1;
-              } else if (isUpDay && inProfitPeriod) {
-                // Continuing profit period
-                currentHoldDays++;
-              } else if (!isUpDay && inProfitPeriod) {
-                // End of profit period
-                inProfitPeriod = false;
-                totalHoldDays += currentHoldDays;
-                holdPeriods++;
-                currentHoldDays = 0;
-              }
-            }
-          });
-          
-          // If we're still in a profit period at the end
-          if (inProfitPeriod && currentHoldDays > 0) {
-            totalHoldDays += currentHoldDays;
-            holdPeriods++;
-          }
-          
-          const avgHoldDays = holdPeriods > 0 ? totalHoldDays / holdPeriods : 0;
-          const avgHoldYears = avgHoldDays / 365;
-          
-          // Format the data
-          const currencyFormatter = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          });
-          
-          setStatisticsData({
-            allTimeHigh: currencyFormatter.format(allTimeHigh),
-            allTimeLow: currencyFormatter.format(allTimeLow),
-            profitDays: `${profitPercentage.toFixed(1)}%`,
-            avgHoldPeriod: `${avgHoldYears.toFixed(1)} Years`
-          });
-        }
+        const stats = await fetchKeyStatistics(symbol);
+        setStatisticsData(stats);
       } catch (error) {
         console.error('Error fetching key statistics:', error);
-        // Set default values in case of error
-        setStatisticsData({
-          allTimeHigh: 'N/A',
-          allTimeLow: 'N/A',
-          profitDays: 'N/A',
-          avgHoldPeriod: 'N/A'
-        });
+        // Error state is handled in the API function with default values
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchKeyStatistics();
+    getKeyStatistics();
   }, [symbol]);
 
   // Handle fullscreen toggle
