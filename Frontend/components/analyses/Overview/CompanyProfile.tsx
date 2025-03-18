@@ -1,45 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
+import { fetchCompanyProfile, CompanyProfile as CompanyProfileType } from '../../../services/api/finance';
 
 interface CompanyProfileProps {
   symbol: string;
 }
 
-interface SummaryProfile {
-  address1?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
-  phone?: string;
-  website?: string;
-  industry?: string;
-  sector?: string;
-  longBusinessSummary?: string;
-  fullTimeEmployees?: number;
-}
-
 const CompanyProfile: React.FC<CompanyProfileProps> = ({ symbol }) => {
-  const [profileData, setProfileData] = useState<SummaryProfile | null>(null);
+  const [profileData, setProfileData] = useState<CompanyProfileType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState<boolean>(false); // Initially collapsed
 
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const getProfileData = async () => {
       try {
         setLoading(true);
-        // Updated to use port 3001 explicitly
-        const response = await axios.get(`http://localhost:3001/api/finance/quoteSummary`, {
-          params: {
-            symbol,
-            modules: 'summaryProfile'
-          }
-        });
+        const data = await fetchCompanyProfile(symbol);
         
-        if (response.data.summaryProfile) {
-          setProfileData(response.data.summaryProfile);
+        if (data) {
+          setProfileData(data);
         } else {
           setError('No profile data available for this company');
         }
@@ -51,7 +31,7 @@ const CompanyProfile: React.FC<CompanyProfileProps> = ({ symbol }) => {
       }
     };
 
-    fetchProfileData();
+    getProfileData();
   }, [symbol]);
 
   // Return null (nothing) if there's an error

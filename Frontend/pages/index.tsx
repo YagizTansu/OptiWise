@@ -2,14 +2,8 @@ import Layout from '../components/Layout'
 import styles from '../styles/Home.module.css'
 import { FaSearch } from 'react-icons/fa'
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router' // Add this import for navigation
-
-// Define interface for search results
-interface SearchResult {
-  symbol: string;
-  shortName?: string;
-  exchange?: string;
-}
+import { useRouter } from 'next/router'
+import { searchSymbols, SearchResult } from '../services/api/finance' // Import the new function
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,12 +11,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const searchSectionRef = useRef<HTMLDivElement>(null);
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
 
   // Debounce search input
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch search results
+  // Fetch search results using the imported function
   const fetchSearchResults = async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
@@ -31,18 +25,8 @@ export default function Home() {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:3001/api/finance/search?query=${encodeURIComponent(query)}&limit=100`);
-      const data = await response.json();
-      
-      if (data.length > 0) {
-        setSearchResults(data.map((quote: any) => ({
-          symbol: quote.symbol,
-          shortName: quote.shortname || '',
-          exchange: quote.exchange || ''
-        })));
-      } else {
-        setSearchResults([]);
-      }
+      const results = await searchSymbols(query);
+      setSearchResults(results);
     } catch (error) {
       console.error('Error fetching search results:', error);
       setSearchResults([]);

@@ -2604,3 +2604,103 @@ export async function fetchStockDashboardData(
     throw error;
   }
 }
+
+// =============================================================================
+// COMPANY PROFILE DATA TYPES
+// =============================================================================
+
+export interface CompanyProfile {
+  address1?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+  phone?: string;
+  website?: string;
+  industry?: string;
+  sector?: string;
+  longBusinessSummary?: string;
+  fullTimeEmployees?: number;
+}
+
+// =============================================================================
+// COMPANY PROFILE FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches company profile information for a given symbol
+ * 
+ * @param symbol - Stock or company symbol
+ * @returns Company profile data
+ */
+export async function fetchCompanyProfile(symbol: string): Promise<CompanyProfile | null> {
+  try {
+    const params = {
+      symbol,
+      modules: 'summaryProfile'
+    };
+    
+    const data = await makeApiRequest<any>('quoteSummary', params);
+    
+    if (data && data.summaryProfile) {
+      return data.summaryProfile;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error fetching company profile:', error);
+    throw error;
+  }
+}
+
+// =============================================================================
+// SEARCH DATA TYPES
+// =============================================================================
+
+export interface SearchResult {
+  symbol: string;
+  shortName?: string;
+  exchange?: string;
+}
+
+// =============================================================================
+// SEARCH FUNCTIONS
+// =============================================================================
+
+/**
+ * Searches for stocks, ETFs and other financial instruments by name or ticker
+ * 
+ * @param query - Search term
+ * @param limit - Maximum number of results to return
+ * @returns Array of search results
+ */
+export async function searchSymbols(
+  query: string,
+  limit: number = 100
+): Promise<SearchResult[]> {
+  try {
+    if (!query.trim()) {
+      return [];
+    }
+    
+    const params = {
+      query,
+      limit: limit.toString()
+    };
+    
+    const data = await makeApiRequest<any[]>('search', params);
+    
+    if (data && Array.isArray(data) && data.length > 0) {
+      return data.map(quote => ({
+        symbol: quote.symbol,
+        shortName: quote.shortname || '',
+        exchange: quote.exchange || ''
+      }));
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Error searching symbols:', error);
+    return [];
+  }
+}
