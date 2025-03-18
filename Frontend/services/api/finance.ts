@@ -177,6 +177,52 @@ export interface SeasonalityResponse {
   error?: string;
 }
 
+// Seasonal Strategy Insights types
+export interface SeasonalPattern {
+  period: string;
+  return: number;
+}
+
+export interface MonthlyPerformance {
+  month: string;
+  avgReturn: number;
+  consistency: number;
+  cumulativeReturn: number;
+}
+
+export interface MonthlyStatistics {
+  avgReturn: number;
+  consistency: number;
+  years: number;
+  positiveYears: number;
+  maxReturn: number;
+  minReturn: number;
+  volatility: number;
+}
+
+export interface SeasonalStrategyResponse {
+  strongestPattern: SeasonalPattern | null;
+  riskPattern: SeasonalPattern | null;
+  monthlyDetailedData: Record<string, MonthlyStatistics>;
+  error: string | null;
+}
+
+// Pattern Correlation types
+export interface PatternCorrelationData {
+  coefficient: number;
+  strength: string;
+  reliabilityScore: number;
+  chartData: {
+    labels: string[];
+    datasets: Array<{
+      data: number[];
+      backgroundColor: string[];
+      borderWidth: number;
+      cutout: string;
+    }>;
+  };
+}
+
 // =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
@@ -1518,8 +1564,7 @@ export async function fetchAllSeasonalityData(
     // Fetch data for all timeframes in parallel
     const promises = timeframes.map(timeframe => 
       fetchSeasonalityData(symbol, timeframe, periods)
-        .then(data => {
-          results[timeframe as keyof SeasonalityResponse] = data;
+        .then(data => {results[timeframe as keyof SeasonalityResponse] = data;
         })
         .catch(error => {
           console.error(`Error fetching ${timeframe} data:`, error);
@@ -1538,3 +1583,357 @@ export async function fetchAllSeasonalityData(
   }
 }
 
+// =============================================================================
+// SEASONAL STRATEGY INSIGHTS FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches and analyzes seasonal strategy insights for a symbol
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param years - Number of years of historical data to analyze (default: 5)
+ * @returns Seasonal strategy insights including strongest and risk patterns
+ */
+export async function fetchSeasonalStrategyInsights(
+  symbol: string,
+  years: number = 5
+): Promise<SeasonalStrategyResponse> {
+  try {
+    // Calculate date range based on years
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setFullYear(endDate.getFullYear() - years);
+    
+    // Format dates for API
+    const fromDate = startDate.toISOString().split('T')[0];
+    const toDate = endDate.toISOString().split('T')[0];
+    
+    const params = {
+      symbol,
+      from: fromDate,
+      to: toDate,
+      interval: '1mo'
+    };
+    
+    // Fetch historical data
+    const historicalData = await makeApiRequest<HistoricalDataPoint[]>('historical', params);
+    
+    if (!historicalData || historicalData.length === 0) {
+      return {
+        strongestPattern: null,
+        riskPattern: null,
+        monthlyDetailedData: {},
+        error: 'No historical data available'
+      };
+    }
+    
+    // Analyze seasonal patterns
+    return analyzeSeasonalPatterns(historicalData);
+    
+  } catch (error) {
+    console.error('Error fetching seasonal strategy insights:', error);
+    return {
+      strongestPattern: null,
+      riskPattern: null,
+      monthlyDetailedData: {},
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
+
+/**
+ * Analyzes historical data to detect seasonal patterns
+ * 
+ * @param historicalData - Array of historical data points
+ * @returns Seasonal strategy insights
+ */
+function analyzeSeasonalPatterns(historicalData: HistoricalDataPoint[]): SeasonalStrategyResponse {
+  // Group data by month
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  const monthlyReturns: Record<string, number[]> = {};
+  monthNames.forEach(month => monthlyReturns[month] = []);
+  
+  // Calculate monthly returns
+  for (let i = 1; i < historicalData.length; i++) {
+    const currentData = historicalData[i];
+    const previousData = historicalData[i-1];
+    
+    const date = new Date(currentData.date);
+    const month = monthNames[date.getMonth()];
+    
+    // Calculate monthly return (%)
+    const monthlyReturn = ((currentData.close - previousData.close) / previousData.close) * 100;
+    monthlyReturns[month].push(monthlyReturn);
+  }
+  
+  // Calculate detailed monthly statistics for strategy exploration
+  const monthlyDetailedData: Record<string, MonthlyStatistics> = {};
+  
+  monthNames.forEach(month => {
+    const returns = monthlyReturns[month];
+    if (returns.length > 0) {
+      const avgReturn = returns.reduce((sum, val) => sum + val, 0) / returns.length;
+      const positiveReturns = returns.filter(ret => ret > 0);
+      const consistency = (positiveReturns.length / returns.length) * 100;
+      
+      monthlyDetailedData[month] = {
+        avgReturn,
+        consistency,
+        years: returns.length,
+        positiveYears: positiveReturns.length,
+        maxReturn: Math.max(...returns),
+        minReturn: Math.min(...returns),
+        volatility: calculateStandardDeviation(returns)
+      };
+    }
+  });
+  
+  // Find best consecutive 3-4 month period
+  const seasonalPatterns: {start: number; end: number; return: number}[] = [];
+  
+  for (let start = 0; start < 12; start++) {
+    for (let length = 3; length <= 4; length++) {
+      let totalReturn = 0;
+      let isValid = true;
+      
+      for (let i = 0; i < length; i++) {
+        const monthIndex = (start + i) % 12;
+        const month = monthNames[monthIndex];
+        
+        if (monthlyReturns[month].length === 0) {
+          isValid = false;
+          break;
+        }
+        
+        const avgReturn = monthlyReturns[month].reduce((sum, val) => sum + val, 0) / monthlyReturns[month].length;
+        totalReturn += avgReturn;
+      }
+      
+      if (isValid) {
+        seasonalPatterns.push({
+          start,
+          end: (start + length - 1) % 12,
+          return: totalReturn
+        });
+      }
+    }
+  }
+  
+  // Find strongest positive pattern
+  let strongestPattern: SeasonalPattern | null = null;
+  const bestPattern = seasonalPatterns.sort((a, b) => b.return - a.return)[0];
+  if (bestPattern) {
+    strongestPattern = {
+      period: `${monthNames[bestPattern.start]} to ${monthNames[bestPattern.end]}`,
+      return: bestPattern.return
+    };
+  }
+  
+  // Find worst month (risk pattern)
+  let riskPattern: SeasonalPattern | null = null;
+  const monthlyAvgReturns = monthNames.map(month => {
+    const returns = monthlyReturns[month];
+    const avgReturn = returns.length > 0 
+      ? returns.reduce((sum, val) => sum + val, 0) / returns.length
+      : 0;
+    return { month, avgReturn };
+  });
+  
+  const worstMonth = monthlyAvgReturns
+    .filter(m => m.avgReturn < 0 && monthlyReturns[m.month].length > 0)
+    .sort((a, b) => a.avgReturn - b.avgReturn)[0];
+    
+  if (worstMonth) {
+    riskPattern = {
+      period: worstMonth.month,
+      return: worstMonth.avgReturn
+    };
+  }
+  
+  return {
+    strongestPattern,
+    riskPattern,
+    monthlyDetailedData,
+    error: null
+  };
+}
+
+/**
+ * Calculate standard deviation (volatility) of values
+ */
+function calculateStandardDeviation(values: number[]): number {
+  if (values.length <= 1) return 0;
+  
+  const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+  const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+  return Math.sqrt(variance);
+}
+
+// =============================================================================
+// PATTERN CORRELATION FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches and calculates pattern correlation between two time periods
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param firstPeriod - First time period in years (e.g., '3 Years')
+ * @param secondPeriod - Second time period in years (e.g., '5 Years') 
+ * @returns Correlation data including coefficient, strength, and chart data
+ */
+export async function fetchPatternCorrelation(
+  symbol: string,
+  firstPeriod: string,
+  secondPeriod: string
+): Promise<PatternCorrelationData> {
+  try {
+    const currentDate = new Date();
+    
+    // Calculate date ranges based on selected periods
+    const firstPeriodMs = periodToMs(firstPeriod);
+    const secondPeriodMs = periodToMs(secondPeriod);
+    
+    // First period
+    const firstPeriodStart = new Date(currentDate.getTime() - firstPeriodMs).toISOString();
+    
+    // Second period
+    const secondPeriodStart = new Date(currentDate.getTime() - secondPeriodMs).toISOString();
+    
+    const currentDateString = currentDate.toISOString();
+    
+    // Make API calls to get historical data
+    const [firstPeriodData, secondPeriodData] = await Promise.all([
+      makeApiRequest<HistoricalDataPoint[]>('historical', {
+        symbol,
+        from: firstPeriodStart,
+        to: currentDateString,
+        interval: '1d'
+      }),
+      makeApiRequest<HistoricalDataPoint[]>('historical', {
+        symbol,
+        from: secondPeriodStart,
+        to: currentDateString,
+        interval: '1d'
+      })
+    ]);
+    
+    // Extract closing prices for correlation calculation
+    const firstPeriodPrices = firstPeriodData.map(item => item.close);
+    const secondPeriodPrices = secondPeriodData.map(item => item.close);
+    
+    // Calculate correlation coefficient
+    const coefficient = calculateCorrelation(firstPeriodPrices, secondPeriodPrices);
+    const correlationPercentage = Math.abs(coefficient) * 100;
+    
+    // Determine strength and reliability
+    const strength = getCorrelationStrength(coefficient);
+    const reliabilityScore = calculateReliabilityScore(
+      coefficient, 
+      Math.min(firstPeriodPrices.length, secondPeriodPrices.length)
+    );
+    
+    // Get the correlation color for visual feedback
+    const correlationColor = getCorrelationColor(coefficient);
+    
+    return {
+      coefficient: parseFloat(coefficient.toFixed(2)),
+      strength,
+      reliabilityScore,
+      chartData: {
+        labels: ['Correlation', 'No Correlation'],
+        datasets: [
+          {
+            data: [correlationPercentage, 100 - correlationPercentage],
+            backgroundColor: [
+              correlationColor,
+              'rgba(230, 230, 230, 0.5)'
+            ],
+            borderWidth: 0,
+            cutout: '75%'
+          }
+        ]
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching pattern correlation data:', error);
+    throw error;
+  }
+}
+
+/**
+ * Helper function to convert period strings to milliseconds
+ */
+function periodToMs(period: string): number {
+  const value = parseInt(period);
+  if (period.includes('Year')) {
+    return value * 365 * 24 * 60 * 60 * 1000;
+  }
+  return 365 * 24 * 60 * 60 * 1000; // default to 1 year
+}
+
+/**
+ * Calculate correlation between two datasets
+ */
+function calculateCorrelation(dataset1: number[], dataset2: number[]): number {
+  if (dataset1.length === 0 || dataset2.length === 0) return 0;
+  
+  // Ensure datasets are the same length by using the smaller one
+  const length = Math.min(dataset1.length, dataset2.length);
+  dataset1 = dataset1.slice(0, length);
+  dataset2 = dataset2.slice(0, length);
+  
+  // Calculate mean
+  const mean1 = dataset1.reduce((sum, val) => sum + val, 0) / length;
+  const mean2 = dataset2.reduce((sum, val) => sum + val, 0) / length;
+  
+  // Calculate correlation coefficient
+  let numerator = 0;
+  let denominator1 = 0;
+  let denominator2 = 0;
+  
+  for (let i = 0; i < length; i++) {
+    const diff1 = dataset1[i] - mean1;
+    const diff2 = dataset2[i] - mean2;
+    numerator += diff1 * diff2;
+    denominator1 += diff1 * diff1;
+    denominator2 += diff2 * diff2;
+  }
+  
+  if (denominator1 === 0 || denominator2 === 0) return 0;
+  
+  return numerator / Math.sqrt(denominator1 * denominator2);
+}
+
+/**
+ * Determine correlation strength as text
+ */
+function getCorrelationStrength(coefficient: number): string {
+  const absCoefficient = Math.abs(coefficient);
+  if (absCoefficient > 0.7) return 'Strong';
+  if (absCoefficient > 0.5) return 'Moderate';
+  if (absCoefficient > 0.3) return 'Weak';
+  return 'Very Weak';
+}
+
+/**
+ * Get color based on correlation value
+ */
+function getCorrelationColor(coefficient: number): string {
+  const absValue = Math.abs(coefficient);
+  if (absValue > 0.7) return '#20a0b8';  // Strong - teal
+  if (absValue > 0.5) return '#5e88fc';  // Moderate - blue
+  if (absValue > 0.3) return '#ba68c8';  // Weak - purple
+  return '#9e9e9e';  // Very Weak - gray
+}
+
+/**
+ * Calculate reliability score based on data size and correlation strength
+ */
+function calculateReliabilityScore(coefficient: number, dataSize: number): number {
+  const baseScore = Math.abs(coefficient) * 100;
+  // Adjust based on data size (more data = more reliable)
+  const dataSizeFactor = Math.min(1, dataSize / 250); // 250 days (~1 trading year) is considered full reliability
+  return Math.round(baseScore * (0.7 + 0.3 * dataSizeFactor));
+}

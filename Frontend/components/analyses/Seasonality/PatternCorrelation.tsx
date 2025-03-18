@@ -2,24 +2,14 @@ import { useState, useEffect } from 'react';
 import { FaQuestion, FaChartLine, FaExchangeAlt, FaInfoCircle, FaTimes, FaLightbulb } from 'react-icons/fa';
 import { Doughnut } from 'react-chartjs-2';
 import styles from '../../../styles/Analyses.module.css';
-import axios from 'axios';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { fetchPatternCorrelation, PatternCorrelationData } from '../../../services/api/finance';
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface PatternCorrelationProps {
   symbol: string;
-}
-
-interface HistoricalData {
-  date: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-  adjClose?: number;
 }
 
 const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
@@ -29,7 +19,7 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
   const [error, setError] = useState<string | null>(null);
   // Add state for modal visibility
   const [showInfoModal, setShowInfoModal] = useState(false);
-  const [correlationData, setCorrelationData] = useState({
+  const [correlationData, setCorrelationData] = useState<PatternCorrelationData>({
     coefficient: 0,
     strength: 'N/A',
     reliabilityScore: 0,
@@ -45,55 +35,6 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
       ]
     }
   });
-
-  // Helper function to convert period strings to milliseconds
-  const periodToMs = (period: string): number => {
-    const value = parseInt(period);
-    if (period.includes('Year')) {
-      return value * 365 * 24 * 60 * 60 * 1000;
-    }
-    return 365 * 24 * 60 * 60 * 1000; // default to 1 year
-  };
-
-  // Calculate correlation between two datasets
-  const calculateCorrelation = (dataset1: number[], dataset2: number[]): number => {
-    if (dataset1.length === 0 || dataset2.length === 0) return 0;
-    
-    // Ensure datasets are the same length by using the smaller one
-    const length = Math.min(dataset1.length, dataset2.length);
-    dataset1 = dataset1.slice(0, length);
-    dataset2 = dataset2.slice(0, length);
-    
-    // Calculate mean
-    const mean1 = dataset1.reduce((sum, val) => sum + val, 0) / length;
-    const mean2 = dataset2.reduce((sum, val) => sum + val, 0) / length;
-    
-    // Calculate correlation coefficient
-    let numerator = 0;
-    let denominator1 = 0;
-    let denominator2 = 0;
-    
-    for (let i = 0; i < length; i++) {
-      const diff1 = dataset1[i] - mean1;
-      const diff2 = dataset2[i] - mean2;
-      numerator += diff1 * diff2;
-      denominator1 += diff1 * diff1;
-      denominator2 += diff2 * diff2;
-    }
-    
-    if (denominator1 === 0 || denominator2 === 0) return 0;
-    
-    return numerator / Math.sqrt(denominator1 * denominator2);
-  };
-
-  // Determine correlation strength as text with added emoji for visual indicator
-  const getCorrelationStrength = (coefficient: number): string => {
-    const absCoefficient = Math.abs(coefficient);
-    if (absCoefficient > 0.7) return 'Strong';
-    if (absCoefficient > 0.5) return 'Moderate';
-    if (absCoefficient > 0.3) return 'Weak';
-    return 'Very Weak';
-  };
 
   // Get emoji based on correlation strength
   const getCorrelationEmoji = (strength: string): string => {
@@ -114,90 +55,19 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
     return '#9e9e9e';  // Very Weak - gray
   };
 
-  // Calculate reliability score based on data size and correlation strength
-  const calculateReliabilityScore = (coefficient: number, dataSize: number): number => {
-    const baseScore = Math.abs(coefficient) * 100;
-    // Adjust based on data size (more data = more reliable)
-    const dataSizeFactor = Math.min(1, dataSize / 250); // 250 days (~1 trading year) is considered full reliability
-    return Math.round(baseScore * (0.7 + 0.3 * dataSizeFactor));
-  };
-
-  // Fetch historical data and calculate correlation
+  // Fetch data and calculate correlation
   const fetchDataAndCalculateCorrelation = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const currentDate = new Date();
+      const data = await fetchPatternCorrelation(
+        symbol,
+        comparisonPeriods.first,
+        comparisonPeriods.second
+      );
       
-      // Calculate date ranges based on selected periods
-      const firstPeriodMs = periodToMs(comparisonPeriods.first);
-      const secondPeriodMs = periodToMs(comparisonPeriods.second);
-      
-      // First period
-      const firstPeriodStart = new Date(currentDate.getTime() - firstPeriodMs).toISOString();
-      
-      // Second period
-      const secondPeriodStart = new Date(currentDate.getTime() - secondPeriodMs).toISOString();
-      
-      const currentDateString = currentDate.toISOString();
-      
-      // Make API calls to get historical data
-      const [firstPeriodResponse, secondPeriodResponse] = await Promise.all([
-        axios.get(`http://localhost:3001/api/finance/historical`, {
-          params: {
-            symbol,
-            from: firstPeriodStart,
-            to: currentDateString,
-            interval: '1d'
-          }
-        }),
-        axios.get(`http://localhost:3001/api/finance/historical`, {
-          params: {
-            symbol,
-            from: secondPeriodStart,
-            to: currentDateString,
-            interval: '1d'
-          }
-        })
-      ]);
-      
-      // Extract closing prices for correlation calculation
-      const firstPeriodPrices = firstPeriodResponse.data.map((item: HistoricalData) => item.close);
-      const secondPeriodPrices = secondPeriodResponse.data.map((item: HistoricalData) => item.close);
-      
-      // Calculate correlation coefficient
-      const coefficient = calculateCorrelation(firstPeriodPrices, secondPeriodPrices);
-      const correlationPercentage = Math.abs(coefficient) * 100;
-      
-      // Determine strength and reliability
-      const strength = getCorrelationStrength(coefficient);
-      const reliabilityScore = calculateReliabilityScore(coefficient, Math.min(firstPeriodPrices.length, secondPeriodPrices.length));
-      
-      // Get the correlation color for visual feedback
-      const correlationColor = getCorrelationColor(coefficient);
-      
-      // Update state with calculated values
-      setCorrelationData({
-        coefficient: parseFloat(coefficient.toFixed(2)),
-        strength,
-        reliabilityScore,
-        chartData: {
-          labels: ['Correlation', 'No Correlation'],
-          datasets: [
-            {
-              data: [correlationPercentage, 100 - correlationPercentage],
-              backgroundColor: [
-                correlationColor,
-                'rgba(230, 230, 230, 0.5)'
-              ],
-              borderWidth: 0,
-              cutout: '75%'
-            }
-          ]
-        }
-      });
-      
+      setCorrelationData(data);
     } catch (err) {
       console.error('Error fetching pattern correlation data:', err);
       setError('Failed to fetch historical data. Please try again later.');

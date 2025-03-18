@@ -1,28 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaChartLine, FaExclamationTriangle, FaRobot, FaArrowRight, FaSpinner, FaTimes, FaInfoCircle, FaDownload, FaExpand, FaCompress, FaQuestion } from 'react-icons/fa';
 import styles from '../../../styles/Analyses.module.css';
-import axios from 'axios';
 import html2canvas from 'html2canvas';
+import { 
+  fetchSeasonalStrategyInsights,
+  SeasonalPattern,
+  MonthlyStatistics
+} from '../../../services/api/finance';
 
 interface SeasonalStrategyInsightsProps {
   symbol: string;
-}
-
-interface MonthlyPerformance {
-  month: string;
-  avgReturn: number;
-  consistency: number; // % of years this month was positive
-  cumulativeReturn: number;
-}
-
-interface HistoricalDataPoint {
-  date: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-  adjClose?: number;
 }
 
 interface StrategyDetails {
@@ -35,17 +22,11 @@ interface StrategyDetails {
 const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ symbol }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [strongestPattern, setStrongestPattern] = useState<{
-    period: string;
-    return: number;
-  } | null>(null);
-  const [riskPattern, setRiskPattern] = useState<{
-    period: string;
-    return: number;
-  } | null>(null);
+  const [strongestPattern, setStrongestPattern] = useState<SeasonalPattern | null>(null);
+  const [riskPattern, setRiskPattern] = useState<SeasonalPattern | null>(null);
   const [showStrategyModal, setShowStrategyModal] = useState<boolean>(false);
   const [activeStrategy, setActiveStrategy] = useState<StrategyDetails | null>(null);
-  const [monthlyDetailedData, setMonthlyDetailedData] = useState<Record<string, any>>({});
+  const [monthlyDetailedData, setMonthlyDetailedData] = useState<Record<string, MonthlyStatistics>>({});
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
 
   // Add new state and refs for fullscreen and download
@@ -54,152 +35,58 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchHistoricalData = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        // Get 5 years of historical data
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setFullYear(endDate.getFullYear() - 5);
+        // Get seasonal strategy insights for 5 years
+        const data = await fetchSeasonalStrategyInsights(symbol, 5);
         
-        const response = await axios.get(`http://localhost:3001/api/finance/historical`, {
-          params: {
-            symbol,
-            from: startDate.toISOString(),
-            to: endDate.toISOString(),
-            interval: '1mo'
-          }
-        });
-        
-        if (response.data && Array.isArray(response.data)) {
-          analyzeSeasonalPatterns(response.data);
+        if (data.error) {
+          setError(data.error);
         } else {
-          throw new Error("Invalid data format received from API");
+          setStrongestPattern(data.strongestPattern);
+          setRiskPattern(data.riskPattern);
+          setMonthlyDetailedData(data.monthlyDetailedData);
         }
       } catch (err) {
-        console.error("Error fetching historical data:", err);
+        console.error("Error fetching seasonal strategy data:", err);
         setError("Failed to load seasonal data");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchHistoricalData();
+    loadData();
   }, [symbol]);
   
-  const analyzeSeasonalPatterns = (historicalData: HistoricalDataPoint[]) => {
-    // Group data by month
+  // Helper function to get all months between two months (inclusive)
+  const getMonthsBetween = (start: string, end: string): string[] => {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                        'July', 'August', 'September', 'October', 'November', 'December'];
+                       'July', 'August', 'September', 'October', 'November', 'December'];
     
-    const monthlyReturns: Record<string, number[]> = {};
-    monthNames.forEach(month => monthlyReturns[month] = []);
+    const startIdx = monthNames.findIndex(m => m === start);
+    const endIdx = monthNames.findIndex(m => m === end);
     
-    // Calculate monthly returns
-    for (let i = 1; i < historicalData.length; i++) {
-      const currentData = historicalData[i];
-      const previousData = historicalData[i-1];
-      
-      const date = new Date(currentData.date);
-      const month = monthNames[date.getMonth()];
-      
-      // Calculate monthly return (%)
-      const monthlyReturn = ((currentData.close - previousData.close) / previousData.close) * 100;
-      monthlyReturns[month].push(monthlyReturn);
-    }
+    if (startIdx === -1 || endIdx === -1) return [];
     
-    // Calculate detailed monthly statistics for strategy exploration
-    const detailedMonthlyData: Record<string, any> = {};
+    const result: string[] = [];
     
-    monthNames.forEach(month => {
-      const returns = monthlyReturns[month];
-      if (returns.length > 0) {
-        const avgReturn = returns.reduce((sum, val) => sum + val, 0) / returns.length;
-        const positiveReturns = returns.filter(ret => ret > 0);
-        const consistency = (positiveReturns.length / returns.length) * 100;
-        
-        detailedMonthlyData[month] = {
-          avgReturn,
-          consistency,
-          years: returns.length,
-          positiveYears: positiveReturns.length,
-          maxReturn: Math.max(...returns),
-          minReturn: Math.min(...returns),
-          volatility: calculateStandardDeviation(returns)
-        };
+    if (startIdx <= endIdx) {
+      // Simple case: start to end in same year
+      for (let i = startIdx; i <= endIdx; i++) {
+        result.push(monthNames[i]);
       }
-    });
-    
-    setMonthlyDetailedData(detailedMonthlyData);
-    
-    // Find best consecutive 3-4 month period
-    const seasonalPatterns: {start: number; end: number; return: number}[] = [];
-    
-    for (let start = 0; start < 12; start++) {
-      for (let length = 3; length <= 4; length++) {
-        let totalReturn = 0;
-        let isValid = true;
-        
-        for (let i = 0; i < length; i++) {
-          const monthIndex = (start + i) % 12;
-          const month = monthNames[monthIndex];
-          
-          if (monthlyReturns[month].length === 0) {
-            isValid = false;
-            break;
-          }
-          
-          const avgReturn = monthlyReturns[month].reduce((sum, val) => sum + val, 0) / monthlyReturns[month].length;
-          totalReturn += avgReturn;
-        }
-        
-        if (isValid) {
-          seasonalPatterns.push({
-            start,
-            end: (start + length - 1) % 12,
-            return: totalReturn
-          });
-        }
+    } else {
+      // Wrap around case: end comes before start in calendar
+      for (let i = startIdx; i < monthNames.length; i++) {
+        result.push(monthNames[i]);
+      }
+      for (let i = 0; i <= endIdx; i++) {
+        result.push(monthNames[i]);
       }
     }
     
-    // Find strongest positive pattern
-    const bestPattern = seasonalPatterns.sort((a, b) => b.return - a.return)[0];
-    if (bestPattern) {
-      setStrongestPattern({
-        period: `${monthNames[bestPattern.start]} to ${monthNames[bestPattern.end]}`,
-        return: bestPattern.return
-      });
-    }
-    
-    // Find worst month (risk pattern)
-    const monthlyAvgReturns = monthNames.map(month => {
-      const returns = monthlyReturns[month];
-      const avgReturn = returns.length > 0 
-        ? returns.reduce((sum, val) => sum + val, 0) / returns.length
-        : 0;
-      return { month, avgReturn };
-    });
-    
-    const worstMonth = monthlyAvgReturns
-      .filter(m => m.avgReturn < 0 && monthlyReturns[m.month].length > 0)
-      .sort((a, b) => a.avgReturn - b.avgReturn)[0];
-      
-    if (worstMonth) {
-      setRiskPattern({
-        period: worstMonth.month,
-        return: worstMonth.avgReturn
-      });
-    }
-  };
-  
-  // Helper function to calculate standard deviation (volatility)
-  const calculateStandardDeviation = (values: number[]): number => {
-    if (values.length <= 1) return 0;
-    
-    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-    const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
-    return Math.sqrt(variance);
+    return result;
   };
 
   const handleExploreStrongestPattern = () => {
@@ -266,36 +153,6 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
     });
     
     setShowStrategyModal(true);
-  };
-  
-  // Helper function to get all months between two months (inclusive)
-  const getMonthsBetween = (start: string, end: string): string[] => {
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-    
-    const startIdx = monthNames.findIndex(m => m === start);
-    const endIdx = monthNames.findIndex(m => m === end);
-    
-    if (startIdx === -1 || endIdx === -1) return [];
-    
-    const result: string[] = [];
-    
-    if (startIdx <= endIdx) {
-      // Simple case: start to end in same year
-      for (let i = startIdx; i <= endIdx; i++) {
-        result.push(monthNames[i]);
-      }
-    } else {
-      // Wrap around case: end comes before start in calendar
-      for (let i = startIdx; i < monthNames.length; i++) {
-        result.push(monthNames[i]);
-      }
-      for (let i = 0; i <= endIdx; i++) {
-        result.push(monthNames[i]);
-      }
-    }
-    
-    return result;
   };
 
   // Info button click handler
