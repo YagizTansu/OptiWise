@@ -12,8 +12,9 @@ const Fundamental = ({ symbol }: FundamentalProps) => {
     <div className={styles.fundamentalContent}>
         
         <StockDashboard symbol={symbol} />
-        <FinancialStatements symbol={symbol} />
         <AnalysisTools symbol={symbol} />
+        <FinancialStatements symbol={symbol} />
+
 
     
     </div>

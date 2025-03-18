@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import styles from '../../../styles/Analyses.module.css';
 import { FaChartLine, FaChartBar, FaEyeSlash, FaInfoCircle, FaArrowLeft, FaArrowRight, FaSyncAlt, FaDownload, FaExpand, FaQuestion, FaTimes } from 'react-icons/fa';
 import { Chart, ChartDataset } from 'chart.js';
-import axios from 'axios';
+import { fetchPriceVolumeData, PriceVolumeData } from '../../../services/api/finance';
 
 // Define proper chart dataset types
 interface PriceDataset extends ChartDataset<'line'> {
@@ -16,32 +16,6 @@ interface PriceDataset extends ChartDataset<'line'> {
 interface VolumeDataset extends ChartDataset<'bar'> {
   type: 'bar';
   yAxisID: string;
-}
-
-// Updated to match actual API response structure
-interface ChartDataResponse {
-  events?: {
-    dividends?: Array<any>;
-    // Other event types can be added as needed
-  };
-  meta: {
-    currency: string;
-    symbol: string;
-    exchangeName: string;
-    fullExchangeName: string;
-    instrumentType: string;
-    // Add other meta fields as needed
-  };
-  quotes: Array<{
-    date: string;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-    volume: number;
-    adjclose?: number;
-    // Other quote fields as needed
-  }>;
 }
 
 interface PriceVolumeChartProps {
@@ -100,106 +74,20 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
     };
   }, [chartData, showVolume]);
 
-  // Map timeframe to appropriate API parameters
-  const getTimeframeParams = (timeframe: string) => {
-    const now = new Date();
-    let period1: Date = new Date();
-    let interval = '1d';
-
-    switch (timeframe) {
-      case '1w': 
-        period1 = new Date(now.setDate(now.getDate() - 7));
-        interval = '60m';
-        break;
-      case '3d': 
-        period1 = new Date(now.setDate(now.getDate() - 3));
-        interval = '30m';
-        break;
-      case 'd': 
-        period1 = new Date(now.setDate(now.getDate() - 1));
-        interval = '15m';
-        break;
-      case 'w': 
-        period1 = new Date(now.setDate(now.getDate() - 7));
-        interval = '1d';
-        break;
-      case '1m': 
-        period1 = new Date(now.setMonth(now.getMonth() - 1));
-        interval = '1d';
-        break;
-      case '6m': 
-        period1 = new Date(now.setMonth(now.getMonth() - 6));
-        interval = '1d';
-        break;
-      case '1y': 
-        period1 = new Date(now.setFullYear(now.getFullYear() - 1));
-        interval = '1d';
-        break;
-      case '3y': 
-        period1 = new Date(now.setFullYear(now.getFullYear() - 3));
-        interval = '1wk';
-        break;
-      case '5y': 
-        period1 = new Date(now.setFullYear(now.getFullYear() - 5));
-        interval = '1wk';
-        break;
-      default: 
-        period1 = new Date(now.setFullYear(now.getFullYear() - 1));
-        interval = '1d';
-    }
-
-    return {
-      period1: period1.toISOString(),
-      period2: new Date().toISOString(),
-      interval
-    };
-  };
-
   const loadChartData = async (timeframe: string) => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // Get the appropriate time parameters based on the timeframe
-      const { period1, period2, interval } = getTimeframeParams(timeframe);
+      // Use the service function from finance.ts
+      const data = await fetchPriceVolumeData(symbol, timeframe);
       
-      // Make the API call to get chart data
-      const response = await axios.get<ChartDataResponse>(`http://localhost:3001/api/finance/chart`, {
-        params: {
-          symbol,
-          period1,
-          period2,
-          interval,
-          includePrePost: true,
-          events: 'div|split|earn'
-        }
+      // Transform the data to match our component's expected format
+      setChartData({
+        labels: data.price.dates,
+        prices: data.price.values,
+        volumes: data.volume.values
       });
-      
-      // Process the response data - updated to match the new structure
-      if (response.data && response.data.quotes && response.data.quotes.length > 0) {
-        const quotes = response.data.quotes;
-        
-        // Extract price and volume data from quotes
-        const labels = quotes.map(quote => {
-          const date = new Date(quote.date);
-          return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric',
-            ...(timeframe === '3y' || timeframe === '5y' ? { year: 'numeric' } : {})
-          });
-        });
-        
-        const prices = quotes.map(quote => quote.adjclose || quote.close);
-        const volumes = quotes.map(quote => quote.volume);
-        
-        setChartData({
-          labels,
-          prices,
-          volumes
-        });
-      } else {
-        throw new Error('No quote data available for this symbol');
-      }
     } catch (error) {
       console.error('Failed to load chart data:', error);
       setError('Failed to load chart data. Please try again later.');
