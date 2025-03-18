@@ -127,6 +127,56 @@ export interface DividendHistoryResponse {
   error: string | null;
 }
 
+// Time Average Returns types
+export interface TimeAverageReturnData {
+  labels: string[];
+  datasets: Array<{
+    label: string;
+    data: number[];
+    backgroundColor: string;
+  }>;
+}
+
+export interface ReturnStatisticData {
+  period: string;
+  avgReturn: number;
+  stdDev: number;
+  winRate: number;
+  best: number;
+  worst: number;
+}
+
+export interface TimeAverageReturnResponse {
+  chartData: TimeAverageReturnData;
+  statistics: ReturnStatisticData[];
+}
+
+// Seasonality types
+export interface SeasonalityDataPoint {
+  period: string;
+  avgChange: number;
+}
+
+export interface SeasonalityDataset {
+  label: string;
+  data: number[];
+  borderColor?: string;
+  backgroundColor: string;
+}
+
+export interface SeasonalityChartData {
+  labels: string[];
+  datasets: SeasonalityDataset[];
+}
+
+export interface SeasonalityResponse {
+  daily?: SeasonalityChartData;
+  weekly?: SeasonalityChartData;
+  monthly?: SeasonalityChartData;
+  yearly?: SeasonalityChartData;
+  error?: string;
+}
+
 // =============================================================================
 // UTILITY FUNCTIONS
 // =============================================================================
@@ -801,3 +851,690 @@ export async function fetchDividendSummary(
     return null;
   }
 }
+
+// =============================================================================
+// TIME AVERAGE RETURNS FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches and processes time average returns data for a symbol
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param period - Time period to analyze (e.g., '1 Year', '5 Years')
+ * @param viewType - Type of view ('daily', 'monthly', 'yearly')
+ * @returns Processed chart data and statistics
+ */
+export async function fetchTimeAverageReturns(
+  symbol: string,
+  period: string,
+  viewType: string
+): Promise<TimeAverageReturnResponse> {
+  try {
+    // Calculate date range based on selected period
+    const { startDate, endDate } = getDateRangeFromPeriod(period);
+    
+    // Determine appropriate interval based on view type
+    const interval = viewType === 'daily' ? '1d' : '1mo';
+    
+    // Format dates for API
+    const fromDate = startDate.toISOString().split('T')[0];
+    const toDate = endDate.toISOString().split('T')[0];
+    
+    const params = {
+      symbol,
+      from: fromDate,
+      to: toDate,
+      interval
+    };
+    
+    // Fetch historical data
+    const data = await makeApiRequest<HistoricalDataPoint[]>('historical', params);
+    
+    if (!data || data.length === 0) {
+      throw new Error('No data available for the selected criteria');
+    }
+    
+    // Process data based on view type
+    let processedChartData;
+    switch (viewType) {
+      case 'daily':
+        processedChartData = processDailyData(data, period);
+        break;
+      case 'monthly':
+        processedChartData = processMonthlyData(data, period);
+        break;
+      case 'yearly':
+        processedChartData = processYearlyData(data, period);
+        break;
+      default:
+        processedChartData = processMonthlyData(data, period);
+    }
+    
+    // Calculate statistics
+    const statistics = calculateTimeAverageStats(data, viewType);
+    
+    return {
+      chartData: processedChartData,
+      statistics
+    };
+  } catch (error) {
+    console.error('Error fetching time average returns:', error);
+    throw error;
+  }
+}
+
+/**
+ * Convert period string to date range
+ */
+function getDateRangeFromPeriod(period: string): { startDate: Date; endDate: Date } {
+  const endDate = new Date();
+  const startDate = new Date();
+  
+  switch (period) {
+    case '1 Year':
+      startDate.setFullYear(endDate.getFullYear() - 1);
+      break;
+    case '3 Years':
+      startDate.setFullYear(endDate.getFullYear() - 3);
+      break;
+    case '5 Years':
+      startDate.setFullYear(endDate.getFullYear() - 5);
+      break;
+    case '10 Years':
+      startDate.setFullYear(endDate.getFullYear() - 10);
+      break;
+    case 'Max':
+      startDate.setFullYear(2000); // Arbitrary start date for "Max"
+      break;
+    default:
+      startDate.setFullYear(endDate.getFullYear() - 5);
+  }
+  
+  return { startDate, endDate };
+}
+
+/**
+ * Process data for daily view (day of month)
+ */
+function processDailyData(data: HistoricalDataPoint[], period: string): TimeAverageReturnData {
+  // Group returns by day of month
+  const dailyReturns: { [day: number]: number[] } = {};
+  
+  // Initialize all days
+  for (let i = 1; i <= 31; i++) {
+    dailyReturns[i] = [];
+  }
+  
+  // Calculate daily returns and group by day of month
+  for (let i = 1; i < data.length; i++) {
+    const previousClose = data[i-1].close;
+    const currentClose = data[i].close;
+    const returnPct = ((currentClose - previousClose) / previousClose) * 100;
+    
+    const date = new Date(data[i].date);
+    const dayOfMonth = date.getDate();
+    
+    dailyReturns[dayOfMonth].push(returnPct);
+  }
+  
+  // Calculate average return for each day of month
+  const labels = Array.from({length: 31}, (_, i) => (i + 1).toString());
+  const averageReturns = labels.map((day) => {
+    const dayNum = parseInt(day);
+    const returns = dailyReturns[dayNum];
+    return returns.length > 0 
+      ? returns.reduce((sum, val) => sum + val, 0) / returns.length 
+      : 0;
+  });
+  
+  return {
+    labels,
+    datasets: [
+      {
+        label: `${period} Average Returns`,
+        data: averageReturns,
+        backgroundColor: 'rgba(53, 162, 235, 0.7)',
+      }
+    ]
+  };
+}
+
+/**
+ * Process data for monthly view
+ */
+function processMonthlyData(data: HistoricalDataPoint[], period: string): TimeAverageReturnData {
+  // Group returns by month
+  const monthlyReturns: { [month: number]: number[] } = {};
+  
+  // Initialize all months
+  for (let i = 0; i < 12; i++) {
+    monthlyReturns[i] = [];
+  }
+  
+  // Calculate monthly returns
+  for (let i = 1; i < data.length; i++) {
+    const previousClose = data[i-1].close;
+    const currentClose = data[i].close;
+    const returnPct = ((currentClose - previousClose) / previousClose) * 100;
+    
+    const date = new Date(data[i].date);
+    const month = date.getMonth();
+    
+    monthlyReturns[month].push(returnPct);
+  }
+  
+  // Calculate average return for each month
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const averageReturns = monthNames.map((_, idx) => {
+    const returns = monthlyReturns[idx];
+    return returns.length > 0 
+      ? returns.reduce((sum, val) => sum + val, 0) / returns.length 
+      : 0;
+  });
+  
+  return {
+    labels: monthNames,
+    datasets: [
+      {
+        label: `${period} Average Returns`,
+        data: averageReturns,
+        backgroundColor: 'rgba(53, 162, 235, 0.7)',
+      }
+    ]
+  };
+}
+
+/**
+ * Process data for yearly view
+ */
+function processYearlyData(data: HistoricalDataPoint[], period: string): TimeAverageReturnData {
+  // Group returns by year
+  const yearlyReturns: { [year: number]: number[] } = {};
+  
+  // Calculate yearly returns
+  for (let i = 1; i < data.length; i++) {
+    const previousClose = data[i-1].close;
+    const currentClose = data[i].close;
+    const returnPct = ((currentClose - previousClose) / previousClose) * 100;
+    
+    const date = new Date(data[i].date);
+    const year = date.getFullYear();
+    
+    if (!yearlyReturns[year]) {
+      yearlyReturns[year] = [];
+    }
+    
+    yearlyReturns[year].push(returnPct);
+  }
+  
+  // Extract unique years and sort them
+  const years = Object.keys(yearlyReturns).map(Number).sort();
+  
+  // Calculate average return for each year
+  const averageReturns = years.map(year => {
+    const returns = yearlyReturns[year];
+    return returns.length > 0 
+      ? returns.reduce((sum, val) => sum + val, 0) / returns.length 
+      : 0;
+  });
+  
+  return {
+    labels: years.map(String),
+    datasets: [
+      {
+        label: `${period} Average Returns`,
+        data: averageReturns,
+        backgroundColor: 'rgba(53, 162, 235, 0.7)',
+      }
+    ]
+  };
+}
+
+/**
+ * Calculate statistics for time average returns
+ */
+function calculateTimeAverageStats(data: HistoricalDataPoint[], viewType: string): ReturnStatisticData[] {
+  const getPeriodName = (idx: number, type: string) => {
+    if (type === 'monthly') {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                         'July', 'August', 'September', 'October', 'November', 'December'];
+      return monthNames[idx];
+    } else if (type === 'daily') {
+      return `Day ${idx + 1}`;
+    } else {
+      // Extract actual years from data for yearly view
+      const years = [...new Set(data.map(point => new Date(point.date).getFullYear()))].sort();
+      return years[idx] ? years[idx].toString() : `Year ${idx + 1}`;
+    }
+  };
+
+  // Determine number of periods based on view type
+  const periodCount = viewType === 'monthly' ? 12 : (viewType === 'daily' ? 31 : 10);
+  
+  // Group data by respective periods
+  const periodReturns: { [period: number]: number[] } = {};
+  
+  // Initialize all periods
+  for (let i = 0; i < periodCount; i++) {
+    periodReturns[i] = [];
+  }
+  
+  // Calculate returns and group by period
+  for (let i = 1; i < data.length; i++) {
+    const previousClose = data[i-1].close;
+    const currentClose = data[i].close;
+    const returnPct = ((currentClose - previousClose) / previousClose) * 100;
+    
+    const date = new Date(data[i].date);
+    let periodIndex: number;
+    
+    if (viewType === 'monthly') {
+      periodIndex = date.getMonth();
+    } else if (viewType === 'daily') {
+      periodIndex = date.getDate() - 1;
+      if (periodIndex >= periodCount) continue; // Skip days beyond 31
+    } else { // yearly
+      // Get unique years and map to index
+      const years = [...new Set(data.map(point => new Date(point.date).getFullYear()))].sort();
+      periodIndex = years.indexOf(date.getFullYear());
+      if (periodIndex === -1 || periodIndex >= periodCount) continue;
+    }
+    
+    periodReturns[periodIndex].push(returnPct);
+  }
+  
+  // Calculate statistics for each period
+  return Object.keys(periodReturns)
+    .map(Number)
+    .filter(idx => idx < periodCount)
+    .map(idx => {
+      const returns = periodReturns[idx];
+      
+      if (returns.length === 0) {
+        return {
+          period: getPeriodName(idx, viewType),
+          avgReturn: 0,
+          stdDev: 0,
+          winRate: 0,
+          best: 0,
+          worst: 0
+        };
+      }
+      
+      // Calculate average return
+      const avgReturn = returns.reduce((sum, val) => sum + val, 0) / returns.length;
+      
+      // Calculate standard deviation
+      const variance = returns.reduce((sum, val) => sum + Math.pow(val - avgReturn, 2), 0) / returns.length;
+      const stdDev = Math.sqrt(variance);
+      
+      // Calculate win rate
+      const winningReturns = returns.filter(ret => ret > 0).length;
+      const winRate = (winningReturns / returns.length) * 100;
+      
+      // Get best and worst returns
+      const best = Math.max(...returns);
+      const worst = Math.min(...returns);
+      
+      return {
+        period: getPeriodName(idx, viewType),
+        avgReturn,
+        stdDev,
+        winRate,
+        best,
+        worst
+      };
+    });
+}
+
+// =============================================================================
+// SEASONALITY FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches and processes seasonality data for a financial symbol
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param timeframe - Timeframe to analyze ('daily', 'weekly', 'monthly', 'yearly')
+ * @param periods - Array of period definitions with labels and years
+ * @returns Processed seasonality data for the requested timeframe
+ */
+export async function fetchSeasonalityData(
+  symbol: string,
+  timeframe: string,
+  periods: { label: string, years: number }[]
+): Promise<SeasonalityChartData> {
+  try {
+    // Process for each period
+    const datasets: SeasonalityDataset[] = [];
+    let periodLabels: string[] = [];
+    
+    for (const period of periods) {
+      const { years } = period;
+      
+      // Calculate date range based on years
+      const to = new Date();
+      const from = new Date();
+      from.setFullYear(from.getFullYear() - years);
+      
+      // Determine appropriate interval based on timeframe
+      let interval = '1d';
+      if (timeframe === 'yearly') {
+        interval = '1mo'; // Monthly data for yearly analysis is sufficient
+      } else if (timeframe === 'monthly' || timeframe === 'weekly') {
+        interval = '1d'; // Need daily data to calculate weekly/monthly performance
+      }
+      
+      // Format dates for API
+      const fromDate = from.toISOString().split('T')[0];
+      const toDate = to.toISOString().split('T')[0];
+      
+      const params = {
+        symbol,
+        from: fromDate,
+        to: toDate,
+        interval
+      };
+      
+      // Fetch historical data
+      const data = await makeApiRequest<HistoricalDataPoint[]>('historical', params);
+      
+      if (!data || data.length === 0) {
+        throw new Error(`No data available for ${symbol} over ${years} years`);
+      }
+      
+      // Process data based on timeframe
+      let processedData: SeasonalityDataPoint[] = [];
+      
+      switch (timeframe) {
+        case 'daily':
+          processedData = calculateDailySeasonality(data, years);
+          break;
+        case 'weekly':
+          processedData = calculateWeeklySeasonality(data, years);
+          break;
+        case 'monthly':
+          processedData = calculateMonthlySeasonality(data, years);
+          break;
+        case 'yearly':
+          processedData = calculateYearlySeasonality(data, years);
+          break;
+      }
+      
+      // Extract labels (only need to do this once)
+      if (periodLabels.length === 0) {
+        periodLabels = processedData.map(item => item.period);
+      }
+      
+      // Determine colors based on whether this is primary or comparison period
+      const isPrimaryPeriod = periods.indexOf(period) === 0;
+      
+      const color = isPrimaryPeriod 
+        ? 'rgba(53, 162, 235, 0.7)'  // Blue for primary period
+        : 'rgba(255, 159, 64, 0.7)'; // Orange for comparison period
+      
+      const borderColor = isPrimaryPeriod
+        ? 'rgb(53, 162, 235)'  // Solid blue for primary period
+        : 'rgb(255, 159, 64)'; // Solid orange for comparison period
+      
+      // Create dataset
+      datasets.push({
+        label: period.label,
+        data: processedData.map(item => item.avgChange),
+        borderColor,
+        backgroundColor: color
+      });
+    }
+    
+    return {
+      labels: periodLabels,
+      datasets
+    };
+  } catch (error) {
+    console.error(`Error fetching seasonality data for ${symbol}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Calculate daily seasonality (average % change by day of month)
+ */
+function calculateDailySeasonality(historicalData: HistoricalDataPoint[], years: number): SeasonalityDataPoint[] {
+  // Initialize data structure for all days (1-31)
+  const dayData: { [key: number]: { sum: number, count: number } } = {};
+  for (let i = 1; i <= 31; i++) {
+    dayData[i] = { sum: 0, count: 0 };
+  }
+  
+  // Process each data point
+  for (let i = 1; i < historicalData.length; i++) {
+    const current = historicalData[i];
+    const previous = historicalData[i - 1];
+    
+    // Skip if data is incomplete
+    if (!current || !previous || !current.close || !previous.close) continue;
+    
+    const date = new Date(current.date);
+    const dayOfMonth = date.getDate();
+    
+    // Calculate percent change
+    const percentChange = ((current.close - previous.close) / previous.close) * 100;
+    
+    // Add to running total
+    dayData[dayOfMonth].sum += percentChange;
+    dayData[dayOfMonth].count += 1;
+  }
+  
+  // Calculate averages and format data
+  return Array.from({length: 31}, (_, i) => {
+    const day = i + 1;
+    const avgChange = dayData[day].count > 0 ? dayData[day].sum / dayData[day].count : 0;
+    return {
+      period: day.toString(),
+      avgChange: Number(avgChange.toFixed(2))
+    };
+  });
+}
+
+/**
+ * Calculate weekly seasonality (average % change by day of week)
+ */
+function calculateWeeklySeasonality(historicalData: HistoricalDataPoint[], years: number): SeasonalityDataPoint[] {
+  const weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  const weekdayData: { [key: number]: { sum: number, count: number } } = {};
+  
+  for (let i = 0; i < 5; i++) {
+    weekdayData[i] = { sum: 0, count: 0 };
+  }
+  
+  // Process each data point
+  for (let i = 1; i < historicalData.length; i++) {
+    const current = historicalData[i];
+    const previous = historicalData[i - 1];
+    
+    if (!current || !previous || !current.close || !previous.close) continue;
+    
+    const date = new Date(current.date);
+    // JavaScript getDay() returns 0-6 where 0 is Sunday and 6 is Saturday
+    // We adjust to 0 = Monday, 4 = Friday
+    const dayOfWeek = date.getDay();
+    // Convert Sunday(0) to Monday(0) through Saturday(6) to Friday(4)
+    const adjustedDay = dayOfWeek === 0 ? -1 : dayOfWeek - 1;
+    
+    // Skip weekends
+    if (adjustedDay < 0 || adjustedDay > 4) continue;
+    
+    const percentChange = ((current.close - previous.close) / previous.close) * 100;
+    
+    weekdayData[adjustedDay].sum += percentChange;
+    weekdayData[adjustedDay].count += 1;
+  }
+  
+  return weekdayNames.map((day, index) => {
+    const avgChange = weekdayData[index].count > 0 ? 
+      weekdayData[index].sum / weekdayData[index].count : 0;
+    return {
+      period: day,
+      avgChange: Number(avgChange.toFixed(2))
+    };
+  });
+}
+
+/**
+ * Calculate monthly seasonality (average % change by month)
+ */
+function calculateMonthlySeasonality(historicalData: HistoricalDataPoint[], years: number): SeasonalityDataPoint[] {
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthlyReturns: { [key: number]: number[] } = {};
+  
+  // Initialize the monthly returns array
+  for (let i = 0; i < 12; i++) {
+    monthlyReturns[i] = [];
+  }
+  
+  // Group data by year-month to calculate monthly returns
+  const monthlyData: { [key: string]: { open?: number, close?: number } } = {};
+  
+  historicalData.forEach(dataPoint => {
+    if (!dataPoint || !dataPoint.close) return;
+    
+    const date = new Date(dataPoint.date);
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    const yearMonthKey = `${year}-${month}`;
+    
+    if (!monthlyData[yearMonthKey]) {
+      // First entry for this month - set open price
+      monthlyData[yearMonthKey] = {
+        open: dataPoint.close
+      };
+    }
+    // Always update close price (it will be the last one for the month)
+    monthlyData[yearMonthKey].close = dataPoint.close;
+  });
+  
+  // Calculate monthly returns
+  Object.keys(monthlyData).forEach(yearMonthKey => {
+    const [year, month] = yearMonthKey.split('-').map(Number);
+    const data = monthlyData[yearMonthKey];
+    
+    if (data.open && data.close) {
+      const monthlyReturn = ((data.close - data.open) / data.open) * 100;
+      monthlyReturns[month].push(monthlyReturn);
+    }
+  });
+  
+  // Calculate average returns for each month
+  return monthNames.map((name, month) => {
+    const returns = monthlyReturns[month];
+    const avgChange = returns.length > 0 
+      ? returns.reduce((sum, val) => sum + val, 0) / returns.length 
+      : 0;
+      
+    return {
+      period: name,
+      avgChange: Number(avgChange.toFixed(2))
+    };
+  });
+}
+
+/**
+ * Calculate yearly seasonality (average % change by year)
+ */
+function calculateYearlySeasonality(historicalData: HistoricalDataPoint[], years: number): SeasonalityDataPoint[] {
+  if (historicalData.length === 0) return [];
+  
+  // Group data by year
+  const yearlyData: { [key: number]: { firstDate?: string, firstPrice?: number, lastDate?: string, lastPrice?: number } } = {};
+  
+  // Sort data by date to ensure chronological order
+  const sortedData = [...historicalData].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  
+  // Process data by year
+  sortedData.forEach(dataPoint => {
+    if (!dataPoint || !dataPoint.close) return;
+    
+    const date = new Date(dataPoint.date);
+    const year = date.getFullYear();
+    
+    if (!yearlyData[year]) {
+      yearlyData[year] = {
+        firstDate: dataPoint.date,
+        firstPrice: dataPoint.close,
+        lastDate: dataPoint.date,
+        lastPrice: dataPoint.close
+      };
+    } else {
+      // Update last price (most recent for the year)
+      yearlyData[year].lastDate = dataPoint.date;
+      yearlyData[year].lastPrice = dataPoint.close;
+    }
+  });
+  
+  // Calculate yearly returns
+  return Object.keys(yearlyData)
+    .map(year => {
+      const yearNum = parseInt(year);
+      const { firstPrice, lastPrice } = yearlyData[yearNum];
+      
+      // Skip years with incomplete data
+      if (firstPrice === undefined || lastPrice === undefined) {
+        return {
+          period: year,
+          avgChange: 0
+        };
+      }
+      
+      const yearlyReturn = ((lastPrice - firstPrice) / firstPrice) * 100;
+      return {
+        period: year,
+        avgChange: Number(yearlyReturn.toFixed(2))
+      };
+    })
+    .filter(item => item.avgChange !== 0); // Remove years with no data
+}
+
+/**
+ * Batch fetch seasonality data for all timeframes
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param primaryPeriod - Primary period label and years
+ * @param comparisonPeriod - Comparison period label and years
+ * @returns Seasonality data for all timeframes
+ */
+export async function fetchAllSeasonalityData(
+  symbol: string,
+  primaryPeriod: { label: string, years: number },
+  comparisonPeriod: { label: string, years: number }
+): Promise<SeasonalityResponse> {
+  try {
+    const periods = [primaryPeriod, comparisonPeriod];
+    const timeframes = ['daily', 'weekly', 'monthly', 'yearly'];
+    
+    const results: SeasonalityResponse = {};
+    
+    // Fetch data for all timeframes in parallel
+    const promises = timeframes.map(timeframe => 
+      fetchSeasonalityData(symbol, timeframe, periods)
+        .then(data => {
+          results[timeframe as keyof SeasonalityResponse] = data;
+        })
+        .catch(error => {
+          console.error(`Error fetching ${timeframe} data:`, error);
+          // Continue with other timeframes even if one fails
+        })
+    );
+    
+    await Promise.all(promises);
+    
+    return results;
+  } catch (error) {
+    console.error(`Error fetching seasonality data for ${symbol}:`, error);
+    return {
+      error: error instanceof Error ? error.message : 'Unknown error fetching seasonality data'
+    };
+  }
+}
+

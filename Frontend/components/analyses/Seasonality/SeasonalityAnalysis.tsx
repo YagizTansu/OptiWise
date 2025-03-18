@@ -1,27 +1,13 @@
 import { FaChartLine, FaCircle, FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
 import { Line, Bar } from 'react-chartjs-2';
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
 import html2canvas from 'html2canvas';
-
-// Define types for our data
-interface SeasonalityDataPoint {
-  period: string;
-  avgChange: number;
-}
-
-interface SeasonalityDataset {
-  label: string;
-  data: number[];
-  borderColor?: string;
-  backgroundColor: string;
-}
-
-interface SeasonalityChartData {
-  labels: string[];
-  datasets: SeasonalityDataset[];
-}
+import { 
+  fetchSeasonalityData, 
+  SeasonalityChartData,
+  fetchAllSeasonalityData
+} from '../../../services/api/finance';
 
 interface SeasonalityAnalysisProps {
   symbol: string;
@@ -123,348 +109,65 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     return parseInt(period.split(' ')[0]);
   };
 
-  // Calculate daily seasonality (average % change by day of month)
-  const calculateDailySeasonality = (historicalData: any[], periodYears: number): SeasonalityDataPoint[] => {
-    // Initialize data structure for all days (1-31)
-    const dayData: { [key: number]: { sum: number, count: number } } = {};
-    for (let i = 1; i <= 31; i++) {
-      dayData[i] = { sum: 0, count: 0 };
-    }
-    
-    // Process each data point
-    for (let i = 1; i < historicalData.length; i++) {
-      const current = historicalData[i];
-      const previous = historicalData[i - 1];
-      
-      // Skip if data is incomplete
-      if (!current || !previous || !current.close || !previous.close) continue;
-      
-      const date = new Date(current.date);
-      const dayOfMonth = date.getDate();
-      
-      // Calculate percent change
-      const percentChange = ((current.close - previous.close) / previous.close) * 100;
-      
-      // Add to running total
-      dayData[dayOfMonth].sum += percentChange;
-      dayData[dayOfMonth].count += 1;
-    }
-    
-    // Calculate averages and format data
-    return Array.from({length: 31}, (_, i) => {
-      const day = i + 1;
-      const avgChange = dayData[day].count > 0 ? dayData[day].sum / dayData[day].count : 0;
-      return {
-        period: day.toString(),
-        avgChange: Number(avgChange.toFixed(2))
-      };
-    });
-  };
-
-  // Calculate weekly seasonality (average % change by day of week)
-  const calculateWeeklySeasonality = (historicalData: any[], periodYears: number): SeasonalityDataPoint[] => {
-    const weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-    const weekdayData: { [key: number]: { sum: number, count: number } } = {};
-    
-    for (let i = 0; i < 5; i++) {
-      weekdayData[i] = { sum: 0, count: 0 };
-    }
-    
-    // Process each data point
-    for (let i = 1; i < historicalData.length; i++) {
-      const current = historicalData[i];
-      const previous = historicalData[i - 1];
-      
-      if (!current || !previous || !current.close || !previous.close) continue;
-      
-      const date = new Date(current.date);
-      // JavaScript getDay() returns 0-6 where 0 is Sunday and 6 is Saturday
-      // We adjust to 0 = Monday, 4 = Friday
-      const dayOfWeek = date.getDay();
-      // Convert Sunday(0) to Monday(0) through Saturday(6) to Friday(4)
-      const adjustedDay = dayOfWeek === 0 ? -1 : dayOfWeek - 1;
-      
-      // Skip weekends
-      if (adjustedDay < 0 || adjustedDay > 4) continue;
-      
-      const percentChange = ((current.close - previous.close) / previous.close) * 100;
-      
-      weekdayData[adjustedDay].sum += percentChange;
-      weekdayData[adjustedDay].count += 1;
-    }
-    
-    return weekdayNames.map((day, index) => {
-      const avgChange = weekdayData[index].count > 0 ? 
-        weekdayData[index].sum / weekdayData[index].count : 0;
-      return {
-        period: day,
-        avgChange: Number(avgChange.toFixed(2))
-      };
-    });
-  };
-
-  // Calculate monthly seasonality (average % change by month)
-  const calculateMonthlySeasonality = (historicalData: any[], periodYears: number): SeasonalityDataPoint[] => {
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const monthlyReturns: { [key: number]: number[] } = {};
-    
-    // Initialize the monthly returns array
-    for (let i = 0; i < 12; i++) {
-      monthlyReturns[i] = [];
-    }
-    
-    // Group data by year-month to calculate monthly returns
-    const monthlyData: { [key: string]: { open?: number, close?: number } } = {};
-    
-    historicalData.forEach(dataPoint => {
-      if (!dataPoint || !dataPoint.close) return;
-      
-      const date = new Date(dataPoint.date);
-      const month = date.getMonth();
-      const year = date.getFullYear();
-      const yearMonthKey = `${year}-${month}`;
-      
-      if (!monthlyData[yearMonthKey]) {
-        // First entry for this month - set open price
-        monthlyData[yearMonthKey] = {
-          open: dataPoint.close
-        };
-      }
-      // Always update close price (it will be the last one for the month)
-      monthlyData[yearMonthKey].close = dataPoint.close;
-    });
-    
-    // Calculate monthly returns
-    Object.keys(monthlyData).forEach(yearMonthKey => {
-      const [year, month] = yearMonthKey.split('-').map(Number);
-      const data = monthlyData[yearMonthKey];
-      
-      if (data.open && data.close) {
-        const monthlyReturn = ((data.close - data.open) / data.open) * 100;
-        monthlyReturns[month].push(monthlyReturn);
-      }
-    });
-    
-    // Calculate average returns for each month
-    return monthNames.map((name, month) => {
-      const returns = monthlyReturns[month];
-      const avgChange = returns.length > 0 
-        ? returns.reduce((sum, val) => sum + val, 0) / returns.length 
-        : 0;
-        
-      return {
-        period: name,
-        avgChange: Number(avgChange.toFixed(2))
-      };
-    });
-  };
-
-  // Calculate yearly seasonality (average % change by year)
-  const calculateYearlySeasonality = (historicalData: any[], periodYears: number): SeasonalityDataPoint[] => {
-    if (historicalData.length === 0) return [];
-    
-    // Group data by year
-    const yearlyData: { [key: number]: { firstDate?: string, firstPrice?: number, lastDate?: string, lastPrice?: number } } = {};
-    
-    // Sort data by date to ensure chronological order
-    const sortedData = [...historicalData].sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-    
-    // Process data by year
-    sortedData.forEach(dataPoint => {
-      if (!dataPoint || !dataPoint.close) return;
-      
-      const date = new Date(dataPoint.date);
-      const year = date.getFullYear();
-      
-      if (!yearlyData[year]) {
-        yearlyData[year] = {
-          firstDate: dataPoint.date,
-          firstPrice: dataPoint.close,
-          lastDate: dataPoint.date,
-          lastPrice: dataPoint.close
-        };
-      } else {
-        // Update last price (most recent for the year)
-        yearlyData[year].lastDate = dataPoint.date;
-        yearlyData[year].lastPrice = dataPoint.close;
-      }
-    });
-    
-    // Calculate yearly returns
-    return Object.keys(yearlyData)
-      .map(year => {
-        const yearNum = parseInt(year);
-        const { firstPrice, lastPrice } = yearlyData[yearNum];
-        
-        // Skip years with incomplete data
-        if (firstPrice === undefined || lastPrice === undefined) {
-          return {
-            period: year,
-            avgChange: 0
-          };
-        }
-        
-        const yearlyReturn = ((lastPrice - firstPrice) / firstPrice) * 100;
-        return {
-          period: year,
-          avgChange: Number(yearlyReturn.toFixed(2))
-        };
-      })
-      .filter(item => item.avgChange !== 0); // Remove years with no data
-  };
-
-  // Fetch data for a specific timeframe and period
-  const fetchSeasonalityData = async (timeframe: string, period: string) => {
-    try {
-      const periodYears = getPeriodYears(period);
-      setIsLoading(true);
-      
-      // Calculate date range based on period (in years)
-      const to = new Date();
-      const from = new Date();
-      from.setFullYear(from.getFullYear() - periodYears);
-      
-      // Determine appropriate interval based on timeframe
-      let interval = '1d';
-      if (timeframe === 'yearly') {
-        interval = '1mo'; // Monthly data for yearly analysis is sufficient
-      } else if (timeframe === 'monthly') {
-        interval = '1d'; // Need daily data to properly calculate monthly performance
-      } else if (timeframe === 'weekly') {
-        interval = '1d'; // Need daily data to calculate day of week performance
-      }
-      
-      // Fetch data from API using port 3001 explicitly
-      const response = await axios.get('http://localhost:3001/api/finance/historical', {
-        params: {
-          symbol,
-          from: from.toISOString().split('T')[0], // Format as YYYY-MM-DD
-          to: to.toISOString().split('T')[0],
-          interval
-        }
-      });
-      
-      // Process data based on timeframe
-      let processedData: SeasonalityDataPoint[] = [];
-      
-      switch (timeframe) {
-        case 'daily':
-          processedData = calculateDailySeasonality(response.data, periodYears);
-          break;
-        case 'weekly':
-          processedData = calculateWeeklySeasonality(response.data, periodYears);
-          break;
-        case 'monthly':
-          processedData = calculateMonthlySeasonality(response.data, periodYears);
-          break;
-        case 'yearly':
-          processedData = calculateYearlySeasonality(response.data, periodYears);
-          break;
-      }
-      
-      // Update the chart data
-      const labels = processedData.map(item => item.period);
-      const data = processedData.map(item => item.avgChange);
-      
-      // Determine colors based on whether this is primary or comparison period
-      // Primary period is always blue, comparison is always orange
-      const isPrimaryPeriod = period === comparisonPeriods.first;
-      
-      const color = isPrimaryPeriod 
-        ? 'rgba(53, 162, 235, 0.7)'  // Blue for primary period
-        : 'rgba(255, 159, 64, 0.7)'; // Orange for comparison period
-      
-      const borderColor = isPrimaryPeriod
-        ? 'rgb(53, 162, 235)'  // Solid blue for primary period
-        : 'rgb(255, 159, 64)'; // Solid orange for comparison period
-      
-      // Update the specific dataset
-      setSeasonalityData(prevData => {
-        // Initialize if null
-        const currentData = prevData[timeframe as keyof typeof prevData] || {
-          labels: labels,
-          datasets: []
-        };
-        
-        // Find existing dataset or create new one
-        const datasetIndex = currentData.datasets.findIndex(ds => ds.label === period);
-        
-        if (datasetIndex >= 0) {
-          // Update existing dataset
-          const updatedDatasets = [...currentData.datasets];
-          updatedDatasets[datasetIndex] = {
-            ...updatedDatasets[datasetIndex],
-            data,
-            borderColor,
-            backgroundColor: color
-          };
-          
-          return {
-            ...prevData,
-            [timeframe]: {
-              labels,
-              datasets: updatedDatasets
-            }
-          };
-        } else {
-          // Create new dataset
-          return {
-            ...prevData,
-            [timeframe]: {
-              labels,
-              datasets: [
-                ...currentData.datasets,
-                {
-                  label: period,
-                  data,
-                  borderColor,
-                  backgroundColor: color
-                }
-              ]
-            }
-          };
-        }
-      });
-      
-    } catch (err) {
-      console.error(`Error fetching ${timeframe} seasonality data for ${period}:`, err);
-      setError(`Failed to fetch ${timeframe} data for ${period}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Load all data when component mounts or when parameters change
+  // Load data when component mounts or when parameters change
   useEffect(() => {
     // Reset error state
     setError(null);
+    setIsLoading(true);
     
-    // Clear existing chart data when periods change to ensure we don't keep old datasets
-    setSeasonalityData(prevData => {
-      // Keep data structure but clear all datasets
-      if (prevData[activeTimeframe as keyof typeof prevData]) {
-        return {
-          ...prevData,
-          [activeTimeframe]: {
-            labels: prevData[activeTimeframe as keyof typeof prevData]?.labels || [],
-            datasets: [] // Clear all datasets, we'll refetch them
-          }
+    const loadData = async () => {
+      try {
+        // Create periods with years
+        const primaryPeriod = { 
+          label: comparisonPeriods.first, 
+          years: getPeriodYears(comparisonPeriods.first) 
         };
+        
+        const comparisonPeriod = { 
+          label: comparisonPeriods.second, 
+          years: getPeriodYears(comparisonPeriods.second) 
+        };
+        
+        // Option 1: Fetch only active timeframe
+        const data = await fetchSeasonalityData(symbol, activeTimeframe, [primaryPeriod, comparisonPeriod]);
+        
+        // Update state with the new data
+        setSeasonalityData(prevData => ({
+          ...prevData,
+          [activeTimeframe]: data
+        }));
+        
+        // Option 2 (for pre-fetching): Fetch all timeframes in the background
+        // Uncomment this to fetch all timeframes at once
+        /*
+        const allData = await fetchAllSeasonalityData(
+          symbol,
+          primaryPeriod,
+          comparisonPeriod
+        );
+        
+        // Update state with all timeframe data
+        setSeasonalityData({
+          daily: allData.daily || null,
+          weekly: allData.weekly || null, 
+          monthly: allData.monthly || null,
+          yearly: allData.yearly || null
+        });
+        
+        if (allData.error) {
+          setError(allData.error);
+        }
+        */
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error(`Error loading seasonality data:`, err);
+        setError(`Failed to load data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setIsLoading(false);
       }
-      return prevData;
-    });
-    
-    // Fetch data for both comparison periods
-    const loadAllData = async () => {
-      Promise.all([
-        fetchSeasonalityData(activeTimeframe, comparisonPeriods.first),
-        fetchSeasonalityData(activeTimeframe, comparisonPeriods.second)
-      ]);
     };
     
-    loadAllData();
+    loadData();
   }, [activeTimeframe, comparisonPeriods.first, comparisonPeriods.second, symbol]);
 
   // Function to get the current seasonality data based on the timeframe
