@@ -1,16 +1,9 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
+import { fetchAnalysisData, AnalysisData } from '../../../services/api/finance';
 
 interface AnalysisToolsProps {
   symbol: string;
-}
-
-interface AnalysisData {
-  recommendationTrend?: any;
-  earningsHistory?: any;
-  earningsTrend?: any;
-  calendarEvents?: any;
 }
 
 const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
@@ -29,8 +22,8 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
           'calendarEvents'
         ];
         
-        const response = await axios.get(`http://localhost:3001/api/finance/quoteSummary?symbol=${symbol}&modules=${modules.join(',')}`);
-        setData(response.data);
+        const response = await fetchAnalysisData(symbol, modules);
+        setData(response);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch analysis data');
@@ -666,8 +659,8 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
                   'calendarEvents'
                 ];
                 
-                const response = await axios.get(`http://localhost:3001/api/finance/quoteSummary?symbol=${symbol}&modules=${modules.join(',')}`);
-                setData(response.data);
+                const response = await fetchAnalysisData(symbol, modules);
+                setData(response);
                 setLoading(false);
               } catch (err) {
                 setError('Failed to fetch analysis data');

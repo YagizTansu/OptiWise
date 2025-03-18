@@ -11,12 +11,12 @@ const API_BASE_URL = 'http://localhost:3001/api/finance';
 export interface ChartDataPoint {
   timestamp: number;
   close: number;
-  open?: number;
-  high?: number;
-  low?: number;
-  volume?: number;
-  date?: string;
-  fullDate?: Date;
+  open: number | undefined;  // Changed from optional to required but can be undefined
+  high: number | undefined;  // Changed from optional to required but can be undefined
+  low: number | undefined;   // Changed from optional to required but can be undefined
+  volume: number | undefined; // Changed from optional to required but can be undefined
+  date: string | undefined;  // Changed from optional to required but can be undefined
+  fullDate: Date | undefined; // Changed from optional to required but can be undefined
 }
 
 export interface ChartDataResponse {
@@ -1304,7 +1304,8 @@ function calculateTimeAverageStats(data: HistoricalDataPoint[], viewType: string
       return `Day ${idx + 1}`;
     } else {
       // Extract actual years from data for yearly view
-      const years = [...new Set(data.map(point => new Date(point.date).getFullYear()))].sort();
+      const yearsSet = new Set(data.map(point => new Date(point.date).getFullYear()));
+      const years = Array.from(yearsSet).sort();
       return years[idx] ? years[idx].toString() : `Year ${idx + 1}`;
     }
   };
@@ -1336,7 +1337,8 @@ function calculateTimeAverageStats(data: HistoricalDataPoint[], viewType: string
       if (periodIndex >= periodCount) continue; // Skip days beyond 31
     } else { // yearly
       // Get unique years and map to index
-      const years = [...new Set(data.map(point => new Date(point.date).getFullYear()))].sort();
+      const yearsSet = new Set(data.map(point => new Date(point.date).getFullYear()));
+      const years = Array.from(yearsSet).sort();
       periodIndex = years.indexOf(date.getFullYear());
       if (periodIndex === -1 || periodIndex >= periodCount) continue;
     }
@@ -1712,14 +1714,17 @@ export async function fetchAllSeasonalityData(
 ): Promise<SeasonalityResponse> {
   try {
     const periods = [primaryPeriod, comparisonPeriod];
-    const timeframes = ['daily', 'weekly', 'monthly', 'yearly'];
+    const timeframes = ['daily', 'weekly', 'monthly', 'yearly'] as const;
+    type TimeframeKey = typeof timeframes[number];
     
     const results: SeasonalityResponse = {};
     
     // Fetch data for all timeframes in parallel
     const promises = timeframes.map(timeframe => 
       fetchSeasonalityData(symbol, timeframe, periods)
-        .then(data => {results[timeframe as keyof SeasonalityResponse] = data;
+        .then(data => {
+          // Use type assertion for correct assignment
+          results[timeframe as TimeframeKey] = data;
         })
         .catch(error => {
           console.error(`Error fetching ${timeframe} data:`, error);
@@ -2466,5 +2471,136 @@ function getIntervalForPeriod(period: string): string {
       return '1wk'; // 1-week intervals for 5+ years
     default:
       return '1d';  // Default to daily data
+  }
+}
+
+// =============================================================================
+// ANALYSIS DATA TYPES
+// =============================================================================
+
+export interface AnalysisData {
+  recommendationTrend?: any;
+  earningsHistory?: any;
+  earningsTrend?: any;
+  calendarEvents?: any;
+  [key: string]: any;
+}
+
+// =============================================================================
+// FUNDAMENTAL ANALYSIS FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches fundamental analysis data for a given symbol
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param modules - Array of data modules to fetch (e.g., 'recommendationTrend', 'earningsHistory')
+ * @returns Analysis data from various modules
+ */
+export async function fetchAnalysisData(
+  symbol: string,
+  modules: string[] = ['recommendationTrend', 'earningsHistory', 'earningsTrend', 'calendarEvents']
+): Promise<AnalysisData> {
+  try {
+    const params = {
+      symbol,
+      modules: modules.join(',')
+    };
+    
+    const data = await makeApiRequest<AnalysisData>('quoteSummary', params);
+    return data;
+  } catch (error) {
+    console.error('Error fetching analysis data:', error);
+    throw error;
+  }
+}
+
+// =============================================================================
+// FINANCIAL STATEMENTS DATA TYPES
+// =============================================================================
+
+export interface FinancialData {
+  incomeStatementHistory?: any;
+  incomeStatementHistoryQuarterly?: any;
+  balanceSheetHistory?: any;
+  balanceSheetHistoryQuarterly?: any;
+  cashflowStatementHistory?: any;
+  cashflowStatementHistoryQuarterly?: any;
+  [key: string]: any;
+}
+
+// =============================================================================
+// FINANCIAL STATEMENTS FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches financial statement data for a given symbol
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param modules - Array of financial statement modules to fetch
+ * @returns Financial statement data
+ */
+export async function fetchFinancialData(
+  symbol: string,
+  modules: string[] = [
+    'incomeStatementHistory', 
+    'incomeStatementHistoryQuarterly', 
+    'balanceSheetHistory', 
+    'balanceSheetHistoryQuarterly',
+    'cashflowStatementHistory', 
+    'cashflowStatementHistoryQuarterly'
+  ]
+): Promise<FinancialData> {
+  try {
+    const params = {
+      symbol,
+      modules: modules.join(',')
+    };
+    
+    const data = await makeApiRequest<FinancialData>('quoteSummary', params);
+    return data;
+  } catch (error) {
+    console.error('Error fetching financial data:', error);
+    throw error;
+  }
+}
+
+// =============================================================================
+// STOCK DASHBOARD DATA TYPES
+// =============================================================================
+
+export interface QuoteSummaryData {
+  price?: any;
+  summaryDetail?: any;
+  defaultKeyStatistics?: any;
+  [key: string]: any;
+}
+
+// =============================================================================
+// STOCK DASHBOARD FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches stock dashboard data including price, summary details, and key statistics
+ * 
+ * @param symbol - Stock or asset symbol
+ * @param modules - Optional array of data modules to fetch
+ * @returns Stock dashboard data with price, summary details, and key statistics
+ */
+export async function fetchStockDashboardData(
+  symbol: string,
+  modules: string[] = ['price', 'summaryDetail', 'defaultKeyStatistics']
+): Promise<QuoteSummaryData> {
+  try {
+    const params = {
+      symbol,
+      modules: modules.join(',')
+    };
+    
+    const data = await makeApiRequest<QuoteSummaryData>('quoteSummary', params);
+    return data;
+  } catch (error) {
+    console.error('Error fetching stock dashboard data:', error);
+    throw error;
   }
 }

@@ -1,18 +1,9 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
+import { fetchFinancialData, FinancialData } from '../../../services/api/finance';
 
 interface FinancialStatementsProps {
   symbol: string;
-}
-
-interface FinancialData {
-  incomeStatementHistory?: any;
-  incomeStatementHistoryQuarterly?: any;
-  balanceSheetHistory?: any;
-  balanceSheetHistoryQuarterly?: any;
-  cashflowStatementHistory?: any;
-  cashflowStatementHistoryQuarterly?: any;
 }
 
 type StatementType = 'income' | 'balance' | 'cashflow';
@@ -38,8 +29,8 @@ const FinancialStatements = ({ symbol }: FinancialStatementsProps) => {
           'cashflowStatementHistoryQuarterly'
         ];
         
-        const response = await axios.get(`http://localhost:3001/api/finance/quoteSummary?symbol=${symbol}&modules=${modules.join(',')}`);
-        setData(response.data);
+        const response = await fetchFinancialData(symbol, modules);
+        setData(response);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch financial data');
@@ -126,7 +117,16 @@ const FinancialStatements = ({ symbol }: FinancialStatementsProps) => {
     }
   };
 
-  const metrics = getDisplayMetrics();
+  // Check if a metric has any valid data across all periods
+  const hasValidData = (metric: { key: string, label: string }) => {
+    return statementData.some((statement: { [x: string]: null; }) => 
+      statement[metric.key] !== undefined && 
+      statement[metric.key] !== null
+    );
+  };
+
+  // Filter metrics to only include those with data
+  const metrics = getDisplayMetrics().filter(hasValidData);
 
   const getStatementTitle = () => {
     switch(activeStatement) {
@@ -207,43 +207,73 @@ const FinancialStatements = ({ symbol }: FinancialStatementsProps) => {
                 setError(null);
                 setLoading(true);
                 // Re-fetch data
+                const fetchData = async () => {
+                  try {
+                    const modules = [
+                      'incomeStatementHistory', 
+                      'incomeStatementHistoryQuarterly', 
+                      'balanceSheetHistory', 
+                      'balanceSheetHistoryQuarterly',
+                      'cashflowStatementHistory', 
+                      'cashflowStatementHistoryQuarterly'
+                    ];
+                    
+                    const response = await fetchFinancialData(symbol, modules);
+                    setData(response);
+                    setLoading(false);
+                  } catch (err) {
+                    setError('Failed to fetch financial data');
+                    setLoading(false);
+                    console.error(err);
+                  }
+                };
+                
+                if (symbol) {
+                  fetchData();
+                }
               }}
             >
               Retry
             </button>
           </div>
         ) : statementData.length > 0 ? (
-          <div className={styles.financialTableContainer}>
-            <table className={styles.financialTable}>
-              <thead>
-                <tr>
-                  <th className={styles.itemColumn}>Item</th>
-                  {statementData.map((statement: any, index: number) => (
-                    <th key={index} className={styles.periodColumn}>
-                      {formatDate(statement.endDate)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {metrics.map((metric) => (
-                  <tr key={metric.key} className={styles.dataRow}>
-                    <td className={styles.metricLabel}>{metric.label}</td>
+          metrics.length > 0 ? (
+            <div className={styles.financialTableContainer}>
+              <table className={styles.financialTable}>
+                <thead>
+                  <tr>
+                    <th className={styles.itemColumn}>Item</th>
                     {statementData.map((statement: any, index: number) => (
-                      <td 
-                        key={index} 
-                        className={`${styles.metricValue} ${
-                          statement[metric.key] < 0 ? styles.negative : ''
-                        }`}
-                      >
-                        {formatValue(statement[metric.key])}
-                      </td>
+                      <th key={index} className={styles.periodColumn}>
+                        {formatDate(statement.endDate)}
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {metrics.map((metric) => (
+                    <tr key={metric.key} className={styles.dataRow}>
+                      <td className={styles.metricLabel}>{metric.label}</td>
+                      {statementData.map((statement: any, index: number) => (
+                        <td 
+                          key={index} 
+                          className={`${styles.metricValue} ${
+                            statement[metric.key] < 0 ? styles.negative : ''
+                          }`}
+                        >
+                          {formatValue(statement[metric.key])}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className={styles.noStatementData}>
+              <p>No valid data available for this statement type</p>
+            </div>
+          )
         ) : (
           <div className={styles.noStatementData}>
             <p>No financial data available</p>

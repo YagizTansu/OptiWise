@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import styles from '../../../styles/Analyses.module.css';
+import { fetchStockDashboardData, QuoteSummaryData } from '../../../services/api/finance';
 
 interface StockDashboardProps {
   symbol: string;
-}
-
-interface QuoteSummaryData {
-  price?: any;
-  summaryDetail?: any;
-  defaultKeyStatistics?: any;
 }
 
 const StockDashboard = ({ symbol }: StockDashboardProps) => {
@@ -21,9 +15,8 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:3001/api/finance/quoteSummary?symbol=${symbol}&modules=price,summaryDetail,defaultKeyStatistics`);
-        
-        setData(response.data);
+        const response = await fetchStockDashboardData(symbol);
+        setData(response);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch stock data');
