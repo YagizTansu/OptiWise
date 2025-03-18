@@ -523,7 +523,7 @@ function processYahooFormat(result: any): ChartDataPoint[] {
         fullDate
       };
     })
-    .filter((point): point is ChartDataPoint => point !== null);
+    .filter((point: null): point is ChartDataPoint => point !== null);
   
   console.log(`Processed ${formattedData.length} valid data points`);
   
