@@ -7,7 +7,6 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
   Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import Overview from '../components/analyses/Overview';
 import Seasonality from '../components/analyses/Seasonality';
-import COTReport from '../components/analyses/COTReport';
 import OverboughtOversold from '../components/analyses/OverboughtOversold';
 import Fundamental from '../components/analyses/Fundamental';
 import ForecastAI from '../components/analyses/ForecastAI';
@@ -90,13 +89,6 @@ export default function Analyses() {
           {/* Seasonality Tab - simplified props */}
           {activeTab === 'seasonality' && (
             <Seasonality symbol={symbol as string} />
-          )}
-
-          {/* COT Report Tab */}
-          {activeTab === 'cot' && (
-            <COTReport 
-              symbol={symbol as string}
-            />
           )}
 
           {/* Overbought/Oversold Tab */}

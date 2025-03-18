@@ -9,14 +9,10 @@ interface FundamentalProps {
 
 const Fundamental = ({ symbol }: FundamentalProps) => {
   return (
-    <div className={styles.fundamentalContent}>
-        
+    <div className={styles.fundamentalContent}> 
         <StockDashboard symbol={symbol} />
         <AnalysisTools symbol={symbol} />
         <FinancialStatements symbol={symbol} />
-
-
-    
     </div>
   );
 };

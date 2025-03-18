@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../../styles/Analyses.module.css';
-import { fetchInsightsData, InsightsData } from '../../services/api/finance';
-import TechnicalAnalysis from './Report/TechnicalAnalysis';
-import CompanySnapshot from './Report/CompanySnapshot';
-import AnalystRecommendation from './Report/AnalystRecommendation';
-import AnalystReports from './Report/AnalystReports';
-import EventsAndDevelopments from './Report/EventsAndDevelopments';
-import SECFilings from './Report/SECFilings';
+import styles from '../../../styles/Analyses.module.css';
+import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
 
-interface ReportProps {
+interface SECFilingsProps {
   symbol: string;
 }
 
@@ -37,7 +31,7 @@ const InfoButton: React.FC<{ title: string; content: string }> = ({ title, conte
   );
 };
 
-const Report: React.FC<ReportProps> = ({ symbol }) => {
+const SECFilings: React.FC<SECFilingsProps> = ({ symbol }) => {
   const [insightsData, setInsightsData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +45,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         setError(null);
       } catch (err) {
         console.error('Error loading insights:', err);
-        setError('Failed to load insights data. Please try again later.');
+        setError('Failed to load SEC filings data. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -73,7 +67,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
-        <p>Loading insights data...</p>
+        <p>Loading SEC filings data...</p>
       </div>
     );
   }
@@ -87,36 +81,48 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
     );
   }
 
-  if (!insightsData) {
+  if (!insightsData || !insightsData.secReports || insightsData.secReports.length === 0) {
     return (
       <div className={styles.errorContainer}>
         <div className={styles.errorIcon}>⚠️</div>
-        <p>No insights data available for {symbol}</p>
+        <p>No SEC filings available for {symbol}</p>
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Technical Analysis Component */}
-      <TechnicalAnalysis symbol={symbol} />
-
-      {/* Company Snapshot Component */}
-      <CompanySnapshot symbol={symbol} />
-
-      {/* Analyst Recommendation Component */}
-      <AnalystRecommendation symbol={symbol} />
-
-      {/* Analyst Reports Component */}
-      <AnalystReports symbol={symbol} />
-
-      {/* Events and Developments Component */}
-      <EventsAndDevelopments symbol={symbol} />
-
-      {/* SEC Filings Component */}
-      <SECFilings symbol={symbol} />
+    <div className={styles.analysisCard}>
+      <div className={styles.sectionHeadingWithInfo}>
+        <h3>Recent SEC Filings</h3>
+        <InfoButton 
+          title="SEC Filings" 
+          content="Official documents submitted by the company to the Securities and Exchange Commission (SEC). These regulatory filings contain important financial data, business updates, and legal disclosures that public companies are required to report." 
+        />
+      </div>
+      <div className={styles.secFilingsTable}>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Form</th>
+              <th>Description</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {insightsData.secReports.slice(0, 8).map((filing) => (
+              <tr key={filing.id}>
+                <td>{formatDate(filing.filingDate)}</td>
+                <td>{filing.formType}</td>
+                <td>{filing.description}</td>
+                <td>{filing.type}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
-export default Report;
+export default SECFilings;

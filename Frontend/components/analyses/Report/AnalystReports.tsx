@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../../styles/Analyses.module.css';
-import { fetchInsightsData, InsightsData } from '../../services/api/finance';
-import TechnicalAnalysis from './Report/TechnicalAnalysis';
-import CompanySnapshot from './Report/CompanySnapshot';
-import AnalystRecommendation from './Report/AnalystRecommendation';
-import AnalystReports from './Report/AnalystReports';
-import EventsAndDevelopments from './Report/EventsAndDevelopments';
-import SECFilings from './Report/SECFilings';
+import styles from '../../../styles/Analyses.module.css';
+import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
 
-interface ReportProps {
+interface AnalystReportsProps {
   symbol: string;
 }
 
@@ -37,7 +31,7 @@ const InfoButton: React.FC<{ title: string; content: string }> = ({ title, conte
   );
 };
 
-const Report: React.FC<ReportProps> = ({ symbol }) => {
+const AnalystReports: React.FC<AnalystReportsProps> = ({ symbol }) => {
   const [insightsData, setInsightsData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +45,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
         setError(null);
       } catch (err) {
         console.error('Error loading insights:', err);
-        setError('Failed to load insights data. Please try again later.');
+        setError('Failed to load analyst reports data. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -73,7 +67,7 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
-        <p>Loading insights data...</p>
+        <p>Loading analyst reports data...</p>
       </div>
     );
   }
@@ -87,36 +81,56 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
     );
   }
 
-  if (!insightsData) {
+  if (!insightsData || !insightsData.reports || insightsData.reports.length === 0) {
     return (
       <div className={styles.errorContainer}>
         <div className={styles.errorIcon}>⚠️</div>
-        <p>No insights data available for {symbol}</p>
+        <p>No analyst reports available for {symbol}</p>
       </div>
     );
   }
 
   return (
-    <div>
-      {/* Technical Analysis Component */}
-      <TechnicalAnalysis symbol={symbol} />
-
-      {/* Company Snapshot Component */}
-      <CompanySnapshot symbol={symbol} />
-
-      {/* Analyst Recommendation Component */}
-      <AnalystRecommendation symbol={symbol} />
-
-      {/* Analyst Reports Component */}
-      <AnalystReports symbol={symbol} />
-
-      {/* Events and Developments Component */}
-      <EventsAndDevelopments symbol={symbol} />
-
-      {/* SEC Filings Component */}
-      <SECFilings symbol={symbol} />
+    <div className={styles.analysisCard}>
+      <div className={styles.sectionHeadingWithInfo}>
+        <h3>Analyst Reports</h3>
+        <InfoButton 
+          title="Analyst Reports" 
+          content="Recent research reports from financial institutions covering this stock. These reports contain detailed analysis of the company's performance, future prospects, and investment recommendations based on thorough research." 
+        />
+      </div>
+      <div className={styles.reportsTable}>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Title</th>
+              <th>Provider</th>
+              <th>Rating</th>
+              <th>Target Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {insightsData.reports.slice(0, 5).map((report) => (
+              <tr key={report.id}>
+                <td>{formatDate(report.reportDate)}</td>
+                <td className={styles.reportTitle}>{report.title}</td>
+                <td>{report.provider}</td>
+                <td className={
+                  report.investmentRating === 'Bullish' ? styles.positive :
+                  report.investmentRating === 'Bearish' ? styles.negative :
+                  styles.neutral
+                }>
+                  {report.investmentRating || 'N/A'}
+                </td>
+                <td>{report.targetPrice ? `$${report.targetPrice}` : 'N/A'} {report.targetPriceStatus ? `(${report.targetPriceStatus})` : ''}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
-export default Report;
+export default AnalystReports;
