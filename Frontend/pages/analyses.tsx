@@ -52,16 +52,17 @@ export default function Analyses() {
             <FaCalendarAlt /> Seasonality
           </button>
           <button 
-            className={`${styles.tabButton} ${activeTab === 'report' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('report')}
-          >
-            <FaFileAlt /> Report
-          </button>
-          <button 
             className={`${styles.tabButton} ${activeTab === 'fundamental' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('fundamental')}
           >
             <FaChartPie /> Fundamental
+          </button>
+
+          <button 
+            className={`${styles.tabButton} ${activeTab === 'report' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('report')}
+          >
+            <FaFileAlt /> Report
           </button>
 
           <button 

@@ -1,108 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styles from '../../styles/Analyses.module.css';
-import { fetchInsightsData, InsightsData } from '../../services/api/finance';
-import TechnicalAnalysis from './Report/TechnicalAnalysis';
-import CompanySnapshot from './Report/CompanySnapshot';
+
 import AnalystRecommendation from './Report/AnalystRecommendation';
 import AnalystReports from './Report/AnalystReports';
 import EventsAndDevelopments from './Report/EventsAndDevelopments';
 import SECFilings from './Report/SECFilings';
+import AnalysisTools from './fundamental/AnalysisTools';
+
 
 interface ReportProps {
   symbol: string;
 }
 
-// InfoButton component
-const InfoButton: React.FC<{ title: string; content: string }> = ({ title, content }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
-  
-  return (
-    <div className={styles.infoButtonContainer}>
-      <button 
-        className={styles.infoButton}
-        onClick={() => setShowTooltip(!showTooltip)}
-        onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
-        aria-label={`Information about ${title}`}
-      >
-        <span className={styles.infoIcon}>ⓘ</span>
-      </button>
-      {showTooltip && (
-        <div className={styles.infoTooltip}>
-          <div className={styles.tooltipTitle}>{title}</div>
-          <div className={styles.tooltipContent}>{content}</div>
-        </div>
-      )}
-    </div>
-  );
-};
-
 const Report: React.FC<ReportProps> = ({ symbol }) => {
-  const [insightsData, setInsightsData] = useState<InsightsData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadInsights = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchInsightsData(symbol);
-        setInsightsData(data);
-        setError(null);
-      } catch (err) {
-        console.error('Error loading insights:', err);
-        setError('Failed to load insights data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadInsights();
-  }, [symbol]);
-
-  // Helper function to format dates
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>Loading insights data...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
-        <p>{error}</p>
-      </div>
-    );
-  }
-
-  if (!insightsData) {
-    return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
-        <p>No insights data available for {symbol}</p>
-      </div>
-    );
-  }
-
   return (
     <div>
-      {/* Technical Analysis Component */}
-      <TechnicalAnalysis symbol={symbol} />
 
-      {/* Company Snapshot Component */}
-      <CompanySnapshot symbol={symbol} />
+      
+      {/* Analysis Tools Component */}
+      <AnalysisTools symbol={symbol} />
 
       {/* Analyst Recommendation Component */}
       <AnalystRecommendation symbol={symbol} />
