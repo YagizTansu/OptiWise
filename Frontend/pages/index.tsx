@@ -87,7 +87,7 @@ export default function Home() {
         </div>
         
         <div className={styles.searchSection} ref={searchSectionRef}>
-          <h2>Discover high-potential stocks</h2>
+          <h2>Explore Global Markets: Stocks, Forex, Indexes & ETFs</h2>
           <div className={styles.searchBar}>
             <input 
               type="text" 
