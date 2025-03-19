@@ -281,9 +281,40 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
   if (error || !analysisResult) {
     return (
       <div className={styles.errorContainer}>
-        <h3>Analysis Error</h3>
-        <p>{error || 'Failed to generate analysis. Please try again.'}</p>
-        <button onClick={() => window.location.reload()}>Retry</button>
+        <div className={styles.errorCard}>
+          <div className={styles.errorIconContainer}>
+            <svg className={styles.errorIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3 className={styles.errorTitle}>Analysis Error</h3>
+          <p className={styles.errorMessage}>{error || 'Failed to generate analysis. Please try again.'}</p>
+          <div className={styles.errorActions}>
+            <button 
+              className={styles.retryButton} 
+              onClick={() => window.location.reload()}
+            >
+              <svg className={styles.retryIcon} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 2v6h-6"></path>
+                <path d="M3 12a9 9 0 0 1 15-6.7l3 2.7"></path>
+                <path d="M3 22v-6h6"></path>
+                <path d="M21 12a9 9 0 0 1-15 6.7l-3-2.7"></path>
+              </svg>
+              Retry Analysis
+            </button>
+            <a href="#" className={styles.supportLink}>Contact Support</a>
+          </div>
+          <div className={styles.errorTips}>
+            <p>Tips:</p>
+            <ul>
+              <li>Check if the stock symbol is valid</li>
+              <li>Verify your internet connection</li>
+              <li>Our servers might be experiencing high demand</li>
+            </ul>
+          </div>
+        </div>
       </div>
     );
   }

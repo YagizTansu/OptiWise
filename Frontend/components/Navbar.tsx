@@ -1,4 +1,4 @@
-import { FaBars, FaUser } from 'react-icons/fa';
+import { FaBars, FaUser, FaChartLine } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Navbar.module.css';
@@ -36,6 +36,10 @@ export default function Navbar() {
         <div className={`${styles.navLinks} ${mobileMenuOpen ? styles.active : ''}`}>
           <Link href="/" className={styles.navLink}>
             Home
+          </Link>
+          
+          <Link href="/terminal" className={styles.navLink}>
+            Terminal
           </Link>
           
           <Link href="/features" className={styles.navLink}>

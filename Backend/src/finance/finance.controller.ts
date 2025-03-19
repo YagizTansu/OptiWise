@@ -344,9 +344,9 @@ Example test URLs:
 
 2. Get quote:
    http://localhost:3001/api/finance/quote              (uses default symbol AAPL)
-   http://localhost:3001/api/finance/quote?symbol=MSFT  (single symbol)
+   http://localhost:3001/api/finance/quote?symbol=CT%3DF  (single symbol)
    http://localhost:3001/api/finance/quote?symbol=AAPL,MSFT,GOOGL (multiple symbols)
-   http://localhost:3001/api/finance/quote?symbol=AAPL&fields=shortName,regularMarketPrice,regularMarketChange (filtered fields)
+   http://localhost:3001/api/finance/quote?symbol=CT%3DF&fields=shortName,regularMarketPrice,regularMarketChange (filtered fields)
    http://localhost:3001/api/finance/quote?symbol=AAPL,MSFT&return=object (return as object)
    
    Common fields:
@@ -369,10 +369,10 @@ Example test URLs:
    http://localhost:3001/api/finance/chart?symbol=AAPL&period1=2023-01-01&period2=2023-12-31&interval=15m&return=object
 
 6. Get quote summary:
-   http://localhost:3001/api/finance/quoteSummary?symbol=AAPL
+   http://localhost:3001/api/finance/quoteSummary?symbol=CT%3DF
    
    Get specific modules:
-   http://localhost:3001/api/finance/quoteSummary?symbol=AAPL&modules=assetProfile,financialData,earnings
+   http://localhost:3001/api/finance/quoteSummary?symbol=CT%3DF&modules=assetProfile,financialData,earnings
    
    Common module combinations:
    - Company overview: summaryProfile,assetProfile
@@ -397,6 +397,6 @@ Example test URLs:
 
 9. Get insights for a symbol:
    http://localhost:3001/api/finance/insights              (uses default symbol AAPL)
-   http://localhost:3001/api/finance/insights?symbol=MSFT
-   http://localhost:3001/api/finance/insights?symbol=GOOGL&reportsCount=10
+   http://localhost:3001/api/finance/insights?symbol=
+   http://localhost:3001/api/finance/insights?symbol=CT%3DF&reportsCount=10
 */

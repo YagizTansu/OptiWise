@@ -1,148 +1,157 @@
 import Layout from '../components/Layout'
+import Link from 'next/link'
 import styles from '../styles/Home.module.css'
-import { FaSearch } from 'react-icons/fa'
-import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/router'
-import { searchSymbols, SearchResult } from '../services/api/finance' // Import the new function
+import { 
+  FaChartLine, 
+  FaGlobe, 
+  FaCoins, 
+  FaOilCan, 
+  FaChartPie, 
+  FaBitcoin, 
+  FaRobot, 
+  FaArrowRight,
+  FaDesktop,
+  FaUsers,
+  FaCheckCircle
+} from 'react-icons/fa'
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const searchSectionRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-
-  // Debounce search input
-  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  // Fetch search results using the imported function
-  const fetchSearchResults = async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const results = await searchSymbols(query);
-      setSearchResults(results);
-    } catch (error) {
-      console.error('Error fetching search results:', error);
-      setSearchResults([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle input change with debounce
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    setShowDropdown(true);
-
-    // Clear previous timeout
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
-
-    // Set new timeout
-    debounceTimeout.current = setTimeout(() => {
-      fetchSearchResults(query);
-    }, 300); // 300ms debounce time
-  };
-
-  // Handle click on a search result item
-  const handleResultClick = (symbol: string) => {
-    // Navigate to the analyses page with the selected symbol as a parameter
-    router.push({
-      pathname: '/analyses',
-      query: { symbol: symbol }
-    });
-  };
-
-  // Dropdown'un dışına tıklanınca kapanmasını sağla
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchSectionRef.current && !searchSectionRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   return (
-    <Layout title="OptiWise - Smart Investment Platform">
-      <main className={styles.main}>
-        <div className={styles.logoContainer}>
-          <h1 className={styles.title}>
-            <span className={styles.titlePrefix}>Opti</span>
-            <span className={styles.titleSuffix}>Wise</span>
-          </h1>
-          <p className={styles.tagline}>smart decisions, optimal results</p>
-        </div>
-        
-        <div className={styles.searchSection} ref={searchSectionRef}>
-          <h2> <span>Unlock the World of Trading:</span> Stocks, Forex, Indices, Commodities & ETFs!</h2>
-          <div className={styles.searchBar}>
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={() => searchQuery && setShowDropdown(true)}
-            />
-            <button 
-              type="submit" 
-              className={styles.searchButton}
-            >
-              <FaSearch className={styles.searchIcon} />
-            </button>
-          </div>
-          
-          {showDropdown && (searchResults.length > 0 || isLoading || searchQuery) && (
-            <div className={styles.searchResults}>
-              {isLoading ? (
-                <div className={styles.loadingMessage}>
-                  <div className={styles.loadingSpinner}></div>
-                  Searching for stocks...
-                </div>
-              ) : searchResults.length > 0 ? (
-                <ul className={styles.resultsList}>
-                  {searchResults.map((result, index) => (
-                    <li 
-                      key={`${result.symbol || ''}-${result.exchange || ''}-${result.shortName || ''}-${index}`}
-                      className={styles.resultItem}
-                      onClick={() => handleResultClick(result.symbol)}
-                      title={`View analysis for ${result.symbol}`}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          handleResultClick(result.symbol);
-                        }
-                      }}
-                    >
-                      <span className={styles.resultSymbol}>{result.symbol}</span>
-                      <span className={styles.resultName}>{result.shortName}</span>
-                      {result.exchange && (
-                        <span className={styles.resultExchange}>{result.exchange}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : searchQuery ? (
-                <div className={styles.noResults}>
-                  No matching stocks found
-                </div>
-              ) : null}
+    <Layout title="OptiWise - Intelligent Financial Analysis Platform">
+      <main className={styles.landingPage}>
+        {/* Hero Section */}
+        <section className={styles.heroSection}>
+          <div className={styles.heroContent}>
+            <h1 className={styles.heroTitle}>
+              <span className={styles.titlePrefix}>Opti</span>
+              <span className={styles.titleSuffix}>Wise</span>
+            </h1>
+            <h2 className={styles.heroSubtitle}>Empowering Your Financial Decisions</h2>
+            <p className={styles.heroDescription}>
+              Best Stock Market Analysis & Decisions for Traders and Investors with Forecaster Terminal.
+              Navigate global markets confidently with our advanced AI-powered tools.
+            </p>
+            <div className={styles.heroCta}>
+              <Link href="/terminal" className={styles.primaryButton}>
+                Try Forecaster Terminal <FaArrowRight className={styles.buttonIcon} />
+              </Link>
+              <Link href="/features" className={styles.secondaryButton}>
+                Learn More
+              </Link>
             </div>
-          )}
-        </div>
+          </div>
+          <div className={styles.heroImage}>
+            {/* You can add an image here showing the platform */}
+          </div>
+        </section>
+        
+        {/* Features Section */}
+        <section className={styles.featuresSection}>
+          <h2 className={styles.sectionTitle}>Why Choose OptiWise?</h2>
+          <div className={styles.featuresGrid}>
+            <div className={styles.featureCard}>
+              <FaRobot className={styles.featureIcon} />
+              <h3>AI-Powered Analysis</h3>
+              <p>Advanced algorithms that analyze market trends and provide accurate predictions</p>
+            </div>
+            <div className={styles.featureCard}>
+              <FaDesktop className={styles.featureIcon} />
+              <h3>Comprehensive Terminal</h3>
+              <p>All-in-one platform for in-depth market analysis across multiple instruments</p>
+            </div>
+            <div className={styles.featureCard}>
+              <FaUsers className={styles.featureIcon} />
+              <h3>For Everyone</h3>
+              <p>Designed for both professional traders and beginner investors</p>
+            </div>
+            <div className={styles.featureCard}>
+              <FaGlobe className={styles.featureIcon} />
+              <h3>Global Markets</h3>
+              <p>Access to worldwide financial markets and instruments</p>
+            </div>
+          </div>
+        </section>
+        
+        {/* Markets Section */}
+        <section className={styles.marketsSection}>
+          <h2 className={styles.sectionTitle}>Forecaster Works On All Financial Instruments</h2>
+          <p className={styles.sectionSubtitle}>Leverage comprehensive tools to navigate global markets confidently</p>
+          
+          <div className={styles.marketsGrid}>
+            <div className={styles.marketCard}>
+              <FaChartLine className={styles.marketIcon} />
+              <h3>Stocks</h3>
+              <p>Analyze equities across major exchanges worldwide</p>
+            </div>
+            <div className={styles.marketCard}>
+              <FaCoins className={styles.marketIcon} />
+              <h3>Forex</h3>
+              <p>Track and analyze currency pairs with precision</p>
+            </div>
+            <div className={styles.marketCard}>
+              <FaChartPie className={styles.marketIcon} />
+              <h3>Indices</h3>
+              <p>Monitor global market indices and their components</p>
+            </div>
+            <div className={styles.marketCard}>
+              <FaOilCan className={styles.marketIcon} />
+              <h3>Commodities</h3>
+              <p>Track precious metals, energy products, and agricultural goods</p>
+            </div>
+            <div className={styles.marketCard}>
+              <FaBitcoin className={styles.marketIcon} />
+              <h3>Cryptos</h3>
+              <p>Analyze digital currencies and blockchain assets</p>
+            </div>
+            <div className={styles.marketCard}>
+              <FaChartPie className={styles.marketIcon} />
+              <h3>ETFs</h3>
+              <p>Comprehensive analysis of exchange-traded funds</p>
+            </div>
+          </div>
+        </section>
+        
+        {/* Testimonials or Benefits */}
+        <section className={styles.benefitsSection}>
+          <h2 className={styles.sectionTitle}>Advanced Features That Make a Difference</h2>
+          <div className={styles.benefitsList}>
+            <div className={styles.benefitItem}>
+              <FaCheckCircle className={styles.benefitIcon} />
+              <p>Real-time market data and alerts</p>
+            </div>
+            <div className={styles.benefitItem}>
+              <FaCheckCircle className={styles.benefitIcon} />
+              <p>AI-driven market predictions with high accuracy</p>
+            </div>
+            <div className={styles.benefitItem}>
+              <FaCheckCircle className={styles.benefitIcon} />
+              <p>Customizable dashboard for your trading style</p>
+            </div>
+            <div className={styles.benefitItem}>
+              <FaCheckCircle className={styles.benefitIcon} />
+              <p>Advanced technical indicators and charting tools</p>
+            </div>
+            <div className={styles.benefitItem}>
+              <FaCheckCircle className={styles.benefitIcon} />
+              <p>Portfolio optimization recommendations</p>
+            </div>
+            <div className={styles.benefitItem}>
+              <FaCheckCircle className={styles.benefitIcon} />
+              <p>Risk assessment and management tools</p>
+            </div>
+          </div>
+        </section>
+        
+        {/* Call to Action */}
+        <section className={styles.ctaSection}>
+          <div className={styles.ctaContent}>
+            <h2>Ready to transform your trading strategy?</h2>
+            <p>Start using OptiWise Forecaster Terminal today and make data-driven decisions.</p>
+            <Link href="/terminal" className={styles.ctaButton}>
+              Launch Forecaster Terminal <FaArrowRight className={styles.buttonIcon} />
+            </Link>
+          </div>
+        </section>
       </main>
     </Layout>
   )
