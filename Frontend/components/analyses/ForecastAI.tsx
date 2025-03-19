@@ -29,7 +29,7 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
         
         // Get real analysis data from AI service
         const result = await technicalAnalysisAI.analyzeStock(symbol);
-        debugger
+        
         setAnalysisResult(result);
         
         // Update chart data based on current timeframe

@@ -111,7 +111,7 @@ class TechnicalAnalysisAI {
       
       // Step 3: Send to Claude for analysis
       const response = await aiService.createMessage(prompt, 'claude-3-7-sonnet-20250219', 4000);
-      debugger
+      
       // Step 4: Parse and structure Claude's response
       return this.parseAIResponse(response, currentPrice, shortTermData);
     } catch (error) {
