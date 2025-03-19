@@ -111,7 +111,7 @@ class TechnicalAnalysisAI {
       
       // Step 3: Send to Claude for analysis
       const response = await aiService.createMessage(prompt, 'claude-3-7-sonnet-20250219', 4000);
-      
+
       // Step 4: Parse and structure Claude's response
       return this.parseAIResponse(response, currentPrice, shortTermData);
     } catch (error) {
@@ -340,12 +340,7 @@ Include key technical indicators, price patterns, support/resistance levels, and
     const midTermStart = midTermData[0]?.close || 0;
     const midTermEnd = midTermData[midTermData.length - 1]?.close || 0;
     const midTermChange = ((midTermEnd - midTermStart) / midTermStart) * 100;
-
-    // Create a sample of the data to keep the prompt size reasonable
-    const shortTermSample = this.sampleData(shortTermData, 20);
-    const midTermSample = this.sampleData(midTermData, 20);
-    const longTermSample = this.sampleData(longTermData, 20);
-    
+        
     // Summarize recent price activity
     const recentTrends = this.summarizeRecentTrends(shortTermData);
 
@@ -371,29 +366,29 @@ PROVIDE THE FOLLOWING ANALYSIS:
    - List exactly 3 key resistance levels (most important first)
 
 3. ANALYSIS SUMMARY:
-   - Write a concise 3-5 sentence summary of the technical outlook
-   - List exactly 4 key findings from the technical analysis
-   - List exactly 4 potential catalysts or risks that could impact the price
+   - Write a concise 3-5 sentence summary of the technical outlook that explains the overall prediction in plain language for regular investors
+   - List exactly 4 key findings that are specific, actionable insights (e.g., "Stock has broken above 200-day moving average, suggesting strong bullish momentum" rather than generic indicators)
+   - List exactly 4 potential catalysts or risks that could impact the price in the next 30 days (be specific about upcoming events, earnings, market conditions, or technical thresholds)
 
 4. TECHNICAL FACTORS:
-   - RSI value and interpretation
-   - MACD status
-   - Moving Averages assessment
-   - Volume trend analysis
-   - Most significant chart pattern visible
+   - RSI value and interpretation: Explain the current RSI (Relative Strength Index) value and what it means for average investors
+   - MACD status: Explain the current MACD (Moving Average Convergence Divergence) status in simple terms
+   - Moving Averages assessment: Explain the relationship between key moving averages and what they suggest
+   - Volume trend analysis: Interpret recent volume patterns in relation to price movements
+   - Most significant chart pattern: Name and explain the pattern in a way that makes its implications clear
 
 5. FUNDAMENTAL FACTORS:
-   - Note any significant earnings or growth trends visible in the charts
+   - Note any significant earnings or growth trends visible in the charts with simple explanations
    - Compare the stock's performance to its sector or industry if possible
-   - Mention any notable valuation metrics if apparent
+   - Mention any notable valuation metrics if apparent and explain what they mean for investors
 
 6. MARKET SENTIMENT:
-   - Interpret the overall market sentiment for this stock
+   - Interpret the overall market sentiment for this stock in plain language
    - Mention any news sentiment if evident in price action
    - Analyst consensus if indicated by price trends
-   - Options market sentiment if readable from chart patterns
+   - Options market sentiment if readable from chart patterns and what it suggests
 
-Format your response concisely but with specific numeric predictions. Use technical terms but make your analysis accessible to intermediate traders.
+Format your response concisely with specific numeric predictions. Whenever you use technical terms, briefly explain what they mean and their implications for investors. Make your analysis accessible to intermediate traders and regular investors who may not be familiar with all technical terminology.
 `;
   }
 

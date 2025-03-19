@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Line, Bar } from 'react-chartjs-2';
-import { FaArrowUp, FaArrowDown, FaArrowRight, FaQuestion, FaChartLine, FaBell, FaHistory, FaExchangeAlt, FaSpinner } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 import styles from '../../styles/ForecastAI.module.css';
 import technicalAnalysisAI, { TechnicalAnalysisResult } from '../../services/analysis/technicalAnalysisAI';
+import TechnicalAnalysis from './Report/TechnicalAnalysis';
+import PricePredictionDashboard from './dashboard/PricePredictionDashboard';
+import SmartAnalysisSummary from './dashboard/SmartAnalysisSummary';
+import MultiTimeframePredictions from './dashboard/MultiTimeframePredictions';
+import AnalysisRationale from './dashboard/AnalysisRationale';
+import HistoricalAccuracy from './dashboard/HistoricalAccuracy';
+import InteractiveFeatures from './dashboard/InteractiveFeatures';
 
 interface ForecastAIProps {
   symbol: string;
@@ -11,11 +17,7 @@ interface ForecastAIProps {
 const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
   // Component state
   const [timeframe, setTimeframe] = useState('daily');
-  const [userQuestion, setUserQuestion] = useState('');
-  const [showQA, setShowQA] = useState(false);
-  const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isAnswerLoading, setIsAnswerLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<TechnicalAnalysisResult | null>(null);
   const [chartData, setChartData] = useState<any>(null);
@@ -27,8 +29,179 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
         setIsLoading(true);
         setError(null);
         
-        // Get real analysis data from AI service
+        // Comment out the API call
         const result = await technicalAnalysisAI.analyzeStock(symbol);
+        
+        // Use hardcoded test data instead
+        // const result = {
+        //   "prediction": {
+        //     "shortTerm": {
+        //       "value": "+2.4%",
+        //       "confidence": 75
+        //     },
+        //     "midTerm": {
+        //       "value": "+5.7%",
+        //       "confidence": 65
+        //     },
+        //     "longTerm": {
+        //       "value": "+10.2%",
+        //       "confidence": 55
+        //     },
+        //     "trendIndicator": "sideways",
+        //     "supportLevels": [
+        //       206.31,
+        //       199.93,
+        //       191.42
+        //     ],
+        //     "resistanceLevels": [
+        //       219.07,
+        //       225.45,
+        //       233.96
+        //     ]
+        //   },
+        //   "analysis": {
+        //     "summary": "",
+        //     "keyFindings": [
+        //       "Technical indicator 1 suggests monitoring price action.",
+        //       "Technical indicator 2 suggests monitoring price action.",
+        //       "Technical indicator 3 suggests monitoring price action.",
+        //       "Technical indicator 4 suggests monitoring price action."
+        //     ],
+        //     "catalysts": [
+        //       "s/",
+        //       "Potential market movement factor 2.",
+        //       "Potential market movement factor 3.",
+        //       "Potential market movement factor 4."
+        //     ]
+        //   },
+        //   "chartData": {
+        //     "labels": [
+        //       "Now",
+        //       "+1D",
+        //       "+2D",
+        //       "+3D",
+        //       "+4D",
+        //       "+5D",
+        //       "+6D",
+        //       "+7D"
+        //     ],
+        //     "datasets": [
+        //       {
+        //         "label": "Predicted Price",
+        //         "data": [
+        //           212.69,
+        //           213.41616306724546,
+        //           214.14895661703915,
+        //           214.87715583633835,
+        //           215.60554394716274,
+        //           216.3522292078796,
+        //           217.07288846580693,
+        //           217.80082641409032
+        //         ],
+        //         "borderColor": "rgba(75, 192, 192, 1)",
+        //         "backgroundColor": "rgba(75, 192, 192, 0.2)",
+        //         "fill": true
+        //       },
+        //       {
+        //         "label": "Upper Range",
+        //         "data": [
+        //           212.69,
+        //           213.56139568069455,
+        //           214.44074794044695,
+        //           215.314587003606,
+        //           216.18865273659532,
+        //           217.08467504945554,
+        //           217.9494661589683,
+        //           218.8229916969084
+        //         ],
+        //         "borderColor": "rgba(75, 192, 192, 0.5)",
+        //         "backgroundColor": "transparent",
+        //         "borderDash": [
+        //           5,
+        //           5
+        //         ]
+        //       },
+        //       {
+        //         "label": "Lower Range",
+        //         "data": [
+        //           212.69,
+        //           213.27093045379635,
+        //           213.8571652936313,
+        //           214.43972466907064,
+        //           215.0224351577302,
+        //           215.61978336630366,
+        //           216.19631077264552,
+        //           216.7786611312723
+        //         ],
+        //         "borderColor": "rgba(75, 192, 192, 0.5)",
+        //         "backgroundColor": "transparent",
+        //         "borderDash": [
+        //           5,
+        //           5
+        //         ]
+        //       }
+        //     ]
+        //   },
+        //   "probabilityData": {
+        //     "labels": [
+        //       "-5%",
+        //       "-2.5%",
+        //       "0%",
+        //       "+2.5%",
+        //       "+5%",
+        //       "+7.5%",
+        //       "+10%"
+        //     ],
+        //     "datasets": [
+        //       {
+        //         "label": "Probability",
+        //         "data": [
+        //           5,
+        //           13,
+        //           18,
+        //           33,
+        //           27,
+        //           11,
+        //           6
+        //         ],
+        //         "backgroundColor": "rgba(153, 102, 255, 0.6)",
+        //         "borderColor": "rgba(153, 102, 255, 1)",
+        //         "borderWidth": 1
+        //       }
+        //     ]
+        //   },
+        //   "technicalFactors": {
+        //     "technical": {
+        //       "RSI": "Moderate",
+        //       "MACD": "Neutral",
+        //       "Moving Averages": "Mixed signals",
+        //       "Volume": "Average",
+        //       "Chart Pattern": "Consolidation"
+        //     },
+        //     "fundamental": {
+        //       "Earnings Growth": "Stable",
+        //       "Revenue Growth": "In line with sector",
+        //       "P/E Ratio": "Near industry average",
+        //       "Debt/Equity": "Manageable",
+        //       "Cash Reserves": "Adequate"
+        //     },
+        //     "sentiment": {
+        //       "**Overall Sentiment**": "Cautiously bearish short term, neutral medium term. Institutional investors appear to be reassessing positions following the recent correction.",
+        //       "**News Sentiment**": "Recent AI announcements at WWDC received mixed reception, contributing to the price volatility. Market appears to be in \"wait and see\" mode regarding Apple's AI integration strategy.",
+        //       "**Analyst Consensus**": "The technical pattern suggests analysts are recalibrating price targets lower, with the current consolidation reflecting uncertainty about near term catalysts.",
+        //       "**Options Market**": "Put/call ratio appears elevated based on price action, indicating hedging activity has increased. The options market is pricing in approximately 5 6% volatility through July expiration."
+        //     }
+        //   },
+        //   "accuracyData": {
+        //     "overall": 81,
+        //     "byTimeframe": {
+        //       "daily": 86,
+        //       "weekly": 77,
+        //       "monthly": 75,
+        //       "yearly": 69
+        //     }
+        //   }
+        // };
         
         setAnalysisResult(result);
         
@@ -86,43 +259,20 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
     setChartData(newChartData);
   };
   
-  // Handle user questions about the stock
-  const handleAskQuestion = async () => {
-    if (!userQuestion.trim()) return;
-    
-    try {
-      setIsAnswerLoading(true);
-      setShowQA(true);
-      
-      // Get AI response to user question
-      const response = await technicalAnalysisAI.answerStockQuestion(symbol, userQuestion);
-      setAnswer(response);
-      
-      setIsAnswerLoading(false);
-    } catch (err) {
-      setAnswer(`Sorry, I couldn't answer that question right now. Please try again later.`);
-      setIsAnswerLoading(false);
-    }
-  };
-  
-  // Render the trend indicator
-  const renderTrendIndicator = (trend: string) => {
-    switch(trend) {
-      case 'up':
-        return <FaArrowUp className={styles.trendUp} />;
-      case 'down':
-        return <FaArrowDown className={styles.trendDown} />;
-      default:
-        return <FaArrowRight className={styles.trendSideways} />;
-    }
-  };
-  
   // Show loading state
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
         <FaSpinner className={styles.spinner} />
         <p>Analyzing {symbol} with AI...</p>
+        <div className={styles.loadingInfo}>
+          <span>Processing market data</span>
+          <div className={styles.loadingDots}>
+            <span className={styles.loadingDot}></span>
+            <span className={styles.loadingDot}></span>
+            <span className={styles.loadingDot}></span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -165,397 +315,33 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
       </div>
       
       {/* 1. Prediction Dashboard */}
-      <div className={styles.dashboardSection}>
-        <h3>Price Prediction Dashboard</h3>
-        <div className={styles.predictionCards}>
-          <div className={styles.predictionCard}>
-            <h4>Short Term (7d)</h4>
-            <div className={styles.predictionValue}>{prediction.shortTerm.value}</div>
-            <div className={styles.confidenceBar}>
-              <div 
-                className={styles.confidenceFill} 
-                style={{ width: `${prediction.shortTerm.confidence}%` }}
-              ></div>
-            </div>
-            <div className={styles.confidenceLabel}>{prediction.shortTerm.confidence}% Confidence</div>
-          </div>
-          
-          <div className={styles.predictionCard}>
-            <h4>Mid Term (30d)</h4>
-            <div className={styles.predictionValue}>{prediction.midTerm.value}</div>
-            <div className={styles.confidenceBar}>
-              <div 
-                className={styles.confidenceFill} 
-                style={{ width: `${prediction.midTerm.confidence}%` }}
-              ></div>
-            </div>
-            <div className={styles.confidenceLabel}>{prediction.midTerm.confidence}% Confidence</div>
-          </div>
-          
-          <div className={styles.predictionCard}>
-            <h4>Long Term (90d)</h4>
-            <div className={styles.predictionValue}>{prediction.longTerm.value}</div>
-            <div className={styles.confidenceBar}>
-              <div 
-                className={styles.confidenceFill} 
-                style={{ width: `${prediction.longTerm.confidence}%` }}
-              ></div>
-            </div>
-            <div className={styles.confidenceLabel}>{prediction.longTerm.confidence}% Confidence</div>
-          </div>
-          
-          <div className={styles.predictionCard}>
-            <h4>Trend Indicator</h4>
-            <div className={styles.trendIndicator}>
-              {renderTrendIndicator(prediction.trendIndicator)}
-            </div>
-            <div className={styles.trendLabel}>
-              {prediction.trendIndicator === 'up' ? 'Bullish' : 
-               prediction.trendIndicator === 'down' ? 'Bearish' : 'Neutral'}
-            </div>
-          </div>
-        </div>
-      </div>
+      <PricePredictionDashboard prediction={prediction} symbol={symbol} />
       
       {/* 2. Smart Analysis Summary */}
-      <div className={styles.analysisSection}>
-        <h3>Smart Analysis Summary</h3>
-        <div className={styles.analysisSummary}>
-          <p className={styles.summaryText}>
-            {summaryText}
-          </p>
-          
-          <div className={styles.keyFindings}>
-            <h4>Key Findings</h4>
-            <ul>
-              {analysis.keyFindings && analysis.keyFindings.length > 0 ? 
-                analysis.keyFindings
-                  .filter(finding => finding && !finding.includes('s/'))
-                  .map((finding, index) => (
-                    <li key={`finding-${index}`}>{finding}</li>
-                  ))
-                : 
-                <li>No key findings available at this time.</li>
-              }
-            </ul>
-          </div>
-          
-          <div className={styles.catalysts}>
-            <h4>Potential Catalysts</h4>
-            <ul>
-              {analysis.catalysts && analysis.catalysts.length > 0 ?
-                analysis.catalysts
-                  .filter(catalyst => catalyst && !catalyst.includes('s/'))
-                  .map((catalyst, index) => (
-                    <li key={`catalyst-${index}`}>{catalyst}</li>
-                  ))
-                :
-                <li>No potential catalysts identified at this time.</li>
-              }
-            </ul>
-          </div>
-        </div>
-      </div>
+      <SmartAnalysisSummary analysis={analysis} summaryText={summaryText} />
+
+      {/* 4. Detailed Analysis Rationale */}
+      <AnalysisRationale 
+        technicalFactors={technicalFactors}
+        sentimentData={sentimentData}
+      />
+      
+      {/* 5. Interactive Features - Now managing its own state */}
+      <InteractiveFeatures symbol={symbol} />
       
       {/* 3. Multi-Timeframe Predictions */}
-      <div className={styles.timeframeSection}>
-        <h3>Multi-Timeframe Predictions</h3>
-        <div className={styles.timeframeSelector}>
-          <button 
-            className={`${styles.timeframeButton} ${timeframe === 'daily' ? styles.activeTimeframe : ''}`}
-            onClick={() => setTimeframe('daily')}
-          >
-            Daily
-          </button>
-          <button 
-            className={`${styles.timeframeButton} ${timeframe === 'weekly' ? styles.activeTimeframe : ''}`}
-            onClick={() => setTimeframe('weekly')}
-          >
-            Weekly
-          </button>
-          <button 
-            className={`${styles.timeframeButton} ${timeframe === 'monthly' ? styles.activeTimeframe : ''}`}
-            onClick={() => setTimeframe('monthly')}
-          >
-            Monthly
-          </button>
-          <button 
-            className={`${styles.timeframeButton} ${timeframe === 'yearly' ? styles.activeTimeframe : ''}`}
-            onClick={() => setTimeframe('yearly')}
-          >
-            Yearly
-          </button>
-        </div>
-        
-        <div className={styles.chartContainer}>
-          <Line 
-            data={chartData || analysisResult.chartData}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                title: {
-                  display: true,
-                  text: `${timeframe.charAt(0).toUpperCase() + timeframe.slice(1)} Price Forecast`,
-                },
-                tooltip: {
-                  mode: 'index',
-                  intersect: false,
-                },
-              },
-              scales: {
-                y: {
-                  beginAtZero: false,
-                }
-              }
-            }}
-          />
-        </div>
-        
-        <div className={styles.levelsContainer}>
-          <div className={styles.levelGroup}>
-            <h4>Resistance Levels</h4>
-            <ul>
-              {prediction.resistanceLevels.map((level, index) => (
-                <li key={`resistance-${index}`}>${level}</li>
-              ))}
-            </ul>
-          </div>
-          <div className={styles.levelGroup}>
-            <h4>Support Levels</h4>
-            <ul>
-              {prediction.supportLevels.map((level, index) => (
-                <li key={`support-${index}`}>${level}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        
-        <div className={styles.probabilityContainer}>
-          <h4>Price Probability Distribution</h4>
-          <Bar
-            data={probabilityData}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: {
-                  display: false,
-                },
-                title: {
-                  display: true,
-                  text: 'Probability Distribution by Price Change',
-                },
-              },
-            }}
-          />
-        </div>
-      </div>
+      <MultiTimeframePredictions 
+        chartData={chartData}
+        timeframe={timeframe}
+        setTimeframe={setTimeframe}
+        prediction={prediction}
+        probabilityData={probabilityData}
+        analysisResult={analysisResult}
+      />
       
-      {/* 4. Detailed Analysis Rationale */}
-      <div className={styles.rationaleSection}>
-        <h3>Analysis Rationale</h3>
-        <div className={styles.factorsGrid}>
-          <div className={styles.factorCard}>
-            <h4>Technical Factors</h4>
-            <ul>
-              {Object.entries(technicalFactors.technical || {}).map(([key, value], index) => (
-                <li key={`tech-${index}`}><strong>{key}:</strong> {value}</li>
-              ))}
-            </ul>
-          </div>
-          
-          <div className={styles.factorCard}>
-            <h4>Fundamental Factors</h4>
-            <ul>
-              {Object.entries(technicalFactors.fundamental || {}).map(([key, value], index) => (
-                <li key={`fund-${index}`}><strong>{key}:</strong> {value}</li>
-              ))}
-            </ul>
-          </div>
-          
-          <div className={styles.factorCard}>
-            <h4>Market Sentiment</h4>
-            <ul>
-              {Object.entries(sentimentData).map(([key, value], index) => (
-                <li key={`sent-${index}`}><strong>{key}:</strong> {value}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      {/* 5. Interactive Features */}
-      <div className={styles.interactiveSection}>
-        <h3>Interactive Features</h3>
-        
-        <div className={styles.qaSection}>
-          <h4>Ask AI About {symbol}</h4>
-          <div className={styles.questionForm}>
-            <input
-              type="text"
-              placeholder="Ask a question about this asset..."
-              value={userQuestion}
-              onChange={(e) => setUserQuestion(e.target.value)}
-              className={styles.questionInput}
-            />
-            <button 
-              className={styles.askButton}
-              onClick={handleAskQuestion}
-              disabled={isAnswerLoading}
-            >
-              {isAnswerLoading ? <FaSpinner className={styles.spinnerSmall} /> : <FaQuestion />} Ask
-            </button>
-          </div>
-          
-          {showQA && (
-            <div className={styles.qaResult}>
-              <h5>Q: {userQuestion}</h5>
-              <p>{isAnswerLoading ? 'Analyzing...' : answer}</p>
-            </div>
-          )}
-        </div>
-        
-        <div className={styles.alertsSection}>
-          <h4>Price Alerts</h4>
-          <div className={styles.alertForm}>
-            <select className={styles.alertType}>
-              <option>Price goes above</option>
-              <option>Price goes below</option>
-              <option>Daily change exceeds</option>
-              <option>Volume exceeds</option>
-            </select>
-            <input 
-              type="number" 
-              placeholder="Value" 
-              className={styles.alertValue}
-              defaultValue={prediction.resistanceLevels[0]}
-            />
-            <button className={styles.setAlertButton}>
-              <FaBell /> Set Alert
-            </button>
-          </div>
-        </div>
-      </div>
       
       {/* 6. Historical Prediction Accuracy */}
-      <div className={styles.accuracySection}>
-        <h3>Historical Prediction Accuracy</h3>
-        <div className={styles.accuracyOverview}>
-          <div className={styles.accuracyCircle}>
-            <svg viewBox="0 0 36 36">
-              <path
-                d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="#eee"
-                strokeWidth="3"
-              />
-              <path
-                d="M18 2.0845
-                  a 15.9155 15.9155 0 0 1 0 31.831
-                  a 15.9155 15.9155 0 0 1 0 -31.831"
-                fill="none"
-                stroke="#4caf50"
-                strokeWidth="3"
-                strokeDasharray={`${accuracyData.overall}, 100`}
-              />
-              <text x="18" y="21" className={styles.accuracyText}>
-                {accuracyData.overall}%
-              </text>
-            </svg>
-            <div>Overall Accuracy</div>
-          </div>
-          
-          <div className={styles.accuracyDetails}>
-            <div className={styles.accuracyItem}>
-              <span>Daily Forecast:</span>
-              <div className={styles.accuracyBar}>
-                <div style={{ width: `${accuracyData.byTimeframe.daily}%` }}></div>
-              </div>
-              <span>{accuracyData.byTimeframe.daily}%</span>
-            </div>
-            <div className={styles.accuracyItem}>
-              <span>Weekly Forecast:</span>
-              <div className={styles.accuracyBar}>
-                <div style={{ width: `${accuracyData.byTimeframe.weekly}%` }}></div>
-              </div>
-              <span>{accuracyData.byTimeframe.weekly}%</span>
-            </div>
-            <div className={styles.accuracyItem}>
-              <span>Monthly Forecast:</span>
-              <div className={styles.accuracyBar}>
-                <div style={{ width: `${accuracyData.byTimeframe.monthly}%` }}></div>
-              </div>
-              <span>{accuracyData.byTimeframe.monthly}%</span>
-            </div>
-            <div className={styles.accuracyItem}>
-              <span>Yearly Forecast:</span>
-              <div className={styles.accuracyBar}>
-                <div style={{ width: `${accuracyData.byTimeframe.yearly}%` }}></div>
-              </div>
-              <span>{accuracyData.byTimeframe.yearly}%</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* 7. Comparative Analysis */}
-      <div className={styles.comparativeSection}>
-        <h3>Comparative Analysis</h3>
-        <div className={styles.comparisonTabs}>
-          <button className={`${styles.compTab} ${styles.activeCompTab}`}>Similar Assets</button>
-          <button className={styles.compTab}>Correlations</button>
-          <button className={styles.compTab}>Scenarios</button>
-        </div>
-        
-        <div className={styles.similarAssets}>
-          <table className={styles.comparisonTable}>
-            <thead>
-              <tr>
-                <th>Asset</th>
-                <th>Current Price</th>
-                <th>7d Forecast</th>
-                <th>Confidence</th>
-                <th>Compare</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{symbol}</td>
-                <td>${chartData ? chartData.datasets[0].data[0].toFixed(2) : "N/A"}</td>
-                <td className={parseFloat(prediction.shortTerm.value) > 0 ? styles.positive : styles.negative}>
-                  {prediction.shortTerm.value}
-                </td>
-                <td>{prediction.shortTerm.confidence}%</td>
-                <td>-</td>
-              </tr>
-              <tr>
-                <td>Similar Asset 1</td>
-                <td>$78.40</td>
-                <td className={styles.positive}>+1.8%</td>
-                <td>82%</td>
-                <td><button className={styles.compareButton}><FaExchangeAlt /></button></td>
-              </tr>
-              <tr>
-                <td>Similar Asset 2</td>
-                <td>$134.90</td>
-                <td className={styles.negative}>-0.5%</td>
-                <td>75%</td>
-                <td><button className={styles.compareButton}><FaExchangeAlt /></button></td>
-              </tr>
-              <tr>
-                <td>Similar Asset 3</td>
-                <td>$223.15</td>
-                <td className={styles.positive}>+3.1%</td>
-                <td>79%</td>
-                <td><button className={styles.compareButton}><FaExchangeAlt /></button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <HistoricalAccuracy accuracyData={accuracyData} />
     </div>
   );
 };
