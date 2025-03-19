@@ -2689,7 +2689,6 @@ export async function searchSymbols(
     };
     
     const data = await makeApiRequest<any[]>('search', params);
-    debugger
     if (data && Array.isArray(data) && data.length > 0) {
       return data.map(quote => ({
         symbol: quote.symbol,
