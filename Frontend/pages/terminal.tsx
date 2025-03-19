@@ -80,7 +80,7 @@ export default function Terminal() {
       <main className={styles.main}>
         <div className={styles.logoContainer}>
           <h1 className={styles.title}>
-            <span className={styles.titlePrefix}>Optiwise</span>
+            <span className={styles.titlePrefix}>Opti</span>
             <span className={styles.titleSuffix}>Terminal</span>
           </h1>
           <p className={styles.tagline}>Advanced Ai Analysis, Informed Decisions</p>

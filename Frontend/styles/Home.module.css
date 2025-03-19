@@ -1373,15 +1373,15 @@
 }
 
 .heroTitle {
-  font-size: 4.5rem;
+  font-size: 5.0rem;
   line-height: 1.1;
   margin-bottom: 0.5rem;
   font-weight: 800;
-  background: linear-gradient(90deg, #2a4da3 0%, #02a6d0 100%);
+  background: linear-gradient(90deg, #2a4da3 0%, #000000 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
+  text-emphasis-color: transparent;
 }
 
 .heroSubtitle {
@@ -1522,11 +1522,11 @@
 }
 
 .featureIcon {
-  font-size: 2.5rem;
+  font-size: 4.2rem; /* Increased from 2.5rem */
   margin-bottom: 1.5rem;
   color: #02a6d0;
   background: rgba(2, 166, 208, 0.1);
-  padding: 1rem;
+  padding: 1.2rem; /* Increased from 1rem */
   border-radius: 50%;
   display: inline-block;
 }
