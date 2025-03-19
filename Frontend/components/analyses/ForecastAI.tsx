@@ -1,77 +1,107 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Line, Bar } from 'react-chartjs-2';
-import { FaArrowUp, FaArrowDown, FaArrowRight, FaQuestion, FaChartLine, FaBell, FaHistory, FaExchangeAlt } from 'react-icons/fa';
+import { FaArrowUp, FaArrowDown, FaArrowRight, FaQuestion, FaChartLine, FaBell, FaHistory, FaExchangeAlt, FaSpinner } from 'react-icons/fa';
 import styles from '../../styles/ForecastAI.module.css';
+import technicalAnalysisAI, { TechnicalAnalysisResult } from '../../services/analysis/technicalAnalysisAI';
 
 interface ForecastAIProps {
   symbol: string;
 }
 
 const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
+  // Component state
   const [timeframe, setTimeframe] = useState('daily');
   const [userQuestion, setUserQuestion] = useState('');
   const [showQA, setShowQA] = useState(false);
+  const [answer, setAnswer] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAnswerLoading, setIsAnswerLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<TechnicalAnalysisResult | null>(null);
+  const [chartData, setChartData] = useState<any>(null);
   
-  // Mock data - in a real application, this would come from an API
-  const predictionData = {
-    shortTerm: { value: '+2.4%', confidence: 87 },
-    midTerm: { value: '+8.1%', confidence: 74 },
-    longTerm: { value: '+15.3%', confidence: 61 },
-    trendIndicator: 'up', // 'up', 'down', or 'sideways'
-    supportLevels: [185.2, 178.5, 172.3],
-    resistanceLevels: [198.7, 205.3, 213.8]
+  // Load analysis data when component mounts or symbol changes
+  useEffect(() => {
+    const loadAnalysis = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        // Get real analysis data from AI service
+        const result = await technicalAnalysisAI.analyzeStock(symbol);
+        debugger
+        setAnalysisResult(result);
+        
+        // Update chart data based on current timeframe
+        updateChartData(result, timeframe);
+        
+        setIsLoading(false);
+      } catch (err) {
+        setError(`Failed to analyze ${symbol}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setIsLoading(false);
+      }
+    };
+    
+    loadAnalysis();
+  }, [symbol]);
+  
+  // Update chart when timeframe changes
+  useEffect(() => {
+    if (analysisResult) {
+      updateChartData(analysisResult, timeframe);
+    }
+  }, [timeframe, analysisResult]);
+  
+  // Function to update chart data based on timeframe
+  const updateChartData = (result: TechnicalAnalysisResult, selectedTimeframe: string) => {
+    if (!result) return;
+    
+    // Get the appropriate prediction value based on timeframe
+    let predictionValue;
+    switch (selectedTimeframe) {
+      case 'daily':
+        predictionValue = result.prediction.shortTerm.value;
+        break;
+      case 'weekly':
+        predictionValue = result.prediction.midTerm.value;
+        break;
+      case 'monthly':
+      case 'yearly':
+        predictionValue = result.prediction.longTerm.value;
+        break;
+      default:
+        predictionValue = result.prediction.shortTerm.value;
+    }
+    
+    // Get current price from chart data
+    const currentPrice = result.chartData.datasets[0].data[0];
+    
+    // Generate new forecast data for selected timeframe
+    const newChartData = technicalAnalysisAI.generateChartForecastData(
+      currentPrice,
+      predictionValue,
+      selectedTimeframe
+    );
+    
+    setChartData(newChartData);
   };
   
-  // Mock chart data
-  const chartData = {
-    labels: ['Now', '+1D', '+2D', '+3D', '+4D', '+5D', '+6D', '+7D'],
-    datasets: [
-      {
-        label: 'Predicted Price',
-        data: [190, 192, 195, 193, 197, 201, 203, 205],
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        fill: true,
-      },
-      {
-        label: 'Upper Range',
-        data: [190, 194, 198, 197, 202, 207, 210, 213],
-        borderColor: 'rgba(75, 192, 192, 0.5)',
-        backgroundColor: 'transparent',
-        borderDash: [5, 5],
-      },
-      {
-        label: 'Lower Range',
-        data: [190, 189, 192, 190, 193, 197, 198, 200],
-        borderColor: 'rgba(75, 192, 192, 0.5)',
-        backgroundColor: 'transparent',
-        borderDash: [5, 5],
-      },
-    ],
-  };
-
-  // Mock probability distribution data
-  const probabilityData = {
-    labels: ['-5%', '-2.5%', '0%', '+2.5%', '+5%', '+7.5%', '+10%'],
-    datasets: [
-      {
-        label: 'Probability',
-        data: [5, 10, 15, 30, 25, 10, 5],
-        backgroundColor: 'rgba(153, 102, 255, 0.6)',
-        borderColor: 'rgba(153, 102, 255, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  // Mock accuracy data
-  const accuracyData = {
-    overall: 78,
-    byTimeframe: {
-      daily: 82,
-      weekly: 76,
-      monthly: 71,
-      yearly: 65,
+  // Handle user questions about the stock
+  const handleAskQuestion = async () => {
+    if (!userQuestion.trim()) return;
+    
+    try {
+      setIsAnswerLoading(true);
+      setShowQA(true);
+      
+      // Get AI response to user question
+      const response = await technicalAnalysisAI.answerStockQuestion(symbol, userQuestion);
+      setAnswer(response);
+      
+      setIsAnswerLoading(false);
+    } catch (err) {
+      setAnswer(`Sorry, I couldn't answer that question right now. Please try again later.`);
+      setIsAnswerLoading(false);
     }
   };
   
@@ -87,6 +117,47 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
     }
   };
   
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <FaSpinner className={styles.spinner} />
+        <p>Analyzing {symbol} with AI...</p>
+      </div>
+    );
+  }
+  
+  // Show error state
+  if (error || !analysisResult) {
+    return (
+      <div className={styles.errorContainer}>
+        <h3>Analysis Error</h3>
+        <p>{error || 'Failed to generate analysis. Please try again.'}</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+      </div>
+    );
+  }
+  
+  // Destructure analysis result for easier access
+  const { prediction, analysis, probabilityData, technicalFactors, accuracyData } = analysisResult;
+  
+  // Default summary if empty
+  const summaryText = analysis.summary?.trim() || 
+    `Based on our analysis, ${symbol} is showing a ${prediction.trendIndicator === 'up' ? 'bullish' : 
+    prediction.trendIndicator === 'down' ? 'bearish' : 'neutral'} trend with key support at $${prediction.supportLevels[0]} 
+    and resistance at $${prediction.resistanceLevels[0]}. Short-term prediction is ${prediction.shortTerm.value} 
+    with ${prediction.shortTerm.confidence}% confidence.`;
+  
+  // Ensure sentiment data is valid
+  const sentimentData = technicalFactors.sentiment && 
+    Object.keys(technicalFactors.sentiment).filter(key => !key.includes('**')).length > 0 ? 
+    technicalFactors.sentiment : 
+    { 
+      "Market Sentiment": "Neutral",
+      "Social Media Buzz": "Moderate",
+      "News Impact": "Mixed" 
+    };
+  
   return (
     <div className={styles.forecastContainer}>
       <div className={styles.sectionTitle}>
@@ -99,48 +170,48 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
         <div className={styles.predictionCards}>
           <div className={styles.predictionCard}>
             <h4>Short Term (7d)</h4>
-            <div className={styles.predictionValue}>{predictionData.shortTerm.value}</div>
+            <div className={styles.predictionValue}>{prediction.shortTerm.value}</div>
             <div className={styles.confidenceBar}>
               <div 
                 className={styles.confidenceFill} 
-                style={{ width: `${predictionData.shortTerm.confidence}%` }}
+                style={{ width: `${prediction.shortTerm.confidence}%` }}
               ></div>
             </div>
-            <div className={styles.confidenceLabel}>{predictionData.shortTerm.confidence}% Confidence</div>
+            <div className={styles.confidenceLabel}>{prediction.shortTerm.confidence}% Confidence</div>
           </div>
           
           <div className={styles.predictionCard}>
             <h4>Mid Term (30d)</h4>
-            <div className={styles.predictionValue}>{predictionData.midTerm.value}</div>
+            <div className={styles.predictionValue}>{prediction.midTerm.value}</div>
             <div className={styles.confidenceBar}>
               <div 
                 className={styles.confidenceFill} 
-                style={{ width: `${predictionData.midTerm.confidence}%` }}
+                style={{ width: `${prediction.midTerm.confidence}%` }}
               ></div>
             </div>
-            <div className={styles.confidenceLabel}>{predictionData.midTerm.confidence}% Confidence</div>
+            <div className={styles.confidenceLabel}>{prediction.midTerm.confidence}% Confidence</div>
           </div>
           
           <div className={styles.predictionCard}>
             <h4>Long Term (90d)</h4>
-            <div className={styles.predictionValue}>{predictionData.longTerm.value}</div>
+            <div className={styles.predictionValue}>{prediction.longTerm.value}</div>
             <div className={styles.confidenceBar}>
               <div 
                 className={styles.confidenceFill} 
-                style={{ width: `${predictionData.longTerm.confidence}%` }}
+                style={{ width: `${prediction.longTerm.confidence}%` }}
               ></div>
             </div>
-            <div className={styles.confidenceLabel}>{predictionData.longTerm.confidence}% Confidence</div>
+            <div className={styles.confidenceLabel}>{prediction.longTerm.confidence}% Confidence</div>
           </div>
           
           <div className={styles.predictionCard}>
             <h4>Trend Indicator</h4>
             <div className={styles.trendIndicator}>
-              {renderTrendIndicator(predictionData.trendIndicator)}
+              {renderTrendIndicator(prediction.trendIndicator)}
             </div>
             <div className={styles.trendLabel}>
-              {predictionData.trendIndicator === 'up' ? 'Bullish' : 
-               predictionData.trendIndicator === 'down' ? 'Bearish' : 'Neutral'}
+              {prediction.trendIndicator === 'up' ? 'Bullish' : 
+               prediction.trendIndicator === 'down' ? 'Bearish' : 'Neutral'}
             </div>
           </div>
         </div>
@@ -151,28 +222,36 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
         <h3>Smart Analysis Summary</h3>
         <div className={styles.analysisSummary}>
           <p className={styles.summaryText}>
-            {symbol} is showing strong bullish momentum with increasing volume and institutional interest. 
-            Technical indicators suggest potential breakout above $195 resistance, with fundamental factors 
-            providing additional support.
+            {summaryText}
           </p>
           
           <div className={styles.keyFindings}>
             <h4>Key Findings</h4>
             <ul>
-              <li>RSI indicates momentum without being overbought</li>
-              <li>Positive reversal pattern forming on daily chart</li>
-              <li>Above major moving averages (20, 50, 200 EMA)</li>
-              <li>Increased institutional buying activity</li>
+              {analysis.keyFindings && analysis.keyFindings.length > 0 ? 
+                analysis.keyFindings
+                  .filter(finding => finding && !finding.includes('s/'))
+                  .map((finding, index) => (
+                    <li key={`finding-${index}`}>{finding}</li>
+                  ))
+                : 
+                <li>No key findings available at this time.</li>
+              }
             </ul>
           </div>
           
           <div className={styles.catalysts}>
             <h4>Potential Catalysts</h4>
             <ul>
-              <li>Upcoming earnings announcement (Est. Mar 15)</li>
-              <li>New product launch expected in Q2</li>
-              <li>Industry regulation changes anticipated</li>
-              <li>Potential market segment expansion</li>
+              {analysis.catalysts && analysis.catalysts.length > 0 ?
+                analysis.catalysts
+                  .filter(catalyst => catalyst && !catalyst.includes('s/'))
+                  .map((catalyst, index) => (
+                    <li key={`catalyst-${index}`}>{catalyst}</li>
+                  ))
+                :
+                <li>No potential catalysts identified at this time.</li>
+              }
             </ul>
           </div>
         </div>
@@ -210,7 +289,7 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
         
         <div className={styles.chartContainer}>
           <Line 
-            data={chartData}
+            data={chartData || analysisResult.chartData}
             options={{
               responsive: true,
               maintainAspectRatio: false,
@@ -237,7 +316,7 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
           <div className={styles.levelGroup}>
             <h4>Resistance Levels</h4>
             <ul>
-              {predictionData.resistanceLevels.map((level, index) => (
+              {prediction.resistanceLevels.map((level, index) => (
                 <li key={`resistance-${index}`}>${level}</li>
               ))}
             </ul>
@@ -245,7 +324,7 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
           <div className={styles.levelGroup}>
             <h4>Support Levels</h4>
             <ul>
-              {predictionData.supportLevels.map((level, index) => (
+              {prediction.supportLevels.map((level, index) => (
                 <li key={`support-${index}`}>${level}</li>
               ))}
             </ul>
@@ -280,33 +359,27 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
           <div className={styles.factorCard}>
             <h4>Technical Factors</h4>
             <ul>
-              <li><strong>RSI:</strong> 62 (Moderately bullish)</li>
-              <li><strong>MACD:</strong> Positive crossover</li>
-              <li><strong>Moving Averages:</strong> Above 20, 50, 200 EMAs</li>
-              <li><strong>Volume:</strong> Above average accumulation</li>
-              <li><strong>Chart Patterns:</strong> Inverted head & shoulders</li>
+              {Object.entries(technicalFactors.technical || {}).map(([key, value], index) => (
+                <li key={`tech-${index}`}><strong>{key}:</strong> {value}</li>
+              ))}
             </ul>
           </div>
           
           <div className={styles.factorCard}>
             <h4>Fundamental Factors</h4>
             <ul>
-              <li><strong>Earnings Growth:</strong> +12% YoY</li>
-              <li><strong>Revenue Growth:</strong> +8.5% YoY</li>
-              <li><strong>P/E Ratio:</strong> 24.3 (Industry avg: 27.8)</li>
-              <li><strong>Debt/Equity:</strong> 0.32 (Healthy)</li>
-              <li><strong>Cash Reserves:</strong> Increasing</li>
+              {Object.entries(technicalFactors.fundamental || {}).map(([key, value], index) => (
+                <li key={`fund-${index}`}><strong>{key}:</strong> {value}</li>
+              ))}
             </ul>
           </div>
           
           <div className={styles.factorCard}>
             <h4>Market Sentiment</h4>
             <ul>
-              <li><strong>News Sentiment:</strong> 78% positive</li>
-              <li><strong>Social Media:</strong> Moderately bullish</li>
-              <li><strong>Analyst Ratings:</strong> 14 Buy, 7 Hold, 2 Sell</li>
-              <li><strong>Options Put/Call Ratio:</strong> 0.72 (Bullish)</li>
-              <li><strong>Insider Activity:</strong> Net buying</li>
+              {Object.entries(sentimentData).map(([key, value], index) => (
+                <li key={`sent-${index}`}><strong>{key}:</strong> {value}</li>
+              ))}
             </ul>
           </div>
         </div>
@@ -328,21 +401,17 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
             />
             <button 
               className={styles.askButton}
-              onClick={() => setShowQA(true)}
+              onClick={handleAskQuestion}
+              disabled={isAnswerLoading}
             >
-              <FaQuestion /> Ask
+              {isAnswerLoading ? <FaSpinner className={styles.spinnerSmall} /> : <FaQuestion />} Ask
             </button>
           </div>
           
           {showQA && (
             <div className={styles.qaResult}>
-              <h5>Q: {userQuestion || "What are the key resistance levels for this asset?"}</h5>
-              <p>
-                Based on my analysis of {symbol}, the key resistance levels to watch are $198.70, 
-                $205.30, and $213.80. The most significant of these is $198.70, which has been tested 
-                three times in the past month. A breakthrough above this level with strong volume would 
-                likely trigger a move toward the $205.30 level.
-              </p>
+              <h5>Q: {userQuestion}</h5>
+              <p>{isAnswerLoading ? 'Analyzing...' : answer}</p>
             </div>
           )}
         </div>
@@ -360,7 +429,7 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
               type="number" 
               placeholder="Value" 
               className={styles.alertValue}
-              defaultValue={195.00}
+              defaultValue={prediction.resistanceLevels[0]}
             />
             <button className={styles.setAlertButton}>
               <FaBell /> Set Alert
@@ -455,9 +524,11 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
             <tbody>
               <tr>
                 <td>{symbol}</td>
-                <td>$190.25</td>
-                <td className={styles.positive}>+2.4%</td>
-                <td>87%</td>
+                <td>${chartData ? chartData.datasets[0].data[0].toFixed(2) : "N/A"}</td>
+                <td className={parseFloat(prediction.shortTerm.value) > 0 ? styles.positive : styles.negative}>
+                  {prediction.shortTerm.value}
+                </td>
+                <td>{prediction.shortTerm.confidence}%</td>
                 <td>-</td>
               </tr>
               <tr>
