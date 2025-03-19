@@ -419,15 +419,27 @@
 }
 
 .searchSection h2 {
-  font-size: 1.2rem; /* Reduced from 2.2rem to 1.7rem to make it smaller */
-  background: linear-gradient(90deg, #1e40af, #3b82f6);
+  font-size: 1.0rem; /* Orta büyüklükte daha modern bir görünüm */
+  background: linear-gradient(90deg, #333333, #333333);
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.searchSection h2 span {
+  font-size: 1.2rem;
+  background: linear-gradient(90deg, #2563eb, #2563eb);
+  -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 2rem;
-  font-weight: 600; /* Slightly reduced from 700 to 600 for better balance */
-  text-transform: lowercase; /* Makes all text lowercase */
+  font-weight: 600;
+  display: inline-block;
+  padding-bottom: 4px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2); /* Hafif alt çizgi efekti */
 }
 
 .searchBar {
@@ -1267,4 +1279,56 @@
 
 .searchResults::-webkit-scrollbar-thumb:hover {
   background: rgba(37, 99, 235, 0.3);
+}
+
+/* Add these new styles to your existing CSS file */
+
+.marketHeading {
+  font-size: 1rem;
+  font-weight: 00;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #202945;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  background: linear-gradient(90deg, #202945 0%, #4a5b8c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+.marketHeading::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+  border-radius: 2px;
+}
+
+.marketTypes {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  color: #4a5b8c;
+  -webkit-text-fill-color: #4a5b8c;
+  text-fill-color: #4a5b8c;
+}
+
+@media (min-width: 768px) {
+  .marketHeading {
+    font-size: 2.25rem;
+  }
+  
+  .marketTypes {
+    display: inline;
+    font-size: 1.75rem;
+  }
 }
