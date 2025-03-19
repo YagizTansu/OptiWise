@@ -254,16 +254,6 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
     loadChartData(activeTimeframe);
   };
 
-  const handlePrevious = () => {
-    // For future implementation: navigate to previous time period
-    console.log('Navigate to previous period');
-  };
-
-  const handleNext = () => {
-    // For future implementation: navigate to next time period
-    console.log('Navigate to next period');
-  };
-
   const toggleVolumeDisplay = () => {
     setShowVolume(prev => !prev);
   };

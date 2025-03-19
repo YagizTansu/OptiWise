@@ -479,9 +479,7 @@ function processDirectFormat(data: ChartDataResponse): ChartDataPoint[] {
       };
     })
     .filter((point): point is ChartDataPoint => point !== null);
-  
-  console.log(`Processed ${formattedData.length} valid data points`);
-  
+    
   if (formattedData.length === 0) {
     throw new Error('No valid data points received for the selected range and interval');
   }
@@ -524,9 +522,7 @@ function processYahooFormat(result: any): ChartDataPoint[] {
       };
     })
     .filter((point: null): point is ChartDataPoint => point !== null);
-  
-  console.log(`Processed ${formattedData.length} valid data points`);
-  
+    
   if (formattedData.length === 0) {
     throw new Error('No valid data points received for the selected range and interval');
   }
@@ -550,13 +546,6 @@ export async function fetchChartData(
   interval: string
 ): Promise<ChartDataPoint[]> {
   try {
-    console.log('Fetching chart data with params:', {
-      symbol,
-      period1,
-      period2,
-      interval
-    });
-
     const params = {
       symbol,
       period1,
@@ -570,9 +559,7 @@ export async function fetchChartData(
     };
 
     const data = await makeApiRequest<any>('chart', params);
-    
-    console.log('API Response:', data);
-    
+        
     // Process the response data based on its format
     if (data && data.meta && data.quotes && Array.isArray(data.quotes)) {
       return processDirectFormat(data);

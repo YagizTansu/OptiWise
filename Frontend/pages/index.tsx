@@ -113,9 +113,9 @@ export default function Home() {
                 </div>
               ) : searchResults.length > 0 ? (
                 <ul className={styles.resultsList}>
-                  {searchResults.map((result) => (
+                  {searchResults.map((result, index) => (
                     <li 
-                      key={result.symbol} 
+                      key={`${result.symbol || ''}-${result.exchange || ''}-${result.shortName || ''}-${index}`}
                       className={styles.resultItem}
                       onClick={() => handleResultClick(result.symbol)}
                       title={`View analysis for ${result.symbol}`}

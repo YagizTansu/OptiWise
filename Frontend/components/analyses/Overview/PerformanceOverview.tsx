@@ -123,9 +123,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
     
     const labels = chartData.map(point => point.date);
     const data = chartData.map(point => point.close);
-    
-    console.log(`Creating chart with ${labels.length} data points`);
-    
+        
     // Create a basic dataset if data is available
     return {
       labels: labels,
@@ -175,11 +173,6 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
     // Close the date picker panel
     setShowCustomDateRange(false);
     
-    // Trigger a chart data refresh (this is already handled by the dateRange dependency in the useEffect)
-    console.log('Applied custom date range:', {
-      startDate: dateRange.startDate.toLocaleDateString(),
-      endDate: dateRange.endDate.toLocaleDateString()
-    });
   };
 
   // Format date for display
