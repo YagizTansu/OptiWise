@@ -3,7 +3,7 @@ import styles from '../styles/Features.module.css'
 import { 
   FaChartLine, FaDatabase, FaShieldAlt, FaMobileAlt, FaClock, FaUsers, 
   FaBrain, FaGlobe, FaChartBar, FaSearch, FaBell, FaLightbulb, FaRobot, 
-  FaBalanceScale, FaNewspaper
+  FaBalanceScale, FaNewspaper, FaCalendarAlt, FaChartPie, FaFileAlt
 } from 'react-icons/fa'
 import { useState } from 'react'
 
@@ -36,6 +36,11 @@ export default function Features() {
         icon: <FaSearch />,
         title: 'IPO Tracking',
         description: 'Comprehensive scanning of upcoming IPOs with pre-listing analysis and potential investment opportunities before they go public.'
+      },
+      {
+        icon: <FaRobot />,
+        title: 'AI Forecast',
+        description: 'Advanced AI predictions of market movements and asset performance based on comprehensive data analysis and machine learning algorithms.'
       }
     ],
     analysis: [
@@ -58,6 +63,16 @@ export default function Features() {
         icon: <FaLightbulb />,
         title: 'MOAT Score Evaluation',
         description: 'Proprietary algorithm rates a company\'s competitive advantage and market dominance on a scale of 1-10 (e.g., NVIDIA 9/10).'
+      },
+      {
+        icon: <FaChartLine />,
+        title: 'Market Overview',
+        description: 'Comprehensive overview of market conditions, trends, and asset performance with interactive charts and insights.'
+      },
+      {
+        icon: <FaBalanceScale />,
+        title: 'Overbought/Oversold Analysis',
+        description: 'Technical indicators to identify when assets are trading above or below their true value, providing optimal entry and exit points.'
       }
     ],
     macro: [
@@ -75,6 +90,11 @@ export default function Features() {
         icon: <FaSearch />,
         title: 'MegaTrends Detection',
         description: 'Advanced scanning of market data to identify long-term trends like AI, clean energy, and biotechnology before they become mainstream.'
+      },
+      {
+        icon: <FaCalendarAlt />,
+        title: 'Seasonality Analysis',
+        description: 'Historical pattern recognition to identify seasonal trends in asset prices and market behavior for strategic timing of investments.'
       }
     ],
     alerts: [
@@ -109,6 +129,16 @@ export default function Features() {
         icon: <FaMobileAlt />,
         title: 'Portfolio Optimization',
         description: 'Advanced algorithms suggest optimal asset allocation to maximize returns while minimizing risk based on your goals.'
+      },
+      {
+        icon: <FaChartPie />,
+        title: 'Fundamental Analysis',
+        description: 'In-depth evaluation of financial statements, business models, and competitive positioning to determine long-term investment value.'
+      },
+      {
+        icon: <FaFileAlt />,
+        title: 'Comprehensive Reports',
+        description: 'Detailed investment reports with actionable insights, combining technical, fundamental, and AI-driven analysis.'
       }
     ],
     tools: [
@@ -136,12 +166,12 @@ export default function Features() {
   };
   
   const allFeatures = [
-    ...featuresByCategory.forecaster,
-    ...featuresByCategory.analysis,
-    ...featuresByCategory.macro,
-    ...featuresByCategory.alerts,
-    ...featuresByCategory.invest,
-    ...featuresByCategory.tools.slice(0, 2)  // Taking just the first 2 to keep the grid balanced
+    ...featuresByCategory.forecaster.slice(0, 3),
+    ...featuresByCategory.analysis.slice(0, 3),
+    ...featuresByCategory.macro.slice(0, 3),
+    ...featuresByCategory.alerts.slice(0, 3),
+    ...featuresByCategory.invest.slice(0, 3),
+    ...featuresByCategory.tools.slice(0, 3)
   ];
 
   const currentFeatures = featuresByCategory[activeCategory] || [];
