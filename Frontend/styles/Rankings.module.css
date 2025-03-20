@@ -1,34 +1,38 @@
 .container {
-  --color-primary: #4361ee;
-  --color-primary-light: #eef2ff;
-  --color-secondary: #3a0ca3;
-  --color-success: #4caf50;
-  --color-success-light: rgba(76, 175, 80, 0.1);
-  --color-danger: #f44336;
-  --color-danger-light: rgba(244, 67, 54, 0.1);
-  --color-text-primary: #333;
-  --color-text-secondary: #666;
-  --color-text-light: #888;
-  --color-bg-light: #f7f9fc;
-  --color-border: rgba(0, 0, 0, 0.08);
+  --color-primary: #2563eb;
+  --color-primary-light: #f0f5ff;
+  --color-secondary: #1e40af;
+  --color-success: #10b981;
+  --color-success-light: rgba(16, 185, 129, 0.1);
+  --color-danger: #ef4444;
+  --color-danger-light: rgba(239, 68, 68, 0.1);
+  --color-text-primary: #334155;
+  --color-text-secondary: #64748b;
+  --color-text-light: #94a3b8;
+  --color-bg-light: #f8fafc;
+  --color-border: #f1f5f9;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --border-radius-sm: 6px;
+  --border-radius-sm: 8px;
   --border-radius-md: 12px;
   --border-radius-lg: 16px;
   
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 2rem 1rem;
 }
 
 .header {
-  margin-bottom: 2.5rem;
+  background: linear-gradient(to right, #f0f5ff, #e6f0ff);
+  border-radius: var(--border-radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   text-align: center;
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1rem;
   color: var(--color-text-primary);
@@ -36,6 +40,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 .description {
@@ -51,7 +56,11 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  padding: 0.5rem 0;
+  padding: 1.25rem;
+  background-color: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
 }
 
 .viewToggle {
@@ -77,9 +86,9 @@
 }
 
 .viewButton.active {
-  background-color: white;
-  color: var(--color-primary);
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: white;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
 }
 
 .filters {
@@ -99,6 +108,11 @@
   color: var(--color-text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.filterChip:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .dropdownArrow {
@@ -121,7 +135,7 @@
   right: 0;
   background-color: white;
   border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   width: 220px;
   z-index: 50;
   overflow: hidden;
@@ -164,18 +178,25 @@
 }
 
 .sectionTitle h2 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .infoTag {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--color-text-light);
+  background-color: var(--color-bg-light);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
 }
 
 .infoIcon {
@@ -192,7 +213,8 @@
 
 .indexesTable {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .indexesTable th,
@@ -210,16 +232,20 @@
   white-space: nowrap;
   transition: all 0.2s ease;
   position: relative;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .indexesTable th:hover {
-  background-color: rgba(67, 97, 238, 0.05);
+  background-color: #e0ecff;
   color: var(--color-primary);
 }
 
 .sortIcon {
   margin-left: 0.5rem;
   font-size: 0.8rem;
+  color: var(--color-primary);
 }
 
 .indexesTable tbody tr {
@@ -234,6 +260,10 @@
 .selectedRow {
   background-color: var(--color-primary-light) !important;
   border-left: 3px solid var(--color-primary);
+}
+
+.selectedRow td:first-child {
+  padding-left: calc(1rem - 3px);
 }
 
 .comingSoonRow {
@@ -292,7 +322,7 @@
 
 .selectedCard {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1), var(--shadow-sm);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1), var(--shadow-sm);
 }
 
 .cardHeader {
@@ -305,7 +335,7 @@
 
 .cardHeader h3 {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -394,7 +424,7 @@
 .sectorCard {
   padding: 1rem;
   border-radius: var(--border-radius-sm);
-  background-color: var(--color-bg-light);
+  background: linear-gradient(135deg, #f0f5ff, #e0ecff);
   border: 1px solid var(--color-border);
 }
 
@@ -446,12 +476,12 @@
   text-align: right;
 }
 
-.sectorCard .potentialFill[style*="var(--color-success-light)"] {
-  background-color: rgba(76, 175, 80, 0.1);
+.sectorCard .potentialFill.positive {
+  background-color: var(--color-success);
 }
 
-.sectorCard .potentialFill[style*="var(--color-danger-light)"] {
-  background-color: rgba(244, 67, 54, 0.1);
+.sectorCard .potentialFill.negative {
+  background-color: var(--color-danger);
 }
 
 .regionGroup {
@@ -470,12 +500,13 @@
   margin: 0;
   display: inline-block;
   position: relative;
+  padding-bottom: 0.5rem;
 }
 
 .regionHeader h3:after {
   content: '';
   position: absolute;
-  bottom: -6px;
+  bottom: 0;
   left: 0;
   width: 30px;
   height: 3px;
@@ -499,13 +530,41 @@
   box-shadow: var(--shadow-sm) !important;
 }
 
+.loadingMessage, .errorMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.errorMessage {
+  color: var(--color-danger);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(37, 99, 235, 0.1);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @media (max-width: 768px) {
   .header {
-    margin-bottom: 1.5rem;
+    padding: 1.5rem 1rem;
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
   
   .description {
@@ -516,6 +575,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+    padding: 1rem;
   }
   
   .indexesTable {
@@ -525,6 +585,12 @@
   .indexesTable th, 
   .indexesTable td {
     padding: 0.75rem;
+  }
+  
+  .sectionTitle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
   }
 }
 

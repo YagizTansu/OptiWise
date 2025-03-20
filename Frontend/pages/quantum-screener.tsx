@@ -343,7 +343,6 @@ export default function QuantumScreener() {
                           className={`${styles.sortableHeader} ${styles.dataColumn}`}
                         >
                           <div className={styles.headerContent}>
-                            <FaChartLine className={styles.headerIcon} /> 
                             <span>Correlation</span>
                             {sortBy === 'correlation' && (
                               <span className={styles.sortIcon}>
@@ -357,7 +356,6 @@ export default function QuantumScreener() {
                           className={`${styles.sortableHeader} ${styles.dataColumn}`}
                         >
                           <div className={styles.headerContent}>
-                            <FaTrophy className={styles.headerIcon} /> 
                             <span>Win Rate %</span>
                             {sortBy === 'winRate' && (
                               <span className={styles.sortIcon}>
@@ -371,7 +369,6 @@ export default function QuantumScreener() {
                           className={`${styles.sortableHeader} ${styles.returnColumn}`}
                         >
                           <div className={styles.headerContent}>
-                            <FaPercentage className={styles.headerIcon} /> 
                             <span>Avg Return %</span>
                             {sortBy === 'avgReturn' && (
                               <span className={styles.sortIcon}>
@@ -385,7 +382,6 @@ export default function QuantumScreener() {
                           className={`${styles.sortableHeader} ${styles.dateColumn}`}
                         >
                           <div className={styles.headerContent}>
-                            <FaCalendarAlt className={styles.headerIcon} /> 
                             <span>Open Date</span>
                             {sortBy === 'openDate' && (
                               <span className={styles.sortIcon}>
@@ -399,7 +395,6 @@ export default function QuantumScreener() {
                           className={`${styles.sortableHeader} ${styles.dateColumn}`}
                         >
                           <div className={styles.headerContent}>
-                            <FaCalendarAlt className={styles.headerIcon} /> 
                             <span>Close Date</span>
                             {sortBy === 'closeDate' && (
                               <span className={styles.sortIcon}>

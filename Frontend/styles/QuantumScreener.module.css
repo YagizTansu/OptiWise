@@ -1,7 +1,7 @@
 .container {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1rem;
 }
 
 .main {
@@ -12,14 +12,18 @@
 
 /* Header Section */
 .headerSection {
-  text-align: center;
+  background: linear-gradient(to right, #f0f5ff, #e6f0ff);
+  border-radius: 1rem;
+  padding: 2rem;
   margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  text-align: center;
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  background: linear-gradient(120deg, #2563eb, #7209b7);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -29,13 +33,13 @@
 
 .description {
   font-size: 1.1rem;
-  color: #555;
+  color: #64748b;
   max-width: 800px;
   margin: 0 auto;
   line-height: 1.6;
 }
 
-/* Filter Section - Styled like filtersBar in Rankings */
+/* Filter Section */
 .filterSection {
   width: 100%;
   margin-bottom: 1.5rem;
@@ -43,10 +47,10 @@
 
 .filterCard {
   background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   padding: 1.2rem 1.5rem;
-  border: 1px solid rgba(220, 220, 220, 0.5);
+  border: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -61,7 +65,7 @@
 .filterHeader h2 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: #334155;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -69,7 +73,7 @@
 }
 
 .filterIcon {
-  color: #4361ee;
+  color: #2563eb;
 }
 
 .filterControls {
@@ -88,7 +92,7 @@
 .filterGroup label {
   font-size: 0.85rem;
   font-weight: 500;
-  color: #555;
+  color: #64748b;
 }
 
 .buttonGroup {
@@ -97,27 +101,27 @@
 }
 
 .filterButton {
-  background-color: #f5f7fa;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.5rem;
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #4a5568;
+  color: #64748b;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .filterButton:hover {
-  background-color: #edf2f7;
-  border-color: #cbd5e0;
+  background-color: #f0f5ff;
+  border-color: #2563eb;
 }
 
 .filterButton.active {
-  background: linear-gradient(135deg, #4361ee, #7209b7);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
   color: white;
   border-color: transparent;
-  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
 /* Results Section */
@@ -127,10 +131,10 @@
 
 .resultsCard {
   background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   padding: 1.5rem;
-  border: 1px solid rgba(220, 220, 220, 0.5);
+  border: 1px solid #f1f5f9;
   overflow: hidden;
 }
 
@@ -140,13 +144,13 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .tableHeader h2 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #333;
+  color: #334155;
   margin: 0;
 }
 
@@ -158,26 +162,29 @@
 }
 
 .sectionTitle h2 {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #333;
+  color: #334155;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .infoTag {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #f9fafb;
+  background-color: #f8fafc;
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
   font-size: 0.8rem;
-  color: #555;
-  border: 1px solid #f0f0f0;
+  color: #64748b;
+  border: 1px solid #f1f5f9;
 }
 
 .infoIcon {
-  color: #4361ee;
+  color: #2563eb;
 }
 
 .legend {
@@ -190,7 +197,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
-  color: #666;
+  color: #64748b;
 }
 
 .legendColor {
@@ -201,7 +208,7 @@
 
 .tableWrapper {
   overflow-x: auto;
-  border-radius: 8px;
+  border-radius: 0.5rem;
 }
 
 .resultsTable {
@@ -214,13 +221,15 @@
 .resultsTable th {
   text-align: left;
   padding: 1rem;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #555;
-  border-bottom: 1px solid #eee;
-  background-color: #f9fafb;
+  color: #64748b;
+  border-bottom: 1px solid #f1f5f9;
+  background-color: #f8fafc;
   position: sticky;
   top: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .headerContent {
@@ -230,7 +239,7 @@
 }
 
 .headerIcon {
-  color: #4361ee;
+  color: #2563eb;
   font-size: 0.9rem;
 }
 
@@ -261,31 +270,31 @@
 }
 
 .sortableHeader:hover {
-  color: #4361ee;
-  background-color: #f0f4ff;
+  color: #2563eb;
+  background-color: #f0f5ff;
 }
 
 .sortIcon {
   font-size: 0.8rem;
   margin-left: 0.3rem;
   display: inline-block;
-  color: #4361ee;
+  color: #2563eb;
 }
 
 .resultsTable td {
   padding: 1rem;
   font-size: 0.95rem;
-  color: #333;
-  border-bottom: 1px solid #eee;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .highlightedRow {
-  background: linear-gradient(to right, rgba(67, 97, 238, 0.05), transparent);
-  border-left: 4px solid #4361ee;
+  background: linear-gradient(to right, rgba(37, 99, 235, 0.05), transparent);
+  border-left: 3px solid #2563eb;
 }
 
 .highlightedRow td:first-child {
-  padding-left: calc(1rem - 4px); /* Adjust padding for highlighted rows */
+  padding-left: calc(1rem - 3px); /* Adjust padding for highlighted rows */
 }
 
 .instrumentCell {
@@ -299,7 +308,7 @@
 
 .ticker {
   font-size: 0.85rem;
-  color: #666;
+  color: #64748b;
   margin-top: 0.3rem;
 }
 
@@ -312,14 +321,14 @@
 .progressBar {
   flex: 1;
   height: 8px;
-  background-color: #edf2f7;
+  background-color: #f1f5f9;
   border-radius: 4px;
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #4361ee, #7209b7);
+  background: linear-gradient(90deg, #2563eb, #1e40af);
   border-radius: 4px;
 }
 
@@ -331,78 +340,6 @@
 }
 
 .returnCell {
-  color: #10b981;
-  font-weight: 500;
-  text-align: center;
-}
-
-/* Media queries for responsive tables */
-@media (max-width: 1100px) {
-  .tableWrapper {
-    margin: 0 -1rem;
-    width: calc(100% + 2rem);
-    border-radius: 0;
-  }
-  
-  .resultsTable {
-    border-left: none;
-    border-right: none;
-  }
-}
-
-.resultsTable td {
-  padding: 1rem;
-  font-size: 0.95rem;
-  color: #333;
-  border-bottom: 1px solid #eee;
-}
-
-.highlightedRow {
-  background: linear-gradient(to right, rgba(67, 97, 238, 0.05), transparent);
-  border-left: 4px solid #4361ee;
-}
-
-.selectedRow {
-  background-color: rgba(67, 97, 238, 0.08);
-}
-
-.instrumentCell {
-  display: flex;
-  flex-direction: column;
-}
-
-.instrumentName {
-  font-weight: 500;
-}
-
-.ticker {
-  font-size: 0.85rem;
-  color: #666;
-  margin-top: 0.3rem;
-}
-
-.correlationCell, .winRateCell {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.progressBar {
-  flex: 1;
-  height: 8px;
-  background-color: #edf2f7;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  background: linear-gradient(90deg, #4361ee, #7209b7);
-  border-radius: 4px;
-}
-
-.returnCell {
-  color: #10b981;
   font-weight: 500;
 }
 
@@ -415,12 +352,12 @@
 }
 
 .positiveBg {
-  background-color: #e6f4e6;
+  background-color: rgba(16, 185, 129, 0.1);
   color: #10b981;
 }
 
 .negativeBg {
-  background-color: #fde9e8;
+  background-color: rgba(239, 68, 68, 0.1);
   color: #ef4444;
 }
 
@@ -428,35 +365,33 @@
   font-weight: 500;
 }
 
-.loadingState {
+/* Loading and Error States */
+.loadingState, .loadingMessage {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 3rem 0;
-  color: #666;
-}
-
-.loadingMessage {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 0;
-  color: #666;
-  font-size: 1rem;
+  color: #64748b;
+  text-align: center;
 }
 
 .errorMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
   color: #ef4444;
   text-align: center;
-  padding: 2rem;
+  gap: 1rem;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(67, 97, 238, 0.1);
-  border-top-color: #4361ee;
+  border: 3px solid rgba(37, 99, 235, 0.1);
+  border-top-color: #2563eb;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -466,7 +401,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* Info Section - styled like sectorsContainer in Rankings */
+/* Info Section */
 .infoSection {
   width: 100%;
   margin-top: 2rem;
@@ -474,16 +409,16 @@
 
 .infoCard {
   background-color: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   padding: 1.5rem;
-  border: 1px solid rgba(220, 220, 220, 0.5);
+  border: 1px solid #f1f5f9;
 }
 
 .infoCard h2 {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #333;
+  color: #334155;
   margin-bottom: 1.5rem;
 }
 
@@ -495,25 +430,29 @@
 
 .infoItem {
   padding: 1.2rem;
-  background-color: #f9fafb;
-  border-radius: 12px;
-  border: 1px solid #f0f0f0;
+  background: linear-gradient(135deg, #f0f5ff, #e0ecff);
+  border-radius: 0.75rem;
+  border: 1px solid #f1f5f9;
+}
+
+.infoItem:nth-child(even) {
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
 }
 
 .infoItem h3 {
   font-size: 1.1rem;
   font-weight: 500;
-  color: #4361ee;
+  color: #1e40af;
   margin-bottom: 0.8rem;
 }
 
 .infoItem p {
   font-size: 0.95rem;
-  color: #555;
+  color: #4b5563;
   line-height: 1.5;
 }
 
-/* Cards View - for potential future implementation */
+/* Cards View */
 .cardsGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -531,7 +470,21 @@
 .regionHeader h3 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #333;
+  color: #334155;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.regionHeader h3:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 3px;
+  background: #2563eb;
+  border-radius: 2px;
 }
 
 .regionCards {
@@ -542,80 +495,32 @@
 
 .indexCard {
   background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  border: 1px solid rgba(220, 220, 220, 0.5);
+  border: 1px solid #f1f5f9;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .indexCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 .selectedCard {
-  border-color: #4361ee;
-  box-shadow: 0 8px 25px rgba(67, 97, 238, 0.1);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.cardHeader {
-  padding: 1.2rem 1.2rem 0.8rem;
-  border-bottom: 1px solid #f0f0f0;
-  position: relative;
-}
-
-.cardHeader h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin: 0;
-  padding-right: 70px;
-}
-
-.cardBody {
-  padding: 1.2rem;
-}
-
-.cardData {
-  margin-bottom: 1rem;
-}
-
-.dataItem {
+.emptyState {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.8rem;
-}
-
-.dataLabel {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.dataValue {
-  font-weight: 500;
-}
-
-.cardPotential {
-  display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  background-color: #f9fafb;
-  padding: 0.8rem;
-  border-radius: 8px;
-  margin-top: 1rem;
-}
-
-.potentialLabel {
-  font-size: 0.85rem;
-  color: #555;
-}
-
-.potentialBadge {
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  justify-content: center;
+  padding: 3rem 0;
+  color: #64748b;
+  text-align: center;
 }
 
 /* Responsive adjustments */
@@ -625,7 +530,7 @@
   }
   
   .title {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
   
   .filterCard {
@@ -657,29 +562,15 @@
     align-items: flex-start;
     gap: 0.8rem;
   }
-}
-
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 0;
-  color: #666;
-  text-align: center;
-}
-
-.errorMessage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 0;
-  color: #ef4444;
-  text-align: center;
-  gap: 1rem;
-}
-
-.errorMessage svg {
-  font-size: 2rem;
+  
+  .tableWrapper {
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+    border-radius: 0;
+  }
+  
+  .resultsTable {
+    border-left: none;
+    border-right: none;
+  }
 }

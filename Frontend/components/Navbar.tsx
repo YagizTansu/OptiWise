@@ -98,31 +98,6 @@ export default function Navbar() {
                 </div>
                 
                 <div className={styles.categorySection}>
-                  <div className={styles.categoryTitle}>Analytics & Trading</div>
-                  <div className={styles.dropdownGrid}>
-                    <Link href="/analytics" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaChartBar className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Analytics</span>
-                        <p className={styles.dropdownItemDesc}>Track your performance</p>
-                      </div>
-                    </Link>
-                    
-                    <Link href="/advanced-trading" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaChartLine className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Trading</span>
-                        <p className={styles.dropdownItemDesc}>Advanced tools</p>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-                
-                <div className={styles.categorySection}>
                   <div className={styles.categoryTitle}>Market Intelligence</div>
                   <div className={styles.dropdownGrid}>
                     <Link href="/hot-topics" className={styles.dropdownGridItem}>
@@ -135,26 +110,6 @@ export default function Navbar() {
                       </div>
                     </Link>
                     
-                    <Link href="/ipo-tracking" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaRocket className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>IPO Tracking</span>
-                        <p className={styles.dropdownItemDesc}>Track upcoming IPOs</p>
-                      </div>
-                    </Link>
-                    
-                    <Link href="/global-markets" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaGlobe className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Global Markets</span>
-                        <p className={styles.dropdownItemDesc}>Real-time updates</p>
-                      </div>
-                    </Link>
-
                     <Link href="/breakeven" className={styles.dropdownGridItem}>
                       <div className={styles.dropdownItemIconWrap}>
                         <FaBalanceScale className={styles.dropdownItemIcon} />
@@ -170,7 +125,7 @@ export default function Navbar() {
                         <FaListOl className={styles.dropdownItemIcon} />
                       </div>
                       <div>
-                        <span className={styles.dropdownItemTitle}>Rankings</span>
+                        <span className={styles.dropdownItemTitle}>Global Market Rankings</span>
                         <p className={styles.dropdownItemDesc}>World indexes fair value</p>
                       </div>
                     </Link>
