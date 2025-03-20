@@ -87,7 +87,7 @@ export default function Navbar() {
               <div className={styles.userDropdown} role="menu">
                 <Link href="/settings" className={styles.dropdownItem}>Settings</Link>
                 {!user && (
-                  <Link href="/signin" className={styles.dropdownItem}>Sign In</Link>
+                  <Link href="/login" className={styles.dropdownItem}>Sign In</Link>
                 )}
               </div>
             )}
