@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { FiMail, FiArrowRight } from 'react-icons/fi';
+import { FiMail, FiArrowRight, FiLock, FiCheck, FiShield } from 'react-icons/fi';
 import styles from '../styles/ResetPassword.module.css';
 import { supabase } from '../lib/supabase';
 
@@ -42,81 +42,127 @@ const ResetPassword = () => {
       </Head>
 
       <div className={styles.page}>
-        <div className={styles.formContainer}>
-          <div className={styles.logoBox}>
-            <div className={styles.logoIcon}>OW</div>
+        <div className={styles.split}>
+          <div className={styles.leftPanel}>
+            <div className={styles.brandWrapper}>
+              <div className={styles.logoBox}>
+                <div className={styles.logoIcon}>OW</div>
+              </div>
+              <h1 className={styles.brandName}>OptiWise</h1>
+              <p className={styles.brandTagline}>AI-Powered Market Intelligence</p>
+              <p className={styles.brandDescription}>
+                Secure your account with our password reset process. We prioritize your data security.
+              </p>
+            </div>
+            
+            <div className={styles.featureList}>
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <FiCheck size={14} />
+                </div>
+                <span className={styles.featureText}>
+                  Secure password reset process
+                </span>
+              </div>
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <FiShield size={14} />
+                </div>
+                <span className={styles.featureText}>
+                  Enhanced account protection measures
+                </span>
+              </div>
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <FiLock size={14} />
+                </div>
+                <span className={styles.featureText}>
+                  End-to-end encryption for your security
+                </span>
+              </div>
+            </div>
+            
+            <div className={styles.graphic + ' ' + styles.circle1}></div>
+            <div className={styles.graphic + ' ' + styles.circle2}></div>
           </div>
 
-          {success ? (
-            <div className={styles.successContainer}>
-              <h1 className={styles.formTitle}>Check your email</h1>
-              <p className={styles.formSubtitle}>
-                We've sent a password reset link to <strong>{email}</strong>. 
-                Please check your inbox and follow the instructions.
-              </p>
-              <Link href="/login" className={styles.button}>
-                <span className={styles.buttonText}>
-                  Return to login
-                  <FiArrowRight className={styles.buttonIcon} />
-                </span>
-              </Link>
-            </div>
-          ) : (
-            <>
-              <h1 className={styles.formTitle}>Reset your password</h1>
-              <p className={styles.formSubtitle}>
-                Enter the email address associated with your account, and we'll send you a link to reset your password.
-              </p>
-
-              {error && (
-                <div className={styles.errorMessage}>{error}</div>
-              )}
-
-              <form onSubmit={handleSubmit} className={styles.form}>
-                <div className={styles.inputGroup}>
-                  <label htmlFor="email" className={styles.inputLabel}>Email address</label>
-                  <div className={styles.inputWrapper}>
-                    <FiMail className={styles.inputIcon} />
-                    <input
-                      id="email"
-                      type="email"
-                      className={styles.input}
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      autoComplete="email"
-                    />
+          <div className={styles.rightPanel}>
+            <div className={styles.formContainer}>
+              {success ? (
+                <div className={styles.successContainer}>
+                  <div className={styles.successIcon}>
+                    <FiCheck size={28} />
                   </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className={styles.button}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <span className={styles.loadingText}>
-                      <div className={styles.spinner}></div>
-                      Sending reset link...
-                    </span>
-                  ) : (
+                  <h1 className={styles.formTitle}>Check your email</h1>
+                  <p className={styles.formSubtitle}>
+                    We've sent a password reset link to <strong>{email}</strong>. 
+                    Please check your inbox and follow the instructions.
+                  </p>
+                  <Link href="/login" className={styles.button}>
                     <span className={styles.buttonText}>
-                      Reset password
+                      Return to login
                       <FiArrowRight className={styles.buttonIcon} />
                     </span>
-                  )}
-                </button>
-              </form>
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <h1 className={styles.formTitle}>Reset your password</h1>
+                  <p className={styles.formSubtitle}>
+                    Enter the email address associated with your account, and we'll send you a link to reset your password.
+                  </p>
 
-              <div className={styles.footerText}>
-                Remember your password?{' '}
-                <Link href="/login" className={styles.footerLink}>
-                  Sign in
-                </Link>
-              </div>
-            </>
-          )}
+                  {error && (
+                    <div className={styles.errorMessage}>{error}</div>
+                  )}
+
+                  <form onSubmit={handleSubmit} className={styles.form}>
+                    <div className={styles.inputGroup}>
+                      <label htmlFor="email" className={styles.inputLabel}>Email address</label>
+                      <div className={styles.inputWrapper}>
+                        <FiMail className={styles.inputIcon} />
+                        <input
+                          id="email"
+                          type="email"
+                          className={styles.input}
+                          placeholder="you@example.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          autoComplete="email"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className={styles.button}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <span className={styles.loadingText}>
+                          <div className={styles.spinner}></div>
+                          Sending reset link...
+                        </span>
+                      ) : (
+                        <span className={styles.buttonText}>
+                          Reset password
+                          <FiArrowRight className={styles.buttonIcon} />
+                        </span>
+                      )}
+                    </button>
+                  </form>
+
+                  <div className={styles.footerText}>
+                    Remember your password?{' '}
+                    <Link href="/login" className={styles.footerLink}>
+                      Sign in
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </>

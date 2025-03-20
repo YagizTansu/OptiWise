@@ -10,6 +10,8 @@ import { useAuth } from '../contexts/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { supabase } from '../lib/supabase';
 
+import Layout from '../components/Layout'
+
 const Account = () => {
   const { user, signOut } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -94,6 +96,8 @@ const Account = () => {
 
   return (
     <ProtectedRoute>
+          <Layout>
+
       <Head>
         <title>My Account | OptiWise</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -296,6 +300,8 @@ const Account = () => {
           </div>
         </div>
       )}
+          </Layout>
+
     </ProtectedRoute>
   );
 };
