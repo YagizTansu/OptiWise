@@ -348,8 +348,15 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
       {/* 1. Prediction Dashboard */}
       <PricePredictionDashboard prediction={prediction} symbol={symbol} />
       
-      {/* 2. Smart Analysis Summary */}
-      <SmartAnalysisSummary analysis={analysis} summaryText={summaryText} />
+      {/* 2. Smart Analysis Summary - Using the enhanced findings and catalysts */}
+      <SmartAnalysisSummary 
+        analysis={{
+          summary: analysis.summary,
+          keyFindings: analysis.keyFindings,
+          catalysts: analysis.catalysts
+        }} 
+        summaryText={summaryText} 
+      />
 
       {/* 4. Detailed Analysis Rationale */}
       <AnalysisRationale 
