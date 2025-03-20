@@ -4,15 +4,16 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { FiMail, FiLock, FiArrowRight, FiCheck, FiShield, FiBarChart } from 'react-icons/fi';
 import styles from '../styles/Login.module.css';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const router = useRouter();
+  const { signIn } = useAuth();
 
   // Check for registration success in query params
   useEffect(() => {
@@ -21,11 +22,32 @@ const Login = () => {
     }
   }, [router.query]);
 
+  // If returnUrl is provided, use it for redirection after login
+  const returnUrl = router.query.returnUrl as string || '/';
 
+  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
+    event.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-    throw new Error('Function not implemented.');
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        setError(error.message || 'Failed to sign in');
+        setIsLoading(false);
+        return;
+      }
+
+      // Successful login
+      router.push(returnUrl);
+    } catch (err) {
+      setError('An unexpected error occurred');
+      setIsLoading(false);
+    }
   }
+
+
 
   return (
     <>
@@ -71,6 +93,10 @@ const Login = () => {
                   {isLoading ? 'Signing in...' : (<><span>Sign in</span> <FiArrowRight className={styles.buttonIcon} /></>)}
                 </button>
               </form>
+
+              <div className={styles.separator}>
+                <span className={styles.separatorText}>or</span>
+              </div>
 
               <div className={styles.footerText}>
                 Don't have an account? <Link href="/register" className={styles.footerLink}>Create account</Link>

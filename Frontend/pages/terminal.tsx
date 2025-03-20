@@ -4,6 +4,7 @@ import { FaSearch } from 'react-icons/fa'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { searchSymbols, SearchResult } from '../services/api/finance'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function Terminal() {
 
@@ -77,6 +78,8 @@ export default function Terminal() {
   }, []);
 
   return (
+    <ProtectedRoute>
+    
     <Layout title="OptiWise Terminal - Financial Analysis Platform">
       <main className={styles.main}>
         <div className={styles.logoContainer}>
@@ -146,5 +149,7 @@ export default function Terminal() {
         </div>
       </main>
     </Layout>
+        </ProtectedRoute>
+    
   )
 }

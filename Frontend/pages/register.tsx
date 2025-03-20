@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { FiUser, FiMail, FiLock, FiArrowRight, FiCheck, FiClock, FiUsers } from 'react-icons/fi';
 import styles from '../styles/Register.module.css';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const router = useRouter();
+  const { signUp } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -27,8 +29,44 @@ const Register = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
+    // Validate form data
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    
+    if (!acceptTerms) {
+      setError('You must accept the terms and conditions');
+      return;
+    }
+    
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const { error } = await signUp(
+        formData.email, 
+        formData.password,
+        formData.firstName,
+        formData.lastName
+      );
+      
+      if (error) {
+        setError(error.message || 'Failed to create account');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Redirect to login with success message
+      router.push('/login?registered=true');
+    } catch (err) {
+      setError('An unexpected error occurred');
+      setIsLoading(false);
+    }
   };
+
 
   return (
     <>

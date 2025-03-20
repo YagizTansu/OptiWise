@@ -11,6 +11,7 @@ import OverboughtOversold from '../components/analyses/OverboughtOversold';
 import Fundamental from '../components/analyses/Fundamental';
 import ForecastAI from '../components/analyses/ForecastAI';
 import Report from '../components/analyses/Report';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -27,6 +28,7 @@ export default function Analyses() {
   };
 
   return (
+    <ProtectedRoute>
     <Layout>
       <div className={styles.analysesContainer}>
         {/* Header with Asset Name and AI Button */}
@@ -122,5 +124,6 @@ export default function Analyses() {
         </div>
       </div>
     </Layout>
+    </ProtectedRoute>
   );
 }
