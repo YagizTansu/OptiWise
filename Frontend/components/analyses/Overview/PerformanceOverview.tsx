@@ -34,7 +34,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string }>({ 
-    name: 'Loading...', 
+    name: symbol, // Use symbol as initial name
     symbol: symbol || ''
   });
   const [selectedPeriod, setSelectedPeriod] = useState('1Y');
@@ -106,7 +106,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
       fetchQuoteData(symbol)
         .then(quote => {
           setAssetInfo({
-            name: quote.shortName || quote.longName || symbol,
+            name: quote.longname || quote.shortname ||symbol,
             symbol: quote.symbol
           });
         })
