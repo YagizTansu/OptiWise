@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { FiUser, FiMail, FiLock, FiArrowRight, FiCheck, FiClock, FiUsers } from 'react-icons/fi';
 import styles from '../styles/Register.module.css';
-import { supabase } from '../utils/supabaseClient';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -28,51 +27,7 @@ const Register = () => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (!acceptTerms) {
-      setError('You must accept the terms and conditions');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-
-    try {
-      // Use Supabase for registration
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-          },
-        }
-      });
-
-      if (signUpError) {
-        throw new Error(signUpError.message);
-      }
-
-      // Check if email confirmation is required
-      if (data?.user?.identities?.length === 0) {
-        router.push('/registration-success?email=' + encodeURIComponent(formData.email));
-      } else {
-        // Redirect to login page after successful registration
-        router.push('/login?registered=true');
-      }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during registration');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   return (

@@ -1,46 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { FiMail, FiLock, FiArrowRight, FiCheck, FiShield, FiBarChart } from 'react-icons/fi';
 import styles from '../styles/Login.module.css';
-import { supabase } from '../utils/supabaseClient';
 
 const Login = () => {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const router = useRouter();
 
+  // Check for registration success in query params
   useEffect(() => {
     if (router.query.registered === 'true') {
       setRegistrationSuccess(true);
     }
   }, [router.query]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
 
-    try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
 
-      if (signInError) {
-        throw new Error(signInError.message);
-      }
-
-      router.replace('/');
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
-      setIsLoading(false);
-    }
-  };
+  function handleSubmit(event: FormEvent<HTMLFormElement>): void {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <>

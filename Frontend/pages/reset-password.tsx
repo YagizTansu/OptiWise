@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { FiMail, FiArrowRight } from 'react-icons/fi';
 import styles from '../styles/ResetPassword.module.css';
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '../lib/supabase';
 
 const ResetPassword = () => {
   const [email, setEmail] = useState('');

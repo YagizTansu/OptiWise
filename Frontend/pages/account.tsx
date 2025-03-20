@@ -6,7 +6,6 @@ import {
   FiMail, FiLock, FiEdit, FiSave, FiRefreshCw
 } from 'react-icons/fi';
 import styles from '../styles/Account.module.css';
-import { supabase } from '../utils/supabaseClient';
 
 const Account = () => {
   const [user, setUser] = useState<any>(null);
@@ -21,78 +20,14 @@ const Account = () => {
   
   const router = useRouter();
   
-  useEffect(() => {
-    const getUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        router.push('/login');
-        return;
-      }
-      
-      setUser(user);
-      setEmail(user.email || '');
-      
-      // Fetch additional user data from profiles table if you have one
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-          
-        if (data) {
-          setFullName(data.full_name || '');
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
-      
-      setLoading(false);
-    };
-    
-    getUserProfile();
-  }, [router]);
-  
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      router.push('/login');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      setMessage({ text: 'Error signing out. Please try again.', type: 'error' });
-    }
-  };
-  
   const updateProfile = async () => {
     setUpdating(true);
     setMessage({ text: '', type: '' });
     
-    try {
-      // Update profile data in your profiles table
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({ full_name: fullName })
-        .eq('id', user.id);
-        
-      if (error) throw error;
-      
-      setMessage({ text: 'Profile updated successfully!', type: 'success' });
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      setMessage({ text: 'Error updating profile. Please try again.', type: 'error' });
-    } finally {
-      setUpdating(false);
-    }
   };
   
   const changePassword = async () => {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/update-password`,
-      });
-      
-      if (error) throw error;
       
       setMessage({ text: 'Password reset email sent. Please check your inbox.', type: 'success' });
     } catch (error) {
@@ -157,10 +92,6 @@ const Account = () => {
               </button>
             </div>
             
-            <button className={styles.signOutButton} onClick={handleSignOut}>
-              <FiLogOut className={styles.signOutIcon} />
-              <span>Sign Out</span>
-            </button>
           </div>
           
           <div className={styles.mainContent}>

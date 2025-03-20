@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { FiLock, FiArrowRight } from 'react-icons/fi';
 import styles from '../styles/UpdatePassword.module.css';
-import { supabase } from '../utils/supabaseClient';
+import { supabase } from '../lib/supabase';
 
 const UpdatePassword = () => {
   const [password, setPassword] = useState('');

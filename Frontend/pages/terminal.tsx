@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { searchSymbols, SearchResult } from '../services/api/finance'
 
 export default function Terminal() {
+
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
