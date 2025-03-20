@@ -1,0 +1,539 @@
+.container {
+  --color-primary: #4361ee;
+  --color-primary-light: #eef2ff;
+  --color-secondary: #3a0ca3;
+  --color-success: #4caf50;
+  --color-success-light: rgba(76, 175, 80, 0.1);
+  --color-danger: #f44336;
+  --color-danger-light: rgba(244, 67, 54, 0.1);
+  --color-text-primary: #333;
+  --color-text-secondary: #666;
+  --color-text-light: #888;
+  --color-bg-light: #f7f9fc;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --border-radius-sm: 6px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.filtersBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0.5rem 0;
+}
+
+.viewToggle {
+  display: flex;
+  gap: 0.5rem;
+  background-color: var(--color-bg-light);
+  padding: 0.25rem;
+  border-radius: var(--border-radius-sm);
+}
+
+.viewButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.viewButton.active {
+  background-color: white;
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.filters {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.filterChip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: white;
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdownArrow {
+  font-size: 0.7rem;
+  margin-left: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.dropdownArrow.open {
+  transform: rotate(180deg);
+}
+
+.regionFilterDropdown {
+  position: relative;
+}
+
+.regionDropdownMenu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background-color: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  width: 220px;
+  z-index: 50;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  animation: fadeInDropdown 0.2s ease;
+}
+
+@keyframes fadeInDropdown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.regionOption {
+  padding: 0.8rem 1.2rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.regionOption:hover, .regionOption.active {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.regionOption.active {
+  font-weight: 500;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+}
+
+.sectionTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.infoTag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
+.infoIcon {
+  color: var(--color-primary);
+}
+
+.tableWrapper {
+  background-color: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.indexesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.indexesTable th,
+.indexesTable td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.indexesTable th {
+  background-color: var(--color-bg-light);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.indexesTable th:hover {
+  background-color: rgba(67, 97, 238, 0.05);
+  color: var(--color-primary);
+}
+
+.sortIcon {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.indexesTable tbody tr {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.indexesTable tbody tr:hover {
+  background-color: var(--color-primary-light);
+}
+
+.selectedRow {
+  background-color: var(--color-primary-light) !important;
+  border-left: 3px solid var(--color-primary);
+}
+
+.comingSoonRow {
+  opacity: 0.7;
+  background-color: var(--color-bg-light);
+  cursor: default !important;
+}
+
+.comingSoonRow:hover {
+  background-color: var(--color-bg-light) !important;
+}
+
+.comingSoonBadge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  background-color: var(--color-text-light);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.7rem;
+  vertical-align: middle;
+}
+
+.potentialValue {
+  font-weight: 600;
+}
+
+.positive {
+  color: var(--color-success);
+}
+
+.negative {
+  color: var(--color-danger);
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.indexCard {
+  background-color: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--color-border);
+}
+
+.indexCard:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.selectedCard {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1), var(--shadow-sm);
+}
+
+.cardHeader {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardHeader h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.regionBadge {
+  background-color: var(--color-bg-light);
+  padding: 0.35rem 0.75rem;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.cardBody {
+  padding: 1.25rem;
+}
+
+.cardData {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.dataItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dataLabel {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+.dataValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cardPotential {
+  background-color: var(--color-bg-light);
+  padding: 1rem;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.potentialLabel {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.potentialBadge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.positiveBg {
+  background-color: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.negativeBg {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.sectorsContainer {
+  background-color: white;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+}
+
+.sectorsList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.sectorCard {
+  padding: 1rem;
+  border-radius: var(--border-radius-sm);
+  background-color: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+}
+
+.sectorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectorHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.sectorWeight {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  background-color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+}
+
+.sectorPotential {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.potentialBar {
+  flex: 1;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.potentialFill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.sectorPotentialValue {
+  font-weight: 600;
+  font-size: 0.9rem;
+  min-width: 60px;
+  text-align: right;
+}
+
+.sectorCard .potentialFill[style*="var(--color-success-light)"] {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.sectorCard .potentialFill[style*="var(--color-danger-light)"] {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.regionGroup {
+  margin-bottom: 2rem;
+}
+
+.regionHeader {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.regionHeader h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  display: inline-block;
+  position: relative;
+}
+
+.regionHeader h3:after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 30px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+.regionCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.comingSoonCard {
+  opacity: 0.7;
+  cursor: default !important;
+}
+
+.comingSoonCard:hover {
+  transform: none !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+@media (max-width: 768px) {
+  .header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .description {
+    font-size: 1rem;
+  }
+  
+  .filtersBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .indexesTable {
+    font-size: 0.9rem;
+  }
+  
+  .indexesTable th, 
+  .indexesTable td {
+    padding: 0.75rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .sectorsContainer {
+    margin-top: 1.5rem;
+  }
+  
+  .sectorsList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

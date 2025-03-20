@@ -1,4 +1,4 @@
-import { FaBars, FaUser, FaChartLine } from 'react-icons/fa';
+import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Navbar.module.css';
@@ -7,15 +7,20 @@ import { useAuth } from '../contexts/AuthContext';
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [featuresDropdownOpen, setFeaturesDropdownOpen] = useState(false);
   const { user } = useAuth();
   
   const userDropdownRef = useRef<HTMLDivElement>(null);
+  const featuresDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (userDropdownRef.current && !userDropdownRef.current.contains(event.target as Node)) {
         setUserDropdownOpen(false);
+      }
+      if (featuresDropdownRef.current && !featuresDropdownRef.current.contains(event.target as Node)) {
+        setFeaturesDropdownOpen(false);
       }
     }
     
@@ -74,6 +79,142 @@ export default function Navbar() {
         </div>
         
         <div className={styles.navRight}>
+          <div className={styles.featuresMenuContainer} ref={featuresDropdownRef}>
+            <button 
+              className={styles.featuresButton}
+              onClick={() => setFeaturesDropdownOpen(!featuresDropdownOpen)}
+              aria-label="Features menu"
+              aria-expanded={featuresDropdownOpen}
+            >
+              <FaTools className={styles.featuresIcon} />
+              <span className={styles.featuresButtonText}>Tools</span>
+            </button>
+            
+            {featuresDropdownOpen && (
+              <div className={styles.featuresDropdown} role="menu">
+                <div className={styles.dropdownHeader}>
+                  <span className={styles.dropdownHeaderTitle}>Tools & Features</span>
+                  <p className={styles.dropdownHeaderDesc}>Explore our powerful tools</p>
+                </div>
+                
+                <div className={styles.categorySection}>
+                  <div className={styles.categoryTitle}>Analytics & Trading</div>
+                  <div className={styles.dropdownGrid}>
+                    <Link href="/analytics" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaChartBar className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Analytics</span>
+                        <p className={styles.dropdownItemDesc}>Track your performance</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/advanced-trading" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaChartLine className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Trading</span>
+                        <p className={styles.dropdownItemDesc}>Advanced tools</p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+                
+                <div className={styles.categorySection}>
+                  <div className={styles.categoryTitle}>Market Intelligence</div>
+                  <div className={styles.dropdownGrid}>
+                    <Link href="/hot-topics" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaFire className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Hot Topics</span>
+                        <p className={styles.dropdownItemDesc}>Trending market topics</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/ipo-tracking" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaRocket className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>IPO Tracking</span>
+                        <p className={styles.dropdownItemDesc}>Track upcoming IPOs</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/global-markets" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaGlobe className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Global Markets</span>
+                        <p className={styles.dropdownItemDesc}>Real-time updates</p>
+                      </div>
+                    </Link>
+
+                    <Link href="/rankings" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaListOl className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Rankings</span>
+                        <p className={styles.dropdownItemDesc}>World indexes fair value</p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+                
+                <div className={styles.categorySection}>
+                  <div className={styles.categoryTitle}>AI-Powered Analysis</div>
+                  <div className={styles.dropdownGrid}>
+                    <Link href="/ai-assistant" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaRobot className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>AI Assistant</span>
+                        <p className={styles.dropdownItemDesc}>Get intelligent help</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/country-economics" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaFlag className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Country Economics</span>
+                        <p className={styles.dropdownItemDesc}>AI economic analysis</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/currency-forecasting" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaMoneyBillWave className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Currency Strength</span>
+                        <p className={styles.dropdownItemDesc}>AI forecasting</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/market-insights" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaLightbulb className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Insights</span>
+                        <p className={styles.dropdownItemDesc}>Market opportunities</p>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
           <div className={styles.userMenuContainer} ref={userDropdownRef}>
             <button 
               className={`${styles.userButton} ${userInitials ? styles.userInitialsButton : ''}`} 
