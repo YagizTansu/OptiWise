@@ -81,8 +81,13 @@ const CompanyProfile: React.FC<CompanyProfileProps> = ({ symbol }) => {
           <div className={styles.profileSummary}>
             {profileData.sector && profileData.industry && (
               <div className={styles.industryInfo}>
-                <span>{profileData.sector}</span> • <span>{profileData.industry}</span>
-              </div>
+                <span>{profileData.sector}</span>  
+              </div>   
+            )}
+              { profileData.industry && (
+              <div className={styles.industryInfo}>
+                <span>{profileData.industry}</span>  
+              </div>   
             )}
             {profileData.longBusinessSummary && (
               <div className={styles.businessSummary}>

@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 import styles from '../../styles/ForecastAI.module.css';
 import technicalAnalysisAI, { TechnicalAnalysisResult } from '../../services/analysis/technicalAnalysisAI';
-import TechnicalAnalysis from './Report/TechnicalAnalysis';
-import PricePredictionDashboard from './dashboard/PricePredictionDashboard';
-import SmartAnalysisSummary from './dashboard/SmartAnalysisSummary';
-import MultiTimeframePredictions from './dashboard/MultiTimeframePredictions';
-import AnalysisRationale from './dashboard/AnalysisRationale';
-import HistoricalAccuracy from './dashboard/HistoricalAccuracy';
-import InteractiveFeatures from './dashboard/InteractiveFeatures';
+import PricePredictionDashboard from './forecastAi/PricePredictionDashboard';
+import SmartAnalysisSummary from './forecastAi/SmartAnalysisSummary';
+import MultiTimeframePredictions from './forecastAi/MultiTimeframePredictions';
+import AnalysisRationale from './forecastAi/AnalysisRationale';
+import HistoricalAccuracy from './forecastAi/HistoricalAccuracy';
+import InteractiveFeatures from './forecastAi/InteractiveFeatures';
 
 interface ForecastAIProps {
   symbol: string;

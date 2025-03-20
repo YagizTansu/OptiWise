@@ -1,48 +1,49 @@
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import { AppProps } from 'next/app'
-import { supabase } from '../utils/supabaseClient'
-import '../styles/globals.css'
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { AppProps } from 'next/app';
+import { supabase } from '../utils/supabaseClient';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const router = useRouter()
-  const [initializedAuth, setInitializedAuth] = useState(false)
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // One-time auth check and setup (prevents redirect loops)
-    const initAuth = async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser()
-        setInitializedAuth(true)
-      } catch (error) {
-        console.error("Auth initialization error:", error)
-        setInitializedAuth(true) // Set to true even on error to avoid hanging
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      setLoading(false);
+      
+      // Eğer kullanıcı yoksa ve korunmuş bir sayfadaysa login'e yönlendir
+      const protectedRoutes = ['/dashboard', '/profile', '/settings'];
+      if (!user && protectedRoutes.includes(router.pathname)) {
+        router.replace('/login');
       }
-    }
+    };
     
-    initAuth()
+    checkUser();
     
-    // Set up auth state listener but only for sign out events
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'SIGNED_OUT') {
-          // Only redirect to login if not already on a public page
-          if (!router.pathname.startsWith('/login') && 
-              !router.pathname.startsWith('/register') &&
-              !router.pathname.startsWith('/forgot-password')) {
-            router.replace('/login')
-          }
+    // Oturum durumunu dinle
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setUser(null);
+        if (!['/login', '/register', '/forgot-password'].includes(router.pathname)) {
+          router.replace('/login');
         }
-        // Removed SIGNED_IN handling - let login page handle the redirect
+      } else if (event === 'SIGNED_IN' && session) {
+        setUser(session.user);
       }
-    )
+    });
     
     return () => {
-      subscription.unsubscribe()
-    }
-  }, [router])
+      subscription.unsubscribe();
+    };
+  }, [router]);
   
-  return <Component {...pageProps} />
+  if (loading) return <div>Loading...</div>; // Yetkilendirme kontrolü tamamlanmadan yüklenmeyi göster
+  
+  return <Component {...pageProps} />;
 }
 
-export default MyApp
+export default MyApp;
