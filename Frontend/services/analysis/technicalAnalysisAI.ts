@@ -1,7 +1,6 @@
 import * as financeAPI from '../api/finance';
 import { aiService } from '../api/aiService';
 import { ChartDataPoint, HistoricalDataPoint, QuoteData } from '../api/finance';
-import Anthropic from '@anthropic-ai/sdk';
 
 export interface TechnicalAnalysisPrediction {
   shortTerm: { value: string; confidence: number };
