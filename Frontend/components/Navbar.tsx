@@ -1,4 +1,4 @@
-import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl } from 'react-icons/fa';
+import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl, FaSearchDollar, FaBalanceScale } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Navbar.module.css';
@@ -155,6 +155,16 @@ export default function Navbar() {
                       </div>
                     </Link>
 
+                    <Link href="/breakeven" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaBalanceScale className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Breakeven</span>
+                        <p className={styles.dropdownItemDesc}>Stocks turning profitable</p>
+                      </div>
+                    </Link>
+
                     <Link href="/rankings" className={styles.dropdownGridItem}>
                       <div className={styles.dropdownItemIconWrap}>
                         <FaListOl className={styles.dropdownItemIcon} />
@@ -177,6 +187,16 @@ export default function Navbar() {
                       <div>
                         <span className={styles.dropdownItemTitle}>AI Assistant</span>
                         <p className={styles.dropdownItemDesc}>Get intelligent help</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/quantum-screener" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaSearchDollar className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Quantum Screener</span>
+                        <p className={styles.dropdownItemDesc}>Seasonality analysis</p>
                       </div>
                     </Link>
                     

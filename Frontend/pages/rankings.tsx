@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Rankings.module.css';
 import { FaSortAmountDown, FaSortAmountUp, FaInfoCircle, FaChartPie, FaTable, FaFilter, FaChevronDown, FaGlobeAmericas } from 'react-icons/fa';
+import { searchSymbols, fetchQuoteData, fetchStockDashboardData, SearchResult, QuoteData } from '../services/api/finance';
+import Layout from '../components/Layout'
 
 // Regions and their indexes
 const regions = {
@@ -12,61 +14,213 @@ const regions = {
   Asia: "Asia"
 };
 
-// Mock data for demonstration - would be fetched from an API in a real application
-const mockIndexes = [
+// Map of indexes to their regions
+const indexToRegionMap: Record<string, string> = {
   // World
-  { id: 1, name: 'World Index', region: regions.World, fairValue: 11.2, currentValue: 3150.75, potential: 11.2 },
-  
-  // North America
-  { id: 2, name: 'S&P 500', region: regions.NorthAmerica, fairValue: 12.4, currentValue: 4510.25, potential: 12.4 },
-  { id: 3, name: 'NASDAQ 100', region: regions.NorthAmerica, fairValue: 15.6, currentValue: 15865.75, potential: 15.6 },
-  { id: 4, name: 'Dow Jones Industrial Average', region: regions.NorthAmerica, fairValue: 8.2, currentValue: 35120.08, potential: 8.2 },
-  { id: 5, name: 'Russell 2000', region: regions.NorthAmerica, fairValue: 9.7, currentValue: 1990.45, potential: 9.7 },
-  { id: 6, name: 'S&P/TSX Composite index', region: regions.NorthAmerica, fairValue: 7.3, currentValue: 20725.00, potential: 7.3 },
-  
-  // Europe
-  { id: 7, name: 'STOXX Europe 600', region: regions.Europe, fairValue: 9.5, currentValue: 475.80, potential: 9.5 },
-  { id: 8, name: 'EURO STOXX 50', region: regions.Europe, fairValue: 8.9, currentValue: 4340.50, potential: 8.9 },
-  { id: 9, name: 'DAX 40', region: regions.Europe, fairValue: 9.3, currentValue: 15808.04, potential: 9.3 },
-  { id: 10, name: 'FTSE 100', region: regions.Europe, fairValue: 5.7, currentValue: 7234.03, potential: 5.7 },
-  { id: 11, name: 'FTSE MIB', region: regions.Europe, fairValue: 10.2, currentValue: 28750.50, potential: 10.2 },
-  { id: 12, name: 'CAC 40', region: regions.Europe, fairValue: 8.5, currentValue: 7115.75, potential: 8.5 },
-  { id: 13, name: 'IBEX 35', region: regions.Europe, fairValue: 7.8, currentValue: 9420.30, potential: 7.8 },
-  { id: 14, name: 'AEX-INDEX', region: regions.Europe, fairValue: 9.1, currentValue: 765.85, potential: 9.1 },
-  { id: 15, name: 'SMI PR', region: regions.Europe, fairValue: 6.4, currentValue: 11125.30, potential: 6.4 },
-  
-  // Latin America
-  { id: 16, name: 'IPC MEXICO', region: regions.LatinAmerica, fairValue: 14.5, currentValue: 54750.25, potential: 14.5 },
-  { id: 17, name: 'BOVESPA', region: regions.LatinAmerica, fairValue: 16.9, currentValue: 115250.75, potential: 16.9 },
-  { id: 18, name: 'MERVAL', region: regions.LatinAmerica, fairValue: 18.3, currentValue: 750850.50, potential: 18.3 },
-  
-  // Asia
-  { id: 19, name: 'Nikkei 225', region: regions.Asia, fairValue: 10.5, currentValue: 27548.00, potential: 10.5 },
-  { id: 20, name: 'HANG SENG INDEX', region: regions.Asia, fairValue: 19.8, currentValue: 18645.20, potential: 19.8 },
-  { id: 21, name: 'NIFTY 50', region: regions.Asia, fairValue: 12.7, currentValue: 18560.50, potential: 12.7 },
-  { id: 22, name: 'BIST 100', region: regions.Asia, fairValue: 15.3, currentValue: 7875.30, potential: 15.3 },
-  { id: 23, name: 'Tadawul All Shares Index', region: regions.Asia, fairValue: 11.5, currentValue: 11550.75, potential: 11.5, comingSoon: true },
-  { id: 24, name: 'FTSE Bursa Malaysia KLCI', region: regions.Asia, fairValue: 8.7, currentValue: 1450.25, potential: 8.7, comingSoon: true },
-];
+  "^GSPC": regions.World, // S&P 500 as world proxy
 
-// Mock sectors data
-const mockSectors = [
-  { id: 1, indexId: 1, name: 'Technology', fairValue: 18.6, weight: 28.3 },
-  { id: 2, indexId: 1, name: 'Healthcare', fairValue: 14.2, weight: 13.5 },
-  { id: 3, indexId: 1, name: 'Financials', fairValue: 8.4, weight: 11.2 },
-  { id: 4, indexId: 1, name: 'Consumer Discretionary', fairValue: 11.8, weight: 12.5 },
-  { id: 5, indexId: 1, name: 'Communication Services', fairValue: 15.3, weight: 10.8 },
-  { id: 6, indexId: 1, name: 'Industrials', fairValue: 9.7, weight: 7.9 },
-  { id: 7, indexId: 1, name: 'Consumer Staples', fairValue: 5.2, weight: 5.8 },
+  // North America
+  "^SPX": regions.NorthAmerica, // S&P 500
+  "^NDX": regions.NorthAmerica, // NASDAQ 100
+  "^DJI": regions.NorthAmerica, // Dow Jones Industrial Average
+  "^RUT": regions.NorthAmerica, // Russell 2000
+  "^GSPTSE": regions.NorthAmerica, // S&P/TSX Composite index
+
+  // Europe
+  "^STOXX": regions.Europe, // STOXX Europe 600
+  "^STOXX50E": regions.Europe, // EURO STOXX 50
+  "^GDAXI": regions.Europe, // DAX 40
+  "^FTSE": regions.Europe, // FTSE 100
+  "FTSEMIB.MI": regions.Europe, // FTSE MIB
+  "^FCHI": regions.Europe, // CAC 40
+  "^IBEX": regions.Europe, // IBEX 35
+  "^AEX": regions.Europe, // AEX-INDEX
+  "^SSMI": regions.Europe, // SMI PR
+
+  // Latin America
+  "^MXX": regions.LatinAmerica, // IPC MEXICO
+  "^BVSP": regions.LatinAmerica, // BOVESPA
+  "^MERV": regions.LatinAmerica, // MERVAL
+
+  // Asia
+  "^N225": regions.Asia, // Nikkei 225
+  "^HSI": regions.Asia, // HANG SENG INDEX
+  "^NSEI": regions.Asia, // NIFTY 50
+  "XU100.IS": regions.Asia, // BIST 100
+  "^TASI": regions.Asia, // Tadawul All Shares Index
+  "^KLSE": regions.Asia // FTSE Bursa Malaysia KLCI
+};
+
+// Index names for better readability
+const indexNames: Record<string, string> = {
+  "^GSPC": "S&P 500",
+  "^SPX": "S&P 500",
+  "^NDX": "NASDAQ 100",
+  "^DJI": "Dow Jones Industrial Average",
+  "^RUT": "Russell 2000",
+  "^GSPTSE": "S&P/TSX Composite",
+  "^STOXX": "STOXX Europe 600",
+  "^STOXX50E": "EURO STOXX 50",
+  "^GDAXI": "DAX 40",
+  "^FTSE": "FTSE 100",
+  "FTSEMIB.MI": "FTSE MIB",
+  "^FCHI": "CAC 40",
+  "^IBEX": "IBEX 35",
+  "^AEX": "AEX-INDEX",
+  "^SSMI": "SMI PR",
+  "^MXX": "IPC MEXICO",
+  "^BVSP": "BOVESPA",
+  "^MERV": "MERVAL",
+  "^N225": "Nikkei 225",
+  "^HSI": "HANG SENG INDEX",
+  "^NSEI": "NIFTY 50",
+  "XU100.IS": "BIST 100",
+  "^TASI": "Tadawul All Shares Index",
+  "^KLSE": "FTSE Bursa Malaysia KLCI"
+};
+
+// Interface for index data with fair value calculations
+interface IndexData {
+  id: number;
+  symbol: string;
+  name: string;
+  region: string;
+  fairValue: number;
+  currentValue: number;
+  potential: number;
+  comingSoon?: boolean;
+}
+
+// Interface for sector data
+interface SectorData {
+  id: number;
+  indexId: number;
+  indexSymbol: string;
+  name: string;
+  fairValue: number;
+  weight: number;
+}
+
+// Sectors for indexes - would be better to fetch this data if available
+const defaultSectors = [
+  { name: 'Technology', weight: 28.3, fairValue: 18.6 },
+  { name: 'Healthcare', weight: 13.5, fairValue: 14.2 },
+  { name: 'Financials', weight: 11.2, fairValue: 8.4 },
+  { name: 'Consumer Discretionary', weight: 12.5, fairValue: 11.8 },
+  { name: 'Communication Services', weight: 10.8, fairValue: 15.3 },
+  { name: 'Industrials', weight: 7.9, fairValue: 9.7 },
+  { name: 'Consumer Staples', weight: 5.8, fairValue: 5.2 },
 ];
 
 export default function Rankings() {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(1);
+  const [indexes, setIndexes] = useState<IndexData[]>([]);
+  const [sectors, setSectors] = useState<SectorData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [sortField, setSortField] = useState('potential');
   const [sortDirection, setSortDirection] = useState('desc');
   const [viewMode, setViewMode] = useState('table');
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [showRegionDropdown, setShowRegionDropdown] = useState(false);
+
+  // Function to calculate "fair value" based on stock metrics
+  // In real-world this would be based on financial models
+  const calculateFairValue = (quote: any) => {
+    // Sample calculation based on available metrics
+    // This is a simplified approach for demonstration
+    const priceToBookRatio = quote.priceToBook || 3;
+    const pe = quote.trailingPE || 20;
+    const dividend = quote.dividendYield || 0;
+    
+    // Fair value calculation (simplified example)
+    // Higher P/B and P/E ratios might indicate overvaluation
+    const peFactor = 20 / Math.max(pe, 1); // Normalize P/E (20 is average)
+    const pbFactor = 3 / Math.max(priceToBookRatio, 0.5); // Normalize P/B (3 is average)
+    const dividendFactor = 1 + (dividend / 100); // Dividend bonus
+    
+    // Calculate potential (% from current price to fair value)
+    // This is just an example calculation - real models would be more complex
+    const potentialRaw = ((peFactor * 0.6) + (pbFactor * 0.3) + (dividendFactor * 0.1) - 1) * 100;
+    
+    // Add some randomness to simulate variance in fair value calculations
+    const randomFactor = (Math.random() * 6) - 3; // -3% to +3%
+    return Math.round((potentialRaw + randomFactor) * 10) / 10; // Round to 1 decimal
+  };
+
+  useEffect(() => {
+    async function fetchIndexes() {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const symbols = Object.keys(indexToRegionMap);
+        const indexData: IndexData[] = [];
+        const sectorData: SectorData[] = [];
+        let idCounter = 1;
+        let sectorIdCounter = 1;
+        
+        // Fetch data for each index
+        for (const symbol of symbols) {
+          try {
+            // Get quote data for the index
+            const quote = await fetchQuoteData(symbol);
+            
+            if (quote && quote.regularMarketPrice) {
+              // Calculate fair value and potential
+              const potential = calculateFairValue(quote);
+              
+              // Create index data object
+              const index: IndexData = {
+                id: idCounter++,
+                symbol: symbol,
+                name: indexNames[symbol] || quote.shortName || quote.longName || symbol,
+                region: indexToRegionMap[symbol],
+                fairValue: potential,
+                currentValue: quote.regularMarketPrice,
+                potential: potential,
+                // Mark certain indexes as coming soon
+                comingSoon: symbol === "^TASI" || symbol === "^KLSE"
+              };
+              
+              indexData.push(index);
+              
+              // Create sectors for this index
+              defaultSectors.forEach(sector => {
+                sectorData.push({
+                  id: sectorIdCounter++,
+                  indexId: idCounter - 1, // ID of the index we just added
+                  indexSymbol: symbol,
+                  name: sector.name,
+                  fairValue: sector.fairValue + (Math.random() * 4 - 2), // Add some variance
+                  weight: sector.weight + (Math.random() * 2 - 1) // Add some variance
+                });
+              });
+            }
+          } catch (err) {
+            console.error(`Failed to fetch data for ${symbol}:`, err);
+            // Continue with other indexes even if one fails
+          }
+        }
+        
+        setIndexes(indexData);
+        setSectors(sectorData);
+        
+        // Set default selected index if we have data
+        if (indexData.length > 0 && selectedIndex === null) {
+          setSelectedIndex(indexData[0].id);
+        }
+        
+      } catch (err) {
+        console.error('Error fetching indexes:', err);
+        setError('Failed to load data. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchIndexes();
+  }, []);
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -79,25 +233,31 @@ export default function Rankings() {
 
   // Filter indexes by region if a region is selected
   const filteredIndexes = selectedRegion 
-    ? mockIndexes.filter(index => index.region === selectedRegion)
-    : mockIndexes;
+    ? indexes.filter(index => index.region === selectedRegion)
+    : indexes;
 
   // Sort the filtered indexes
   const sortedIndexes = [...filteredIndexes].sort((a, b) => {
+    // Add null checking with fallback to handle undefined values
+    const aValue = a[sortField as keyof typeof a] ?? 0;
+    const bValue = b[sortField as keyof typeof b] ?? 0;
+    
     if (sortDirection === 'asc') {
-      return a[sortField as keyof typeof a] > b[sortField as keyof typeof b] ? 1 : -1;
+      return aValue > bValue ? 1 : -1;
     } else {
-      return a[sortField as keyof typeof a] < b[sortField as keyof typeof b] ? 1 : -1;
+      return aValue < bValue ? 1 : -1;
     }
   });
 
-  const selectedIndexData = mockIndexes.find(index => index.id === selectedIndex);
-  const selectedIndexSectors = mockSectors.filter(sector => sector.indexId === selectedIndex);
+  const selectedIndexData = indexes.find(index => index.id === selectedIndex);
+  const selectedIndexSectors = sectors.filter(sector => sector.indexId === selectedIndex);
 
   // Get unique regions for the dropdown
   const uniqueRegions = Object.values(regions);
 
   return (
+    <Layout title="Rankings - OptiWise">
+
     <>
       <Head>
         <title>World Indexes Rankings - OptiWise</title>
@@ -105,13 +265,6 @@ export default function Rankings() {
       </Head>
 
       <main className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>World Indexes Rankings</h1>
-          <p className={styles.description}>
-            Explore world indexes and analyze their fair values compared to current market prices.
-            Fair values are calculated by weighted averaging of component stocks.
-          </p>
-        </div>
 
         <div className={styles.filtersBar}>
           <div className={styles.viewToggle}>
@@ -179,7 +332,11 @@ export default function Rankings() {
               </div>
             </div>
 
-            {viewMode === 'table' ? (
+            {loading ? (
+              <div className={styles.loadingMessage}>Loading index data...</div>
+            ) : error ? (
+              <div className={styles.errorMessage}>{error}</div>
+            ) : viewMode === 'table' ? (
               <div className={styles.tableWrapper}>
                 <table className={styles.indexesTable}>
                   <thead>
@@ -310,7 +467,7 @@ export default function Rankings() {
                   <div key={sector.id} className={styles.sectorCard}>
                     <div className={styles.sectorHeader}>
                       <h3>{sector.name}</h3>
-                      <span className={styles.sectorWeight}>{sector.weight}% of index</span>
+                      <span className={styles.sectorWeight}>{sector.weight.toFixed(1)}% of index</span>
                     </div>
                     <div className={styles.sectorPotential}>
                       <div className={styles.potentialBar}>
@@ -336,5 +493,7 @@ export default function Rankings() {
         </div>
       </main>
     </>
+    </Layout>
+
   );
 }

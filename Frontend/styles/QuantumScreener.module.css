@@ -1,0 +1,685 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Header Section */
+.headerSection {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(120deg, #2563eb, #7209b7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+  letter-spacing: -0.5px;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #555;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Filter Section - Styled like filtersBar in Rankings */
+.filterSection {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.filterCard {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 1.2rem 1.5rem;
+  border: 1px solid rgba(220, 220, 220, 0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filterHeader {
+  margin-bottom: 0;
+}
+
+.filterHeader h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.filterIcon {
+  color: #4361ee;
+}
+
+.filterControls {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterGroup label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filterButton {
+  background-color: #f5f7fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a5568;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover {
+  background-color: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+.filterButton.active {
+  background: linear-gradient(135deg, #4361ee, #7209b7);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
+}
+
+/* Results Section */
+.resultsSection {
+  width: 100%;
+}
+
+.resultsCard {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  border: 1px solid rgba(220, 220, 220, 0.5);
+  overflow: hidden;
+}
+
+.tableHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tableHeader h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.infoTag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f9fafb;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: #555;
+  border: 1px solid #f0f0f0;
+}
+
+.infoIcon {
+  color: #4361ee;
+}
+
+.legend {
+  display: flex;
+  gap: 1rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.legendColor {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+.resultsTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 900px; /* Prevent table from becoming too narrow */
+}
+
+.resultsTable th {
+  text-align: left;
+  padding: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 1px solid #eee;
+  background-color: #f9fafb;
+  position: sticky;
+  top: 0;
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.headerIcon {
+  color: #4361ee;
+  font-size: 0.9rem;
+}
+
+/* Column width classes */
+.instrumentColumn {
+  width: 22%;
+  min-width: 180px;
+}
+
+.dataColumn {
+  width: 18%;
+  min-width: 150px;
+}
+
+.returnColumn {
+  width: 12%;
+  min-width: 100px;
+}
+
+.dateColumn {
+  width: 15%;
+  min-width: 110px;
+}
+
+.sortableHeader {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sortableHeader:hover {
+  color: #4361ee;
+  background-color: #f0f4ff;
+}
+
+.sortIcon {
+  font-size: 0.8rem;
+  margin-left: 0.3rem;
+  display: inline-block;
+  color: #4361ee;
+}
+
+.resultsTable td {
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+.highlightedRow {
+  background: linear-gradient(to right, rgba(67, 97, 238, 0.05), transparent);
+  border-left: 4px solid #4361ee;
+}
+
+.highlightedRow td:first-child {
+  padding-left: calc(1rem - 4px); /* Adjust padding for highlighted rows */
+}
+
+.instrumentCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.instrumentName {
+  font-weight: 500;
+}
+
+.ticker {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.3rem;
+}
+
+.correlationCell, .winRateCell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background-color: #edf2f7;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4361ee, #7209b7);
+  border-radius: 4px;
+}
+
+.numericValue {
+  width: 50px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.returnCell {
+  color: #10b981;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Media queries for responsive tables */
+@media (max-width: 1100px) {
+  .tableWrapper {
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+    border-radius: 0;
+  }
+  
+  .resultsTable {
+    border-left: none;
+    border-right: none;
+  }
+}
+
+.resultsTable td {
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+.highlightedRow {
+  background: linear-gradient(to right, rgba(67, 97, 238, 0.05), transparent);
+  border-left: 4px solid #4361ee;
+}
+
+.selectedRow {
+  background-color: rgba(67, 97, 238, 0.08);
+}
+
+.instrumentCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.instrumentName {
+  font-weight: 500;
+}
+
+.ticker {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.3rem;
+}
+
+.correlationCell, .winRateCell {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background-color: #edf2f7;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4361ee, #7209b7);
+  border-radius: 4px;
+}
+
+.returnCell {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.positive {
+  color: #10b981;
+}
+
+.negative {
+  color: #ef4444;
+}
+
+.positiveBg {
+  background-color: #e6f4e6;
+  color: #10b981;
+}
+
+.negativeBg {
+  background-color: #fde9e8;
+  color: #ef4444;
+}
+
+.potentialValue {
+  font-weight: 500;
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: #666;
+}
+
+.loadingMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.errorMessage {
+  color: #ef4444;
+  text-align: center;
+  padding: 2rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(67, 97, 238, 0.1);
+  border-top-color: #4361ee;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Info Section - styled like sectorsContainer in Rankings */
+.infoSection {
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.infoCard {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  border: 1px solid rgba(220, 220, 220, 0.5);
+}
+
+.infoCard h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.infoItem {
+  padding: 1.2rem;
+  background-color: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #f0f0f0;
+}
+
+.infoItem h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #4361ee;
+  margin-bottom: 0.8rem;
+}
+
+.infoItem p {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Cards View - for potential future implementation */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.regionGroup {
+  margin-bottom: 2rem;
+}
+
+.regionHeader {
+  margin-bottom: 1rem;
+}
+
+.regionHeader h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.regionCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+
+.indexCard {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid rgba(220, 220, 220, 0.5);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.indexCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.selectedCard {
+  border-color: #4361ee;
+  box-shadow: 0 8px 25px rgba(67, 97, 238, 0.1);
+}
+
+.cardHeader {
+  padding: 1.2rem 1.2rem 0.8rem;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+}
+
+.cardHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  padding-right: 70px;
+}
+
+.cardBody {
+  padding: 1.2rem;
+}
+
+.cardData {
+  margin-bottom: 1rem;
+}
+
+.dataItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.8rem;
+}
+
+.dataLabel {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.dataValue {
+  font-weight: 500;
+}
+
+.cardPotential {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9fafb;
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.potentialLabel {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.potentialBadge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .filterCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filterHeader {
+    margin-bottom: 1rem;
+  }
+
+  .filterControls {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .buttonGroup {
+    flex-wrap: wrap;
+  }
+
+  .sectionTitle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: #666;
+  text-align: center;
+}
+
+.errorMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  color: #ef4444;
+  text-align: center;
+  gap: 1rem;
+}
+
+.errorMessage svg {
+  font-size: 2rem;
+}

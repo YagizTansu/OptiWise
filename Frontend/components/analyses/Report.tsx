@@ -15,8 +15,6 @@ interface ReportProps {
 const Report: React.FC<ReportProps> = ({ symbol }) => {
   return (
     <div>
-
-      
       {/* Analysis Tools Component */}
       <AnalysisTools symbol={symbol} />
 
