@@ -228,7 +228,7 @@
 }
 
 .userButton {
-  background: linear-gradient(135deg, #4361ee, #7209b7);
+  background: linear-gradient(135deg, #2563eb, #4361ee);
   color: white;
   border: none;
   border-radius: 50%;
@@ -239,12 +239,21 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(67, 97, 238, 0.2);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.userInitialsButton {
+  background: linear-gradient(135deg, #2563eb, #7209b7);
+  font-size: 0.9rem;
+  letter-spacing: -0.5px;
 }
 
 .userButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+  background: linear-gradient(135deg, #2563eb, #7209b7);
 }
 
 .menuButton {
@@ -260,8 +269,9 @@
 }
 
 .menuButton:hover {
-  background-color: rgba(67, 97, 238, 0.08);
-  color: #4361ee;
+  background-color: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+  transform: rotate(15deg);
 }
 
 @media (max-width: 768px) {

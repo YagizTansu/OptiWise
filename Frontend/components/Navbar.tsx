@@ -2,10 +2,12 @@ import { FaBars, FaUser, FaChartLine } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Navbar.module.css';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const { user } = useAuth();
   
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -22,6 +24,23 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+  
+  // Get user initials
+  const getUserInitials = () => {
+    if (!user) return null;
+    
+    const firstName = user.user_metadata?.first_name || '';
+    const lastName = user.user_metadata?.last_name || '';
+    
+    if (!firstName && !lastName) return null;
+    
+    const firstInitial = firstName ? firstName.charAt(0) : '';
+    const lastInitial = lastName ? lastName.charAt(0) : '';
+    
+    return (firstInitial + lastInitial).toUpperCase();
+  };
+  
+  const userInitials = getUserInitials();
   
   return (
     <nav className={styles.navbar}>
@@ -57,20 +76,19 @@ export default function Navbar() {
         <div className={styles.navRight}>
           <div className={styles.userMenuContainer} ref={userDropdownRef}>
             <button 
-              className={styles.userButton} 
+              className={`${styles.userButton} ${userInitials ? styles.userInitialsButton : ''}`} 
               onClick={() => setUserDropdownOpen(!userDropdownOpen)}
               aria-label="User menu"
               aria-expanded={userDropdownOpen}
             >
-              <FaUser />
+              {userInitials ? userInitials : <FaUser />}
             </button>
             {userDropdownOpen && (
               <div className={styles.userDropdown} role="menu">
-                <Link href="/login" className={styles.dropdownItem}>Log In</Link>
-                <Link href="/signup" className={styles.dropdownItem}>Sign Up</Link>
-                <hr className={styles.dropdownDivider} />
-                <Link href="/account" className={styles.dropdownItem}>My Account</Link>
                 <Link href="/settings" className={styles.dropdownItem}>Settings</Link>
+                {!user && (
+                  <Link href="/signin" className={styles.dropdownItem}>Sign In</Link>
+                )}
               </div>
             )}
           </div>
