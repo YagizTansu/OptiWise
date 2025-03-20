@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { FiUser, FiMail, FiLock, FiArrowRight, FiCheck, FiClock, FiUsers } from 'react-icons/fi';
+import { FcGoogle } from 'react-icons/fc';
 import styles from '../styles/Register.module.css';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -18,7 +19,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const router = useRouter();
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,6 +68,24 @@ const Register = () => {
     }
   };
 
+  const handleGoogleSignUp = async () => {
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const { error } = await signInWithGoogle();
+      
+      if (error) {
+        setError(error.message || 'Failed to sign up with Google');
+        setIsLoading(false);
+        return;
+      }
+      // If successful, the user will be redirected to the OAuth provider
+    } catch (err) {
+      setError('An unexpected error occurred');
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -139,6 +158,20 @@ const Register = () => {
               {error && (
                 <div className={styles.errorMessage}>{error}</div>
               )}
+
+              <button 
+                onClick={handleGoogleSignUp} 
+                className={`${styles.button} ${styles.googleButton}`}
+                disabled={isLoading}
+                type="button"
+              >
+                <FcGoogle className={styles.buttonIcon} />
+                <span>Sign up with Google</span>
+              </button>
+
+              <div className={styles.separator}>
+                <span className={styles.separatorText}>or</span>
+              </div>
 
               <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.nameInputs}>

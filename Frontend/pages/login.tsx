@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
 import { FiMail, FiLock, FiArrowRight, FiCheck, FiShield, FiBarChart } from 'react-icons/fi';
+import { FcGoogle } from 'react-icons/fc';
 import styles from '../styles/Login.module.css';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -13,7 +14,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
 
   // Check for registration success in query params
   useEffect(() => {
@@ -47,7 +48,23 @@ const Login = () => {
     }
   }
 
+  async function handleGoogleSignIn(): Promise<void> {
+    setIsLoading(true);
+    setError(null);
 
+    try {
+      const { error } = await signInWithGoogle();
+      
+      if (error) {
+        setError(error.message || 'Failed to sign in with Google');
+        setIsLoading(false);
+      }
+      // If successful, the user will be redirected to the OAuth provider
+    } catch (err) {
+      setError('An unexpected error occurred');
+      setIsLoading(false);
+    }
+  }
 
   return (
     <>
@@ -97,6 +114,16 @@ const Login = () => {
               <div className={styles.separator}>
                 <span className={styles.separatorText}>or</span>
               </div>
+
+              <button 
+                onClick={handleGoogleSignIn} 
+                className={`${styles.button} ${styles.googleButton}`}
+                disabled={isLoading}
+                type="button"
+              >
+                <FcGoogle className={styles.buttonIcon} />
+                <span>Sign in with Google</span>
+              </button>
 
               <div className={styles.footerText}>
                 Don't have an account? <Link href="/register" className={styles.footerLink}>Create account</Link>
