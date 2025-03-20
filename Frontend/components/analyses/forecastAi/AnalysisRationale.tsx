@@ -1,111 +1,164 @@
 import React, { useState } from 'react';
-import styles from '../../../styles/ForecastAI.module.css';
-
-interface TechnicalFactors {
-  technical: Record<string, string>;
-  fundamental: Record<string, string>;
-  sentiment: Record<string, string>;
-}
+import { FiInfo } from 'react-icons/fi';
+import styles from '../../../styles/AnalysisRationale.module.css';
 
 interface AnalysisRationaleProps {
-  technicalFactors: TechnicalFactors;
+  technicalFactors: {
+    technical: Record<string, string>;
+    fundamental: Record<string, string>;
+    sentiment: Record<string, string>;
+  };
   sentimentData: Record<string, string>;
 }
 
-// Custom Tooltip component
-const CustomTooltip = ({ children, title }: { children: React.ReactNode, title: string }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  
-  return (
-    <span 
-      className={styles.tooltipContainer}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-    >
-      {children}
-      {isVisible && (
-        <span className={styles.tooltipText}>
-          {title}
-        </span>
-      )}
-    </span>
-  );
-};
+const AnalysisRationale: React.FC<AnalysisRationaleProps> = ({ 
+  technicalFactors,
+  sentimentData 
+}) => {
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
-// Technical terminology explanations
-const termDefinitions: Record<string, string> = {
-  'RSI': 'Relative Strength Index - Measures the speed and change of price movements, indicating overbought (>70) or oversold (<30) conditions.',
-  'MACD': 'Moving Average Convergence Divergence - Shows the relationship between two moving averages of a security\'s price, indicating momentum shifts.',
-  'Moving Averages': 'Lines showing the average price over specified time periods, helping identify trends and potential support/resistance levels.',
-  'Volume': 'The number of shares traded in a given time period, indicating the strength behind price movements.',
-  'Chart Pattern': 'Recognizable patterns in price charts that may indicate continuation or reversal of trends.',
-  'Earnings Growth': 'The rate at which a company\'s earnings are increasing, a key factor in stock valuation.',
-  'Revenue Growth': 'The rate at which a company\'s sales are increasing, indicating business expansion.',
-  'P/E Ratio': 'Price-to-Earnings Ratio - Compares a company\'s share price to its earnings per share, indicating valuation.',
-  'Debt/Equity': 'Ratio comparing a company\'s debt to its equity, indicating financial leverage and risk.',
-  'News Sentiment': 'The general attitude of news coverage towards a company, which can influence stock price movements.',
-  'Analyst Ratings': 'Professional recommendations (buy, hold, sell) from financial analysts, influencing investor decisions.',
-  'Options Put/Call': 'Ratio of put options to call options, indicating market sentiment (bearish vs. bullish).',
-  'Insider Activity': 'Buying or selling of company shares by company executives and directors, which may signal confidence levels.'
-};
+  const tooltipContent: Record<string, string> = {
+    'RSI': 'Relative Strength Index - Measures the speed and change of price movements on a scale of 0-100.',
+    'MACD': 'Moving Average Convergence Divergence - A trend-following momentum indicator.',
+    'Moving Averages': 'Shows the average price of an asset over a specified time period.',
+    'Volume': 'The number of shares traded during a given period.',
+    'Chart Pattern': 'Visual patterns in price charts that can indicate future price movements.',
+    'Earnings Growth': 'Percentage increase in a company\'s earnings per share.',
+    'Revenue Growth': 'Year-over-year percentage increase in company revenue.',
+    'P/E Ratio': 'Price-to-Earnings ratio - Measures current share price relative to earnings per share.',
+    'Debt/Equity': 'Total liabilities divided by total shareholder equity.',
+    'Cash Reserves': 'Amount of cash a company keeps to meet short-term needs.'
+  };
 
-const AnalysisRationale: React.FC<AnalysisRationaleProps> = ({ technicalFactors, sentimentData }) => {
+  const handleTooltipToggle = (key: string) => {
+    if (activeTooltip === key) {
+      setActiveTooltip(null);
+    } else {
+      setActiveTooltip(key);
+    }
+  };
+
+  // Format the sentiment text to be more readable
+  const formatSentimentText = (text: string) => {
+    if (!text) return '';
+    return text.replace(/:/g, ': ').replace(/-/g, ' - ');
+  };
+
+  // Get indicator class based on value for visual cues
+  const getIndicatorClass = (value: string) => {
+    const lowerValue = value.toLowerCase();
+    if (lowerValue.includes('bullish') || lowerValue.includes('strong') || lowerValue.includes('above')) {
+      return styles.positiveIndicator;
+    } else if (lowerValue.includes('bearish') || lowerValue.includes('weak') || lowerValue.includes('below')) {
+      return styles.negativeIndicator;
+    } else {
+      return styles.neutralIndicator;
+    }
+  };
+
   return (
-    <div className={styles.rationaleSection}>
-      <h3>Analysis Rationale</h3>
-      <div className={styles.factorsGrid}>
+    <div className={styles.container}>
+      <h3 className={styles.title}>Analysis Rationale</h3>
+      
+      <div className={styles.rationales}>
+        {/* Technical Factors */}
         <div className={styles.factorCard}>
-          <h4>Technical Factors</h4>
-          <ul>
-            {Object.entries(technicalFactors.technical || {}).map(([key, value], index) => (
-              <li key={`tech-${index}`}>
-                <div className={styles.factorItem}>
-                  <strong>{key}:</strong> {value}
-                  {termDefinitions[key] && (
-                    <CustomTooltip title={termDefinitions[key]}>
-                      <span className={styles.infoIcon}>ⓘ</span>
-                    </CustomTooltip>
+          <div className={styles.cardHeader}>
+            <h4>Technical Factors</h4>
+            <div className={styles.cardBadge}>Short-term Indicators</div>
+          </div>
+          <div className={styles.factorGrid}>
+            {Object.entries(technicalFactors.technical).map(([key, value]) => (
+              <div key={key} className={styles.factorItem}>
+                <div className={styles.factorLabel}>
+                  {key}
+                  {tooltipContent[key] && (
+                    <button 
+                      className={styles.infoButton}
+                      onClick={() => handleTooltipToggle(key)}
+                      aria-label={`Info about ${key}`}
+                    >
+                      <FiInfo />
+                    </button>
                   )}
                 </div>
-              </li>
+                <div className={`${styles.factorValue} ${getIndicatorClass(value)}`}>
+                  {value}
+                </div>
+                {activeTooltip === key && tooltipContent[key] && (
+                  <div className={styles.tooltip}>
+                    {tooltipContent[key]}
+                  </div>
+                )}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
-        
+
+        {/* Fundamental Factors */}
         <div className={styles.factorCard}>
-          <h4>Fundamental Factors</h4>
-          <ul>
-            {Object.entries(technicalFactors.fundamental || {}).map(([key, value], index) => (
-              <li key={`fund-${index}`}>
-                <div className={styles.factorItem}>
-                  <strong>{key}:</strong> {value}
-                  {termDefinitions[key] && (
-                    <CustomTooltip title={termDefinitions[key]}>
-                      <span className={styles.infoIcon}>ⓘ</span>
-                    </CustomTooltip>
+          <div className={styles.cardHeader}>
+            <h4>Fundamental Factors</h4>
+            <div className={styles.cardBadge}>Medium-term Indicators</div>
+          </div>
+          <div className={styles.factorGrid}>
+            {Object.entries(technicalFactors.fundamental).map(([key, value]) => (
+              <div key={key} className={styles.factorItem}>
+                <div className={styles.factorLabel}>
+                  {key}
+                  {tooltipContent[key] && (
+                    <button 
+                      className={styles.infoButton}
+                      onClick={() => handleTooltipToggle(key)}
+                      aria-label={`Info about ${key}`}
+                    >
+                      <FiInfo />
+                    </button>
                   )}
                 </div>
-              </li>
+                <div className={`${styles.factorValue} ${getIndicatorClass(value)}`}>
+                  {value}
+                </div>
+                {activeTooltip === key && tooltipContent[key] && (
+                  <div className={styles.tooltip}>
+                    {tooltipContent[key]}
+                  </div>
+                )}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
-        
-        <div className={styles.factorCard}>
+      </div>
+
+      {/* Market Sentiment */}
+      <div className={styles.sentimentCard}>
+        <div className={styles.cardHeader}>
           <h4>Market Sentiment</h4>
-          <ul>
-            {Object.entries(sentimentData).map(([key, value], index) => (
-              <li key={`sent-${index}`}>
-                <div className={styles.factorItem}>
-                  <strong>{key}:</strong> {value}
-                  {termDefinitions[key] && (
-                    <CustomTooltip title={termDefinitions[key]}>
-                      <span className={styles.infoIcon}>ⓘ</span>
-                    </CustomTooltip>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div className={styles.cardBadge}>Analyst & Market Perception</div>
+        </div>
+        <div className={styles.sentimentContent}>
+          {Object.entries(sentimentData)
+            .filter(([key]) => !key.includes('**'))
+            .map(([key, value], index) => {
+              // Check if value is long enough to be a paragraph
+              if (value && value.length > 100) {
+                return (
+                  <div key={index} className={styles.sentimentParagraph}>
+                    <h5>{key.replace(/\*\*/g, '')}</h5>
+                    <p>{formatSentimentText(value)}</p>
+                  </div>
+                );
+              } else {
+                return (
+                  <div key={index} className={styles.sentimentItem}>
+                    <div className={styles.sentimentLabel}>{key.replace(/\*\*/g, '')}</div>
+                    <div className={`${styles.sentimentValue} ${getIndicatorClass(value)}`}>
+                      {value}
+                    </div>
+                  </div>
+                );
+              }
+            })}
         </div>
       </div>
     </div>

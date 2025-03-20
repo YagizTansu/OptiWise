@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaQuestion, FaSpinner } from 'react-icons/fa';
-import styles from '../../../styles/ForecastAI.module.css';
+import styles from '../../../styles/InteractiveFeatures.module.css';
 import technicalAnalysisAI from '../../../services/analysis/technicalAnalysisAI';
 
 interface InteractiveFeaturesProps {
@@ -33,6 +33,13 @@ const InteractiveFeatures: React.FC<InteractiveFeaturesProps> = ({ symbol }) => 
     }
   };
 
+  // Handle pressing Enter in the input field
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !isAnswerLoading) {
+      handleAskQuestion();
+    }
+  };
+
   return (
     <div className={styles.interactiveSection}>
       <h3>Interactive Features</h3>
@@ -45,12 +52,13 @@ const InteractiveFeatures: React.FC<InteractiveFeaturesProps> = ({ symbol }) => 
             placeholder="Ask a question about this asset..."
             value={userQuestion}
             onChange={(e) => setUserQuestion(e.target.value)}
+            onKeyPress={handleKeyPress}
             className={styles.questionInput}
           />
           <button 
             className={styles.askButton}
             onClick={handleAskQuestion}
-            disabled={isAnswerLoading}
+            disabled={isAnswerLoading || !userQuestion.trim()}
           >
             {isAnswerLoading ? <FaSpinner className={styles.spinnerSmall} /> : <FaQuestion />} Ask
           </button>

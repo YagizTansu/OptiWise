@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaArrowUp, FaArrowDown, FaArrowRight } from 'react-icons/fa';
-import styles from '../../../styles/ForecastAI.module.css';
+import styles from '../../../styles/PricePredictionDashboard.module.css';
 
 interface PredictionData {
   shortTerm: {
@@ -24,6 +24,15 @@ interface PricePredictionDashboardProps {
 }
 
 const PricePredictionDashboard: React.FC<PricePredictionDashboardProps> = ({ prediction, symbol }) => {
+  // Check if value is positive or negative
+  const isPredictionPositive = (value: string) => {
+    return value.includes('+');
+  };
+  
+  const isPredictionNegative = (value: string) => {
+    return value.includes('-');
+  };
+  
   // Render the trend indicator
   const renderTrendIndicator = (trend: string) => {
     switch(trend) {
@@ -42,7 +51,13 @@ const PricePredictionDashboard: React.FC<PricePredictionDashboardProps> = ({ pre
       <div className={styles.predictionCards}>
         <div className={styles.predictionCard}>
           <h4>Short Term (7d)</h4>
-          <div className={styles.predictionValue}>{prediction.shortTerm.value}</div>
+          <div 
+            className={styles.predictionValue}
+            data-positive={isPredictionPositive(prediction.shortTerm.value)}
+            data-negative={isPredictionNegative(prediction.shortTerm.value)}
+          >
+            {prediction.shortTerm.value}
+          </div>
           <div className={styles.confidenceBar}>
             <div 
               className={styles.confidenceFill} 
@@ -54,7 +69,13 @@ const PricePredictionDashboard: React.FC<PricePredictionDashboardProps> = ({ pre
         
         <div className={styles.predictionCard}>
           <h4>Mid Term (30d)</h4>
-          <div className={styles.predictionValue}>{prediction.midTerm.value}</div>
+          <div 
+            className={styles.predictionValue}
+            data-positive={isPredictionPositive(prediction.midTerm.value)}
+            data-negative={isPredictionNegative(prediction.midTerm.value)}
+          >
+            {prediction.midTerm.value}
+          </div>
           <div className={styles.confidenceBar}>
             <div 
               className={styles.confidenceFill} 
@@ -66,7 +87,13 @@ const PricePredictionDashboard: React.FC<PricePredictionDashboardProps> = ({ pre
         
         <div className={styles.predictionCard}>
           <h4>Long Term (90d)</h4>
-          <div className={styles.predictionValue}>{prediction.longTerm.value}</div>
+          <div 
+            className={styles.predictionValue}
+            data-positive={isPredictionPositive(prediction.longTerm.value)}
+            data-negative={isPredictionNegative(prediction.longTerm.value)}
+          >
+            {prediction.longTerm.value}
+          </div>
           <div className={styles.confidenceBar}>
             <div 
               className={styles.confidenceFill} 
@@ -81,7 +108,10 @@ const PricePredictionDashboard: React.FC<PricePredictionDashboardProps> = ({ pre
           <div className={styles.trendIndicator}>
             {renderTrendIndicator(prediction.trendIndicator)}
           </div>
-          <div className={styles.trendLabel}>
+          <div 
+            className={styles.trendLabel}
+            data-trend={prediction.trendIndicator}
+          >
             {prediction.trendIndicator === 'up' ? 'Bullish' : 
              prediction.trendIndicator === 'down' ? 'Bearish' : 'Neutral'}
           </div>

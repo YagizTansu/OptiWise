@@ -1,0 +1,259 @@
+.container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.container:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: #1a1a2e;
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+.title:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50px;
+  height: 4px;
+  background: linear-gradient(90deg, #4361ee, #4cc9f0);
+  border-radius: 2px;
+}
+
+.rationales {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .rationales {
+    grid-template-columns: 1fr;
+  }
+}
+
+.factorCard, .sentimentCard {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(to right, rgba(67, 97, 238, 0.1), rgba(76, 201, 240, 0.05));
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.cardHeader h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.cardBadge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #4361ee, #4cc9f0);
+  color: white;
+  letter-spacing: 0.02em;
+}
+
+.factorGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 0.5rem;
+}
+
+.factorItem {
+  position: relative;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.factorItem:last-child {
+  border-bottom: none;
+}
+
+.factorLabel {
+  display: flex;
+  align-items: center;
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.infoButton {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  font-size: 0.85rem;
+  padding: 0.2rem;
+  margin-left: 0.35rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.infoButton:hover {
+  color: #4361ee;
+}
+
+.tooltip {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  z-index: 10;
+  background-color: #2d3748;
+  color: white;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  width: 220px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.tooltip:after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 15px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #2d3748 transparent;
+}
+
+.factorValue {
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  text-align: center;
+  min-width: 90px;
+  white-space: nowrap;
+}
+
+.positiveIndicator {
+  background-color: rgba(72, 187, 120, 0.1);
+  color: #2f855a;
+}
+
+.negativeIndicator {
+  background-color: rgba(245, 101, 101, 0.1);
+  color: #c53030;
+}
+
+.neutralIndicator {
+  background-color: rgba(160, 174, 192, 0.1);
+  color: #4a5568;
+}
+
+.sentimentContent {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sentimentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
+}
+
+.sentimentItem:last-child {
+  border-bottom: none;
+}
+
+.sentimentLabel {
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.sentimentValue {
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  text-align: center;
+}
+
+.sentimentParagraph {
+  margin-bottom: 1rem;
+}
+
+.sentimentParagraph h5 {
+  color: #2d3748;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  border-left: 3px solid #4361ee;
+  padding-left: 0.75rem;
+}
+
+.sentimentParagraph p {
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  text-align: justify;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .factorItem, .sentimentItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .factorValue, .sentimentValue {
+    margin-top: 0.5rem;
+    align-self: flex-start;
+  }
+  
+  .tooltip {
+    width: calc(100% - 32px);
+    left: 16px;
+  }
+}

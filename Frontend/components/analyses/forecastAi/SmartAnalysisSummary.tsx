@@ -1,53 +1,55 @@
 import React from 'react';
-import styles from '../../../styles/ForecastAI.module.css';
-
-interface AnalysisData {
-  summary: string;
-  keyFindings: string[];
-  catalysts: string[];
-}
+import styles from '../../../styles/SmartAnalysisSummary.module.css';
 
 interface SmartAnalysisSummaryProps {
-  analysis: AnalysisData;
+  analysis: {
+    summary: string;
+    keyFindings: string[];
+    catalysts: string[];
+  };
   summaryText: string;
 }
 
 const SmartAnalysisSummary: React.FC<SmartAnalysisSummaryProps> = ({ analysis, summaryText }) => {
   return (
-    <div className={styles.analysisSection}>
-      <h3>Smart Analysis Summary</h3>
-      <div className={styles.analysisSummary}>
-        <p className={styles.summaryText}>
-          {summaryText}
-        </p>
-        
-        <div className={styles.keyFindings}>
-          <h4>Key Findings</h4>
-          <ul>
-            {analysis.keyFindings && analysis.keyFindings.length > 0 ? 
-              analysis.keyFindings
-                .filter(finding => finding && !finding.includes('s/'))
-                .map((finding, index) => (
-                  <li key={`finding-${index}`}>{finding}</li>
-                ))
-              : 
-              <li>No key findings available at this time.</li>
-            }
+    <div className={styles.container}>
+      <h3 className={styles.title}>Smart Analysis Summary</h3>
+      
+      <div className={styles.summaryCard}>
+        <div className={styles.summaryHeader}>
+          <span className={styles.badge}>Analysis</span>
+        </div>
+        <div className={styles.summaryContent}>
+          <p>{summaryText}</p>
+        </div>
+      </div>
+      
+      <div className={styles.sectionsContainer}>
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h4>Key Findings</h4>
+          </div>
+          <ul className={styles.findingsList}>
+            {analysis.keyFindings.map((finding, index) => (
+              <li key={index} className={styles.findingItem}>
+                <span className={styles.bulletPoint}></span>
+                {finding}
+              </li>
+            ))}
           </ul>
         </div>
         
-        <div className={styles.catalysts}>
-          <h4>Potential Catalysts</h4>
-          <ul>
-            {analysis.catalysts && analysis.catalysts.length > 0 ?
-              analysis.catalysts
-                .filter(catalyst => catalyst && !catalyst.includes('s/'))
-                .map((catalyst, index) => (
-                  <li key={`catalyst-${index}`}>{catalyst}</li>
-                ))
-              :
-              <li>No potential catalysts identified at this time.</li>
-            }
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h4>Potential Catalysts</h4>
+          </div>
+          <ul className={styles.catalystsList}>
+            {analysis.catalysts.map((catalyst, index) => (
+              <li key={index} className={styles.catalystItem}>
+                <span className={styles.bulletPoint}></span>
+                {catalyst}
+              </li>
+            ))}
           </ul>
         </div>
       </div>

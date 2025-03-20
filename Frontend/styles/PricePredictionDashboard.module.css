@@ -1,0 +1,211 @@
+.dashboardSection {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.dashboardSection:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.dashboardSection h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: #1a1a2e;
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+.dashboardSection h3:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50px;
+  height: 4px;
+  background: linear-gradient(90deg, #4361ee, #4cc9f0);
+  border-radius: 2px;
+}
+
+.predictionCards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .predictionCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .predictionCards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.predictionCard {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.predictionCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.predictionCard:before {
+  content: '';
+  position: absolute;
+  height: 4px;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: linear-gradient(90deg, #4361ee, #4cc9f0);
+}
+
+.predictionCard:nth-child(2):before {
+  background: linear-gradient(90deg, #4361ee, #7209b7);
+}
+
+.predictionCard:nth-child(3):before {
+  background: linear-gradient(90deg, #7209b7, #f72585);
+}
+
+.predictionCard:nth-child(4):before {
+  background: linear-gradient(90deg, #f72585, #ff9e00);
+}
+
+.predictionCard h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.predictionValue {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin-bottom: 1rem;
+}
+
+.predictionValue[data-positive="true"] {
+  color: #2f855a;
+}
+
+.predictionValue[data-negative="true"] {
+  color: #c53030;
+}
+
+.confidenceBar {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.confidenceFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4361ee, #4cc9f0);
+  border-radius: 4px;
+  transition: width 1s ease-in-out;
+}
+
+.confidenceLabel {
+  font-size: 0.85rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.trendIndicator {
+  font-size: 3rem;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.trendUp {
+  color: #2f855a;
+}
+
+.trendDown {
+  color: #c53030;
+}
+
+.trendSideways {
+  color: #718096;
+}
+
+.trendLabel {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.trendLabel[data-trend="up"] {
+  color: #2f855a;
+}
+
+.trendLabel[data-trend="down"] {
+  color: #c53030;
+}
+
+.trendLabel[data-trend="sideways"] {
+  color: #718096;
+}
+
+/* Animation for loading and transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.predictionCard {
+  animation: fadeIn 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+.predictionCard:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.predictionCard:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.predictionCard:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.predictionCard:nth-child(4) {
+  animation-delay: 0.4s;
+}
