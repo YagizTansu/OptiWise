@@ -100,13 +100,14 @@ export default function Navbar() {
                 <div className={styles.categorySection}>
                   <div className={styles.categoryTitle}>Market Intelligence</div>
                   <div className={styles.dropdownGrid}>
-                    <Link href="/hot-topics" className={styles.dropdownGridItem}>
+                    
+                    <Link href="/rankings" className={styles.dropdownGridItem}>
                       <div className={styles.dropdownItemIconWrap}>
-                        <FaFire className={styles.dropdownItemIcon} />
+                        <FaListOl className={styles.dropdownItemIcon} />
                       </div>
                       <div>
-                        <span className={styles.dropdownItemTitle}>Hot Topics</span>
-                        <p className={styles.dropdownItemDesc}>Trending market topics</p>
+                        <span className={styles.dropdownItemTitle}>Global Market Rankings</span>
+                        <p className={styles.dropdownItemDesc}>World indexes fair value</p>
                       </div>
                     </Link>
                     
@@ -120,13 +121,23 @@ export default function Navbar() {
                       </div>
                     </Link>
 
-                    <Link href="/rankings" className={styles.dropdownGridItem}>
+                    <Link href="/quantum-screener" className={styles.dropdownGridItem}>
                       <div className={styles.dropdownItemIconWrap}>
-                        <FaListOl className={styles.dropdownItemIcon} />
+                        <FaSearchDollar className={styles.dropdownItemIcon} />
                       </div>
                       <div>
-                        <span className={styles.dropdownItemTitle}>Global Market Rankings</span>
-                        <p className={styles.dropdownItemDesc}>World indexes fair value</p>
+                        <span className={styles.dropdownItemTitle}>Quantum Screener</span>
+                        <p className={styles.dropdownItemDesc}>Seasonality analysis</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/hot-topics" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaFire className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Hot Topics</span>
+                        <p className={styles.dropdownItemDesc}>Trending market topics</p>
                       </div>
                     </Link>
                   </div>
@@ -142,16 +153,6 @@ export default function Navbar() {
                       <div>
                         <span className={styles.dropdownItemTitle}>AI Assistant</span>
                         <p className={styles.dropdownItemDesc}>Get intelligent help</p>
-                      </div>
-                    </Link>
-                    
-                    <Link href="/quantum-screener" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaSearchDollar className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Quantum Screener</span>
-                        <p className={styles.dropdownItemDesc}>Seasonality analysis</p>
                       </div>
                     </Link>
                     

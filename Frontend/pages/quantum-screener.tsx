@@ -4,6 +4,7 @@ import { FaFilter, FaArrowDown, FaArrowUp, FaCalendarAlt, FaChartLine, FaPercent
 import styles from '../styles/QuantumScreener.module.css';
 import { fetchSeasonalityData, fetchSeasonalStrategyInsights, SeasonalStrategyResponse } from '../services/api/finance';
 import Layout from '../components/Layout';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Types for our data
 interface ScreenerItem {
@@ -247,234 +248,236 @@ export default function QuantumScreener() {
 
   return (
     <Layout title="Quantum Screener | OptiWise">
-      <div className={styles.container}>
-        <main className={styles.main}>
-          <div className={styles.filterSection}>
-            <div className={styles.filterCard}>
-              <div className={styles.filterHeader}>
-                <h2><FaFilter className={styles.filterIcon} /> Filter Options</h2>
+      <ProtectedRoute>
+        <div className={styles.container}>
+          <main className={styles.main}>
+            <div className={styles.filterSection}>
+              <div className={styles.filterCard}>
+                <div className={styles.filterHeader}>
+                  <h2><FaFilter className={styles.filterIcon} /> Filter Options</h2>
+                </div>
+                <div className={styles.filterControls}>
+                  <div className={styles.filterGroup}>
+                    <label>Direction</label>
+                    <div className={styles.buttonGroup}>
+                      <button 
+                        className={`${styles.filterButton} ${direction === 'long' ? styles.active : ''}`} 
+                        onClick={() => setDirection('long')}
+                      >
+                        Long
+                      </button>
+                      <button 
+                        className={`${styles.filterButton} ${direction === 'short' ? styles.active : ''}`} 
+                        onClick={() => setDirection('short')}
+                      >
+                        Short
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.filterGroup}>
+                    <label>Duration</label>
+                    <div className={styles.buttonGroup}>
+                      <button 
+                        className={`${styles.filterButton} ${duration === '1M' ? styles.active : ''}`} 
+                        onClick={() => setDuration('1M')}
+                      >
+                        1M
+                      </button>
+                      <button 
+                        className={`${styles.filterButton} ${duration === '3M' ? styles.active : ''}`} 
+                        onClick={() => setDuration('3M')}
+                      >
+                        3M
+                      </button>
+                      <button 
+                        className={`${styles.filterButton} ${duration === '6M' ? styles.active : ''}`} 
+                        onClick={() => setDuration('6M')}
+                      >
+                        6M
+                      </button>
+                      <button 
+                        className={`${styles.filterButton} ${duration === '12M' ? styles.active : ''}`} 
+                        onClick={() => setDuration('12M')}
+                      >
+                        12M
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className={styles.filterControls}>
-                <div className={styles.filterGroup}>
-                  <label>Direction</label>
-                  <div className={styles.buttonGroup}>
-                    <button 
-                      className={`${styles.filterButton} ${direction === 'long' ? styles.active : ''}`} 
-                      onClick={() => setDirection('long')}
-                    >
-                      Long
-                    </button>
-                    <button 
-                      className={`${styles.filterButton} ${direction === 'short' ? styles.active : ''}`} 
-                      onClick={() => setDirection('short')}
-                    >
-                      Short
-                    </button>
+            </div>
+
+            <div className={styles.resultsSection}>
+              <div className={styles.resultsCard}>
+                <div className={styles.tableHeader}>
+                  <h2>Screening Results</h2>
+                  <div className={styles.legend}>
+                    <div className={styles.legendItem}>
+                      <div className={styles.legendColor} style={{ background: 'linear-gradient(135deg, #4361ee, #7209b7)' }}></div>
+                      <span>Top Opportunities</span>
+                    </div>
                   </div>
                 </div>
                 
-                <div className={styles.filterGroup}>
-                  <label>Duration</label>
-                  <div className={styles.buttonGroup}>
-                    <button 
-                      className={`${styles.filterButton} ${duration === '1M' ? styles.active : ''}`} 
-                      onClick={() => setDuration('1M')}
-                    >
-                      1M
-                    </button>
-                    <button 
-                      className={`${styles.filterButton} ${duration === '3M' ? styles.active : ''}`} 
-                      onClick={() => setDuration('3M')}
-                    >
-                      3M
-                    </button>
-                    <button 
-                      className={`${styles.filterButton} ${duration === '6M' ? styles.active : ''}`} 
-                      onClick={() => setDuration('6M')}
-                    >
-                      6M
-                    </button>
-                    <button 
-                      className={`${styles.filterButton} ${duration === '12M' ? styles.active : ''}`} 
-                      onClick={() => setDuration('12M')}
-                    >
-                      12M
-                    </button>
+                {loading ? (
+                  <div className={styles.loadingState}>
+                    <div className={styles.spinner}></div>
+                    <p>Analyzing market data...</p>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.resultsSection}>
-            <div className={styles.resultsCard}>
-              <div className={styles.tableHeader}>
-                <h2>Screening Results</h2>
-                <div className={styles.legend}>
-                  <div className={styles.legendItem}>
-                    <div className={styles.legendColor} style={{ background: 'linear-gradient(135deg, #4361ee, #7209b7)' }}></div>
-                    <span>Top Opportunities</span>
+                ) : error ? (
+                  <div className={styles.errorMessage}>
+                    <FaExclamationTriangle />
+                    <p>{error}</p>
                   </div>
-                </div>
-              </div>
-              
-              {loading ? (
-                <div className={styles.loadingState}>
-                  <div className={styles.spinner}></div>
-                  <p>Analyzing market data...</p>
-                </div>
-              ) : error ? (
-                <div className={styles.errorMessage}>
-                  <FaExclamationTriangle />
-                  <p>{error}</p>
-                </div>
-              ) : sortedResults.length === 0 ? (
-                <div className={styles.emptyState}>
-                  <p>No results found. Try adjusting your filters.</p>
-                </div>
-              ) : (
-                <div className={styles.tableWrapper}>
-                  <table className={styles.resultsTable}>
-                    <thead>
-                      <tr>
-                        <th className={styles.instrumentColumn}>Instrument</th>
-                        <th 
-                          onClick={() => handleSort('correlation')} 
-                          className={`${styles.sortableHeader} ${styles.dataColumn}`}
-                        >
-                          <div className={styles.headerContent}>
-                            <span>Correlation</span>
-                            {sortBy === 'correlation' && (
-                              <span className={styles.sortIcon}>
-                                {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          onClick={() => handleSort('winRate')} 
-                          className={`${styles.sortableHeader} ${styles.dataColumn}`}
-                        >
-                          <div className={styles.headerContent}>
-                            <span>Win Rate %</span>
-                            {sortBy === 'winRate' && (
-                              <span className={styles.sortIcon}>
-                                {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          onClick={() => handleSort('avgReturn')} 
-                          className={`${styles.sortableHeader} ${styles.returnColumn}`}
-                        >
-                          <div className={styles.headerContent}>
-                            <span>Avg Return %</span>
-                            {sortBy === 'avgReturn' && (
-                              <span className={styles.sortIcon}>
-                                {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          onClick={() => handleSort('openDate')} 
-                          className={`${styles.sortableHeader} ${styles.dateColumn}`}
-                        >
-                          <div className={styles.headerContent}>
-                            <span>Open Date</span>
-                            {sortBy === 'openDate' && (
-                              <span className={styles.sortIcon}>
-                                {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          onClick={() => handleSort('closeDate')} 
-                          className={`${styles.sortableHeader} ${styles.dateColumn}`}
-                        >
-                          <div className={styles.headerContent}>
-                            <span>Close Date</span>
-                            {sortBy === 'closeDate' && (
-                              <span className={styles.sortIcon}>
-                                {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
-                              </span>
-                            )}
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sortedResults.map((item) => (
-                        <tr key={item.id} className={item.score > 0.7 ? styles.highlightedRow : ''}>
-                          <td className={styles.instrumentColumn}>
-                            <div className={styles.instrumentCell}>
-                              <span className={styles.instrumentName}>{item.instrument}</span>
-                              <span className={styles.ticker}>{item.ticker}</span>
+                ) : sortedResults.length === 0 ? (
+                  <div className={styles.emptyState}>
+                    <p>No results found. Try adjusting your filters.</p>
+                  </div>
+                ) : (
+                  <div className={styles.tableWrapper}>
+                    <table className={styles.resultsTable}>
+                      <thead>
+                        <tr>
+                          <th className={styles.instrumentColumn}>Instrument</th>
+                          <th 
+                            onClick={() => handleSort('correlation')} 
+                            className={`${styles.sortableHeader} ${styles.dataColumn}`}
+                          >
+                            <div className={styles.headerContent}>
+                              <span>Correlation</span>
+                              {sortBy === 'correlation' && (
+                                <span className={styles.sortIcon}>
+                                  {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
+                                </span>
+                              )}
                             </div>
-                          </td>
-                          <td className={styles.dataColumn}>
-                            <div className={styles.correlationCell}>
-                              <div className={styles.progressBar}>
-                                <div 
-                                  className={styles.progressFill} 
-                                  style={{ width: `${item.correlation * 100}%` }}
-                                ></div>
-                              </div>
-                              <span className={styles.numericValue}>{item.correlation.toFixed(2)}</span>
+                          </th>
+                          <th 
+                            onClick={() => handleSort('winRate')} 
+                            className={`${styles.sortableHeader} ${styles.dataColumn}`}
+                          >
+                            <div className={styles.headerContent}>
+                              <span>Win Rate %</span>
+                              {sortBy === 'winRate' && (
+                                <span className={styles.sortIcon}>
+                                  {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
+                                </span>
+                              )}
                             </div>
-                          </td>
-                          <td className={styles.dataColumn}>
-                            <div className={styles.winRateCell}>
-                              <div className={styles.progressBar}>
-                                <div 
-                                  className={styles.progressFill} 
-                                  style={{ width: `${item.winRate}%` }}
-                                ></div>
-                              </div>
-                              <span className={styles.numericValue}>{item.winRate.toFixed(1)}%</span>
+                          </th>
+                          <th 
+                            onClick={() => handleSort('avgReturn')} 
+                            className={`${styles.sortableHeader} ${styles.returnColumn}`}
+                          >
+                            <div className={styles.headerContent}>
+                              <span>Avg Return %</span>
+                              {sortBy === 'avgReturn' && (
+                                <span className={styles.sortIcon}>
+                                  {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
+                                </span>
+                              )}
                             </div>
-                          </td>
-                          <td className={`${styles.returnCell} ${styles.returnColumn} ${item.avgReturn >= 0 ? styles.positive : styles.negative}`}>
-                            {item.avgReturn >= 0 ? '+' : ''}{item.avgReturn.toFixed(1)}%
-                          </td>
-                          <td className={styles.dateColumn}>{item.openDate}</td>
-                          <td className={styles.dateColumn}>{item.closeDate}</td>
+                          </th>
+                          <th 
+                            onClick={() => handleSort('openDate')} 
+                            className={`${styles.sortableHeader} ${styles.dateColumn}`}
+                          >
+                            <div className={styles.headerContent}>
+                              <span>Open Date</span>
+                              {sortBy === 'openDate' && (
+                                <span className={styles.sortIcon}>
+                                  {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
+                            onClick={() => handleSort('closeDate')} 
+                            className={`${styles.sortableHeader} ${styles.dateColumn}`}
+                          >
+                            <div className={styles.headerContent}>
+                              <span>Close Date</span>
+                              {sortBy === 'closeDate' && (
+                                <span className={styles.sortIcon}>
+                                  {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
+                                </span>
+                              )}
+                            </div>
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody>
+                        {sortedResults.map((item) => (
+                          <tr key={item.id} className={item.score > 0.7 ? styles.highlightedRow : ''}>
+                            <td className={styles.instrumentColumn}>
+                              <div className={styles.instrumentCell}>
+                                <span className={styles.instrumentName}>{item.instrument}</span>
+                                <span className={styles.ticker}>{item.ticker}</span>
+                              </div>
+                            </td>
+                            <td className={styles.dataColumn}>
+                              <div className={styles.correlationCell}>
+                                <div className={styles.progressBar}>
+                                  <div 
+                                    className={styles.progressFill} 
+                                    style={{ width: `${item.correlation * 100}%` }}
+                                  ></div>
+                                </div>
+                                <span className={styles.numericValue}>{item.correlation.toFixed(2)}</span>
+                              </div>
+                            </td>
+                            <td className={styles.dataColumn}>
+                              <div className={styles.winRateCell}>
+                                <div className={styles.progressBar}>
+                                  <div 
+                                    className={styles.progressFill} 
+                                    style={{ width: `${item.winRate}%` }}
+                                  ></div>
+                                </div>
+                                <span className={styles.numericValue}>{item.winRate.toFixed(1)}%</span>
+                              </div>
+                            </td>
+                            <td className={`${styles.returnCell} ${styles.returnColumn} ${item.avgReturn >= 0 ? styles.positive : styles.negative}`}>
+                              {item.avgReturn >= 0 ? '+' : ''}{item.avgReturn.toFixed(1)}%
+                            </td>
+                            <td className={styles.dateColumn}>{item.openDate}</td>
+                            <td className={styles.dateColumn}>{item.closeDate}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className={styles.infoSection}>
-            <div className={styles.infoCard}>
-              <h2>Understanding the Quantum Screener</h2>
-              <div className={styles.infoGrid}>
-                <div className={styles.infoItem}>
-                  <h3>Correlation</h3>
-                  <p>Shows the seasonality (1, 3, 5, 7, 10, 15, 20, etc.) that has the strongest correlation with the current price of the financial instrument being analyzed.</p>
-                </div>
-                <div className={styles.infoItem}>
-                  <h3>Win Rate %</h3>
-                  <p>Shows how often an investment or trading strategy has been profitable. For example, if you made money 8 times out of 10 years, your Win Rate% is 80%.</p>
-                </div>
-                <div className={styles.infoItem}>
-                  <h3>Average Return %</h3>
-                  <p>Shows the average gain or loss during profitable periods. For example, if you made money 80% of the time over the last 10 years with an average gain of 2% when you were profitable, your Avg Return% is 2%.</p>
-                </div>
-                <div className={styles.infoItem}>
-                  <h3>Open Date & Close Date</h3>
-                  <p>These dates mark the beginning and the ending of the trade or investment. For adjustments or to enhance statistics, please visit the instrument page.</p>
+            <div className={styles.infoSection}>
+              <div className={styles.infoCard}>
+                <h2>Understanding the Quantum Screener</h2>
+                <div className={styles.infoGrid}>
+                  <div className={styles.infoItem}>
+                    <h3>Correlation</h3>
+                    <p>Shows the seasonality (1, 3, 5, 7, 10, 15, 20, etc.) that has the strongest correlation with the current price of the financial instrument being analyzed.</p>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <h3>Win Rate %</h3>
+                    <p>Shows how often an investment or trading strategy has been profitable. For example, if you made money 8 times out of 10 years, your Win Rate% is 80%.</p>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <h3>Average Return %</h3>
+                    <p>Shows the average gain or loss during profitable periods. For example, if you made money 80% of the time over the last 10 years with an average gain of 2% when you were profitable, your Avg Return% is 2%.</p>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <h3>Open Date & Close Date</h3>
+                    <p>These dates mark the beginning and the ending of the trade or investment. For adjustments or to enhance statistics, please visit the instrument page.</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      </div>
+          </main>
+        </div>
+      </ProtectedRoute>
     </Layout>
   );
 }

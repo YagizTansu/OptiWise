@@ -1,0 +1,374 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.iconContainer {
+  background-color: #f59e0b;
+  color: white;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.5rem;
+}
+
+.headerIcon {
+  font-size: 30px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.filtersContainer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  background-color: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filterLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.filterIcon {
+  color: #f59e0b;
+  font-size: 0.875rem;
+}
+
+.filterSelect {
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background-color: #f9fafb;
+  font-size: 0.875rem;
+  color: #333;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.25rem;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: #f59e0b;
+}
+
+.insightsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1.5rem;
+}
+
+.insightCard {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-top: 5px solid #9ca3af;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.insightCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.insightCard.opportunity {
+  border-top-color: #10b981;
+}
+
+.insightCard.warning {
+  border-top-color: #ef4444;
+}
+
+.insightCard.trend {
+  border-top-color: #f59e0b;
+}
+
+.insightHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.insightIcon {
+  font-size: 1.25rem;
+}
+
+.opportunityIcon {
+  color: #10b981;
+}
+
+.warningIcon {
+  color: #ef4444;
+}
+
+.trendIcon {
+  color: #f59e0b;
+}
+
+.insightType {
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  background-color: #f3f4f6;
+}
+
+.opportunity .insightType {
+  background-color: #ecfdf5;
+  color: #10b981;
+}
+
+.warning .insightType {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.trend .insightType {
+  background-color: #fffbeb;
+  color: #f59e0b;
+}
+
+.insightDate {
+  margin-left: auto;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.insightTitle {
+  margin-top: 0;
+  margin-bottom: 0.875rem;
+  font-size: 1.25rem;
+  color: #111827;
+  line-height: 1.4;
+}
+
+.insightDescription {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #4b5563;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  flex-grow: 1;
+}
+
+.insightFooter {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.insightSector {
+  font-size: 0.875rem;
+}
+
+.sectorLabel {
+  color: #6b7280;
+  margin-right: 0.5rem;
+}
+
+.insightMetrics {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.confidenceMetric {
+  flex: 1;
+}
+
+.confidenceLabel {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.confidenceBar {
+  height: 6px;
+  background-color: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.confidenceFill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.confidenceValue {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.impactMetric {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.impactLabel {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.impactValue {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.impactHigh {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.impactMedium {
+  background-color: #fffbeb;
+  color: #f59e0b;
+}
+
+.impactLow {
+  background-color: #ecfdf5;
+  color: #10b981;
+}
+
+.saveButton {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.saveButton:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.saveIcon {
+  font-size: 0.875rem;
+}
+
+.noInsights {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 3rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.noInsightsIcon {
+  font-size: 2.5rem;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 992px) {
+  .filtersContainer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .filterGroup {
+    width: 100%;
+  }
+  
+  .filterSelect {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .iconContainer {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .headerIcon {
+    font-size: 24px;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .insightsGrid {
+    grid-template-columns: 1fr;
+  }
+}

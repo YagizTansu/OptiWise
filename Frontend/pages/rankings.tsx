@@ -3,7 +3,8 @@ import Head from 'next/head';
 import styles from '../styles/Rankings.module.css';
 import { FaSortAmountDown, FaSortAmountUp, FaInfoCircle, FaChartPie, FaTable, FaFilter, FaChevronDown, FaGlobeAmericas } from 'react-icons/fa';
 import { searchSymbols, fetchQuoteData, fetchStockDashboardData, SearchResult, QuoteData } from '../services/api/finance';
-import Layout from '../components/Layout'
+import Layout from '../components/Layout';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Regions and their indexes
 const regions = {
@@ -257,243 +258,243 @@ export default function Rankings() {
 
   return (
     <Layout title="Rankings - OptiWise">
+      <ProtectedRoute>
+        <>
+          <Head>
+            <title>World Indexes Rankings - OptiWise</title>
+            <meta name="description" content="Explore world indexes and their fair values" />
+          </Head>
 
-    <>
-      <Head>
-        <title>World Indexes Rankings - OptiWise</title>
-        <meta name="description" content="Explore world indexes and their fair values" />
-      </Head>
+          <main className={styles.container}>
 
-      <main className={styles.container}>
-
-        <div className={styles.filtersBar}>
-          <div className={styles.viewToggle}>
-            <button 
-              className={`${styles.viewButton} ${viewMode === 'table' ? styles.active : ''}`}
-              onClick={() => setViewMode('table')}
-            >
-              <FaTable /> Table
-            </button>
-            <button 
-              className={`${styles.viewButton} ${viewMode === 'cards' ? styles.active : ''}`}
-              onClick={() => setViewMode('cards')}
-            >
-              <FaChartPie /> Cards
-            </button>
-          </div>
-          
-          <div className={styles.filters}>
-            <div className={styles.regionFilterDropdown}>
-              <button 
-                className={styles.filterChip}
-                onClick={() => setShowRegionDropdown(!showRegionDropdown)}
-              >
-                <FaGlobeAmericas className={styles.filterIcon} />
-                {selectedRegion || 'All Regions'}
-                <FaChevronDown className={`${styles.dropdownArrow} ${showRegionDropdown ? styles.open : ''}`} />
-              </button>
+            <div className={styles.filtersBar}>
+              <div className={styles.viewToggle}>
+                <button 
+                  className={`${styles.viewButton} ${viewMode === 'table' ? styles.active : ''}`}
+                  onClick={() => setViewMode('table')}
+                >
+                  <FaTable /> Table
+                </button>
+                <button 
+                  className={`${styles.viewButton} ${viewMode === 'cards' ? styles.active : ''}`}
+                  onClick={() => setViewMode('cards')}
+                >
+                  <FaChartPie /> Cards
+                </button>
+              </div>
               
-              {showRegionDropdown && (
-                <div className={styles.regionDropdownMenu}>
-                  <div 
-                    className={`${styles.regionOption} ${selectedRegion === null ? styles.active : ''}`}
-                    onClick={() => {
-                      setSelectedRegion(null);
-                      setShowRegionDropdown(false);
-                    }}
+              <div className={styles.filters}>
+                <div className={styles.regionFilterDropdown}>
+                  <button 
+                    className={styles.filterChip}
+                    onClick={() => setShowRegionDropdown(!showRegionDropdown)}
                   >
-                    All Regions
-                  </div>
-                  {uniqueRegions.map(region => (
-                    <div 
-                      key={region} 
-                      className={`${styles.regionOption} ${selectedRegion === region ? styles.active : ''}`}
-                      onClick={() => {
-                        setSelectedRegion(region);
-                        setShowRegionDropdown(false);
-                      }}
-                    >
-                      {region}
+                    <FaGlobeAmericas className={styles.filterIcon} />
+                    {selectedRegion || 'All Regions'}
+                    <FaChevronDown className={`${styles.dropdownArrow} ${showRegionDropdown ? styles.open : ''}`} />
+                  </button>
+                  
+                  {showRegionDropdown && (
+                    <div className={styles.regionDropdownMenu}>
+                      <div 
+                        className={`${styles.regionOption} ${selectedRegion === null ? styles.active : ''}`}
+                        onClick={() => {
+                          setSelectedRegion(null);
+                          setShowRegionDropdown(false);
+                        }}
+                      >
+                        All Regions
+                      </div>
+                      {uniqueRegions.map(region => (
+                        <div 
+                          key={region} 
+                          className={`${styles.regionOption} ${selectedRegion === region ? styles.active : ''}`}
+                          onClick={() => {
+                            setSelectedRegion(region);
+                            setShowRegionDropdown(false);
+                          }}
+                        >
+                          {region}
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.content}>
+              <div className={styles.indexesContainer}>
+                <div className={styles.sectionTitle}>
+                  <h2>{selectedRegion || 'World'} Indexes</h2>
+                  <div className={styles.infoTag}>
+                    <FaInfoCircle className={styles.infoIcon} />
+                    <span>Fair value based on component analysis</span>
+                  </div>
+                </div>
+
+                {loading ? (
+                  <div className={styles.loadingMessage}>Loading index data...</div>
+                ) : error ? (
+                  <div className={styles.errorMessage}>{error}</div>
+                ) : viewMode === 'table' ? (
+                  <div className={styles.tableWrapper}>
+                    <table className={styles.indexesTable}>
+                      <thead>
+                        <tr>
+                          <th onClick={() => handleSort('name')}>
+                            Index Name
+                            {sortField === 'name' && (
+                              sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
+                            )}
+                          </th>
+                          <th onClick={() => handleSort('region')}>
+                            Region
+                            {sortField === 'region' && (
+                              sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
+                            )}
+                          </th>
+                          <th onClick={() => handleSort('currentValue')}>
+                            Current Value
+                            {sortField === 'currentValue' && (
+                              sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
+                            )}
+                          </th>
+                          <th onClick={() => handleSort('fairValue')}>
+                            Fair Value
+                            {sortField === 'fairValue' && (
+                              sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
+                            )}
+                          </th>
+                          <th onClick={() => handleSort('potential')}>
+                            Potential (%)
+                            {sortField === 'potential' && (
+                              sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
+                            )}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sortedIndexes.map((index) => (
+                          <tr 
+                            key={index.id} 
+                            className={`${selectedIndex === index.id ? styles.selectedRow : ''} ${index.comingSoon ? styles.comingSoonRow : ''}`}
+                            onClick={() => !index.comingSoon && setSelectedIndex(index.id)}
+                          >
+                            <td>
+                              {index.name}
+                              {index.comingSoon && <span className={styles.comingSoonBadge}>Coming soon</span>}
+                            </td>
+                            <td>{index.region}</td>
+                            <td>{index.currentValue.toLocaleString()}</td>
+                            <td>{(index.currentValue * (1 + index.fairValue / 100)).toLocaleString()}</td>
+                            <td>
+                              <span 
+                                className={`${styles.potentialValue} ${index.potential > 0 ? styles.positive : styles.negative}`}
+                              >
+                                {index.potential > 0 ? '+' : ''}{index.potential.toFixed(1)}%
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className={styles.cardsGrid}>
+                    {uniqueRegions.filter(region => 
+                      selectedRegion ? region === selectedRegion : true
+                    ).map(region => (
+                      <div key={region} className={styles.regionGroup}>
+                        <div className={styles.regionHeader}>
+                          <h3>{region}</h3>
+                        </div>
+                        <div className={styles.regionCards}>
+                          {sortedIndexes
+                            .filter(index => index.region === region)
+                            .map((index) => (
+                              <div 
+                                key={index.id} 
+                                className={`${styles.indexCard} ${selectedIndex === index.id ? styles.selectedCard : ''} ${index.comingSoon ? styles.comingSoonCard : ''}`}
+                                onClick={() => !index.comingSoon && setSelectedIndex(index.id)}
+                              >
+                                <div className={styles.cardHeader}>
+                                  <h3>{index.name}</h3>
+                                  {index.comingSoon && <span className={styles.comingSoonBadge}>Coming soon</span>}
+                                </div>
+                                <div className={styles.cardBody}>
+                                  <div className={styles.cardData}>
+                                    <div className={styles.dataItem}>
+                                      <span className={styles.dataLabel}>Current Value</span>
+                                      <span className={styles.dataValue}>{index.currentValue.toLocaleString()}</span>
+                                    </div>
+                                    <div className={styles.dataItem}>
+                                      <span className={styles.dataLabel}>Fair Value</span>
+                                      <span className={styles.dataValue}>
+                                        {(index.currentValue * (1 + index.fairValue / 100)).toLocaleString()}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className={styles.cardPotential}>
+                                    <span className={styles.potentialLabel}>Growth Potential</span>
+                                    <span 
+                                      className={`${styles.potentialBadge} ${index.potential > 0 ? styles.positiveBg : styles.negativeBg}`}
+                                    >
+                                      {index.potential > 0 ? '+' : ''}{index.potential.toFixed(1)}%
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {selectedIndexData && (
+                <div className={styles.sectorsContainer}>
+                  <div className={styles.sectionTitle}>
+                    <h2>Sectors in {selectedIndexData.name}</h2>
+                    <div className={styles.infoTag}>
+                      <FaInfoCircle className={styles.infoIcon} />
+                      <span>Weighted by market capitalization</span>
+                    </div>
+                  </div>
+
+                  <div className={styles.sectorsList}>
+                    {selectedIndexSectors.map((sector) => (
+                      <div key={sector.id} className={styles.sectorCard}>
+                        <div className={styles.sectorHeader}>
+                          <h3>{sector.name}</h3>
+                          <span className={styles.sectorWeight}>{sector.weight.toFixed(1)}% of index</span>
+                        </div>
+                        <div className={styles.sectorPotential}>
+                          <div className={styles.potentialBar}>
+                            <div 
+                              className={styles.potentialFill} 
+                              style={{ 
+                                width: `${Math.min(Math.abs(sector.fairValue), 25)}%`,
+                                backgroundColor: sector.fairValue > 0 ? '#e6f4e6' : '#fde9e8' // Direct color values instead of CSS vars
+                              }}
+                            ></div>
+                          </div>
+                          <span 
+                            className={`${styles.sectorPotentialValue} ${sector.fairValue > 0 ? styles.positive : styles.negative}`}
+                          >
+                            {sector.fairValue > 0 ? '+' : ''}{sector.fairValue.toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-
-        <div className={styles.content}>
-          <div className={styles.indexesContainer}>
-            <div className={styles.sectionTitle}>
-              <h2>{selectedRegion || 'World'} Indexes</h2>
-              <div className={styles.infoTag}>
-                <FaInfoCircle className={styles.infoIcon} />
-                <span>Fair value based on component analysis</span>
-              </div>
-            </div>
-
-            {loading ? (
-              <div className={styles.loadingMessage}>Loading index data...</div>
-            ) : error ? (
-              <div className={styles.errorMessage}>{error}</div>
-            ) : viewMode === 'table' ? (
-              <div className={styles.tableWrapper}>
-                <table className={styles.indexesTable}>
-                  <thead>
-                    <tr>
-                      <th onClick={() => handleSort('name')}>
-                        Index Name
-                        {sortField === 'name' && (
-                          sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
-                        )}
-                      </th>
-                      <th onClick={() => handleSort('region')}>
-                        Region
-                        {sortField === 'region' && (
-                          sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
-                        )}
-                      </th>
-                      <th onClick={() => handleSort('currentValue')}>
-                        Current Value
-                        {sortField === 'currentValue' && (
-                          sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
-                        )}
-                      </th>
-                      <th onClick={() => handleSort('fairValue')}>
-                        Fair Value
-                        {sortField === 'fairValue' && (
-                          sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
-                        )}
-                      </th>
-                      <th onClick={() => handleSort('potential')}>
-                        Potential (%)
-                        {sortField === 'potential' && (
-                          sortDirection === 'asc' ? <FaSortAmountUp className={styles.sortIcon} /> : <FaSortAmountDown className={styles.sortIcon} />
-                        )}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedIndexes.map((index) => (
-                      <tr 
-                        key={index.id} 
-                        className={`${selectedIndex === index.id ? styles.selectedRow : ''} ${index.comingSoon ? styles.comingSoonRow : ''}`}
-                        onClick={() => !index.comingSoon && setSelectedIndex(index.id)}
-                      >
-                        <td>
-                          {index.name}
-                          {index.comingSoon && <span className={styles.comingSoonBadge}>Coming soon</span>}
-                        </td>
-                        <td>{index.region}</td>
-                        <td>{index.currentValue.toLocaleString()}</td>
-                        <td>{(index.currentValue * (1 + index.fairValue / 100)).toLocaleString()}</td>
-                        <td>
-                          <span 
-                            className={`${styles.potentialValue} ${index.potential > 0 ? styles.positive : styles.negative}`}
-                          >
-                            {index.potential > 0 ? '+' : ''}{index.potential.toFixed(1)}%
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className={styles.cardsGrid}>
-                {uniqueRegions.filter(region => 
-                  selectedRegion ? region === selectedRegion : true
-                ).map(region => (
-                  <div key={region} className={styles.regionGroup}>
-                    <div className={styles.regionHeader}>
-                      <h3>{region}</h3>
-                    </div>
-                    <div className={styles.regionCards}>
-                      {sortedIndexes
-                        .filter(index => index.region === region)
-                        .map((index) => (
-                          <div 
-                            key={index.id} 
-                            className={`${styles.indexCard} ${selectedIndex === index.id ? styles.selectedCard : ''} ${index.comingSoon ? styles.comingSoonCard : ''}`}
-                            onClick={() => !index.comingSoon && setSelectedIndex(index.id)}
-                          >
-                            <div className={styles.cardHeader}>
-                              <h3>{index.name}</h3>
-                              {index.comingSoon && <span className={styles.comingSoonBadge}>Coming soon</span>}
-                            </div>
-                            <div className={styles.cardBody}>
-                              <div className={styles.cardData}>
-                                <div className={styles.dataItem}>
-                                  <span className={styles.dataLabel}>Current Value</span>
-                                  <span className={styles.dataValue}>{index.currentValue.toLocaleString()}</span>
-                                </div>
-                                <div className={styles.dataItem}>
-                                  <span className={styles.dataLabel}>Fair Value</span>
-                                  <span className={styles.dataValue}>
-                                    {(index.currentValue * (1 + index.fairValue / 100)).toLocaleString()}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className={styles.cardPotential}>
-                                <span className={styles.potentialLabel}>Growth Potential</span>
-                                <span 
-                                  className={`${styles.potentialBadge} ${index.potential > 0 ? styles.positiveBg : styles.negativeBg}`}
-                                >
-                                  {index.potential > 0 ? '+' : ''}{index.potential.toFixed(1)}%
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {selectedIndexData && (
-            <div className={styles.sectorsContainer}>
-              <div className={styles.sectionTitle}>
-                <h2>Sectors in {selectedIndexData.name}</h2>
-                <div className={styles.infoTag}>
-                  <FaInfoCircle className={styles.infoIcon} />
-                  <span>Weighted by market capitalization</span>
-                </div>
-              </div>
-
-              <div className={styles.sectorsList}>
-                {selectedIndexSectors.map((sector) => (
-                  <div key={sector.id} className={styles.sectorCard}>
-                    <div className={styles.sectorHeader}>
-                      <h3>{sector.name}</h3>
-                      <span className={styles.sectorWeight}>{sector.weight.toFixed(1)}% of index</span>
-                    </div>
-                    <div className={styles.sectorPotential}>
-                      <div className={styles.potentialBar}>
-                        <div 
-                          className={styles.potentialFill} 
-                          style={{ 
-                            width: `${Math.min(Math.abs(sector.fairValue), 25)}%`,
-                            backgroundColor: sector.fairValue > 0 ? '#e6f4e6' : '#fde9e8' // Direct color values instead of CSS vars
-                          }}
-                        ></div>
-                      </div>
-                      <span 
-                        className={`${styles.sectorPotentialValue} ${sector.fairValue > 0 ? styles.positive : styles.negative}`}
-                      >
-                        {sector.fairValue > 0 ? '+' : ''}{sector.fairValue.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
-    </>
+          </main>
+        </>
+      </ProtectedRoute>
     </Layout>
-
   );
 }

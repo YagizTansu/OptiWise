@@ -1,0 +1,302 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.iconContainer {
+  background-color: #10b981;
+  color: white;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.5rem;
+}
+
+.headerIcon {
+  font-size: 30px;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.searchSection {
+  margin-bottom: 1rem;
+}
+
+.searchContainer {
+  position: relative;
+  max-width: 600px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
+  border-radius: 50px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  border-color: #10b981;
+}
+
+.contentLayout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.countriesList {
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  border-right: 1px solid #eaeaea;
+  height: 600px;
+}
+
+.countriesList h2 {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.countryItemsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  max-height: calc(100% - 50px);
+}
+
+.countryItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.countryItem:hover {
+  background-color: #f0f4f9;
+}
+
+.selectedCountry {
+  background-color: #e6f7f1;
+  font-weight: 600;
+}
+
+.sentimentIndicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.countryDetails {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 600px;
+  overflow-y: auto;
+}
+
+.countryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.countryHeader h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  color: #333;
+}
+
+.sentimentBadge {
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  color: white;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.economicIndicators {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.indicatorCard {
+  background-color: #f9fafb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.indicatorIcon {
+  font-size: 1.5rem;
+  color: #10b981;
+  margin-bottom: 0.75rem;
+}
+
+.indicatorValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  color: #111827;
+}
+
+.analysisSection {
+  background-color: #f0f9f6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.analysisSection h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #10b981;
+  font-size: 1.25rem;
+}
+
+.analysisText {
+  margin: 0;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.additionalMetrics {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metricLabel {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.metricValue {
+  font-weight: 600;
+  color: #111827;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6b7280;
+  text-align: center;
+  padding: 2rem;
+}
+
+.emptyStateIcon {
+  font-size: 3rem;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 992px) {
+  .contentLayout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  
+  .countriesList {
+    height: auto;
+    max-height: 300px;
+    border-right: none;
+    border-bottom: 1px solid #eaeaea;
+  }
+  
+  .countryItemsContainer {
+    max-height: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .iconContainer {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .headerIcon {
+    font-size: 24px;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .economicIndicators {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .economicIndicators {
+    grid-template-columns: 1fr;
+  }
+}
