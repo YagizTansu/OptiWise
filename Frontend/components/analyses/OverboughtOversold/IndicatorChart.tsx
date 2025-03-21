@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import styles from '../../../styles/Analyses.module.css';
-import { FaInfoCircle, FaExpand, FaDownload } from 'react-icons/fa';
+import { FaInfoCircle, FaExpand, FaDownload,FaQuestion } from 'react-icons/fa';
 import { Chart } from 'chart.js';
 import { fetchWyckoffIndicatorData, WyckoffIndicatorData } from '../../../services/api/finance';
 
@@ -201,18 +201,21 @@ const IndicatorChart: React.FC<IndicatorChartProps> = ({ symbol }) => {
             onClick={toggleInfoDisplay}
             title="Show indicator information"
           >
-            <FaInfoCircle />
+            <FaQuestion />
+            
           </button>
         </div>
       </div>
       
       {showInfo && (
-        <div className={styles.infoBox}>
-          <p>The Wyckoff indicator shows supply/demand balance based on price and volume.</p>
+        <div className={styles.modalBody}>
+<p>The Wyckoff indicator shows supply/demand balance based on price and volume.</p>
           <p>Values above zero suggest accumulation (bullish), while values below zero suggest distribution (bearish).</p>
           <p>Divergence between indicator and price can signal potential reversals.</p>
           <p className={styles.disclaimerText}>Disclaimer: This analysis is for informational purposes only and does not constitute investment advice.</p>
-        </div>
+</div>
+
+        
       )}
 
       {isLoading ? (

@@ -54,6 +54,12 @@ export default function Analyses() {
             <FaCalendarAlt /> Seasonality
           </button>
           <button 
+            className={`${styles.tabButton} ${activeTab === 'overbought-oversold' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('overbought-oversold')}
+          >
+            <FaBalanceScale /> Overbought/Oversold
+          </button>
+          <button 
             className={`${styles.tabButton} ${activeTab === 'fundamental' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('fundamental')}
           >
@@ -65,13 +71,6 @@ export default function Analyses() {
             onClick={() => setActiveTab('report')}
           >
             <FaFileAlt /> Report
-          </button>
-
-          <button 
-            className={`${styles.tabButton} ${activeTab === 'overbought-oversold' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('overbought-oversold')}
-          >
-            <FaBalanceScale /> Overbought/Oversold
           </button>
 
           <button 
