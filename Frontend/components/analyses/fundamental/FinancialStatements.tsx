@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from '../../../styles/Analyses.module.css';
 import { fetchFinancialData, FinancialData } from '../../../services/api/finance';
+import { FaQuestion, FaTimes } from 'react-icons/fa';
 
 interface FinancialStatementsProps {
   symbol: string;
@@ -15,6 +16,7 @@ const FinancialStatements = ({ symbol }: FinancialStatementsProps) => {
   const [error, setError] = useState<string | null>(null);
   const [activeStatement, setActiveStatement] = useState<StatementType>('income');
   const [activePeriod, setActivePeriod] = useState<PeriodType>('annual');
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -138,19 +140,72 @@ const FinancialStatements = ({ symbol }: FinancialStatementsProps) => {
 
   return (
     <div className={styles.financialStatementCard}>
-      <div className={styles.cardHeader}>
+      <div className={styles.seasonalityHeader} style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        width: '100%' 
+      }}>
         <h3>{getStatementTitle()}</h3>
-        <div className={styles.statementDescription}>
-          {activeStatement === 'income' && (
-            <p>Shows revenue, expenses, and profitability over a period of time</p>
-          )}
-          {activeStatement === 'balance' && (
-            <p>Provides a snapshot of assets, liabilities, and shareholders' equity</p>
-          )}
-          {activeStatement === 'cashflow' && (
-            <p>Tracks the flow of cash in and out of the business</p>
-          )}
+        <div className={styles.chartControls} style={{ marginLeft: 'auto' }}>
+          <button 
+            className={styles.modernIconButton} 
+            title="Learn More"
+            onClick={() => setShowInfoModal(true)}
+          >
+            <FaQuestion />
+          </button>
         </div>
+      </div>
+
+      {/* Information Modal */}
+      {showInfoModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Financial Statements Explained</h3>
+              <button 
+                className={styles.closeButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <h4>Understanding Financial Statements</h4>
+              <p>Financial statements provide a structured view of a company's financial information, helping investors assess its financial health and performance.</p>
+              
+              <h4>Types of Statements:</h4>
+              <p><strong>Income Statement:</strong> Shows revenue, expenses, and profitability over a period of time. It answers "Is the company profitable?"</p>
+              <p><strong>Balance Sheet:</strong> Provides a snapshot of assets, liabilities, and shareholders' equity at a specific point in time. It follows the equation: Assets = Liabilities + Equity.</p>
+              <p><strong>Cash Flow Statement:</strong> Tracks the flow of cash in and out of the business across operating, investing, and financing activities.</p>
+              
+              <h4>Time Periods:</h4>
+              <p><strong>Annual:</strong> Financial data for complete fiscal years, useful for identifying long-term trends.</p>
+              <p><strong>Quarterly:</strong> Financial data for three-month periods, providing more timely information about recent performance.</p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.applyButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.statementDescription}>
+        {activeStatement === 'income' && (
+          <p>Shows revenue, expenses, and profitability over a period of time</p>
+        )}
+        {activeStatement === 'balance' && (
+          <p>Provides a snapshot of assets, liabilities, and shareholders' equity</p>
+        )}
+        {activeStatement === 'cashflow' && (
+          <p>Tracks the flow of cash in and out of the business</p>
+        )}
       </div>
 
       <div className={styles.cardContent}>

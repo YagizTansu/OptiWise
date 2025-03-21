@@ -402,30 +402,6 @@ Format your response concisely with specific numeric predictions. Whenever you u
   }
 
   /**
-   * Sample data points to reduce data volume
-   */
-  private sampleData(data: ChartDataPoint[], count: number): ChartDataPoint[] {
-    if (data.length <= count) return data;
-    
-    const result: ChartDataPoint[] = [];
-    const step = Math.floor(data.length / count);
-    
-    for (let i = 0; i < count; i++) {
-      const index = i * step;
-      if (index < data.length) {
-        result.push(data[index]);
-      }
-    }
-    
-    // Always include the most recent data point
-    if (data.length > 0) {
-      result.push(data[data.length - 1]);
-    }
-    
-    return result;
-  }
-
-  /**
    * Summarize recent price trends from stock data
    */
   private summarizeRecentTrends(data: ChartDataPoint[]): string {

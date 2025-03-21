@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from '../../../styles/Analyses.module.css';
 import { fetchStockDashboardData, QuoteSummaryData } from '../../../services/api/finance';
+import { FaExpand, FaQuestion, FaDownload, FaCompress, FaInfoCircle, FaTimes } from 'react-icons/fa';
 
 interface StockDashboardProps {
   symbol: string;
@@ -10,6 +11,7 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
   const [data, setData] = useState<QuoteSummaryData>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,72 +62,144 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
   const changeClass = isPositiveChange ? styles.positive : styles.negative;
 
   return (
-    <div className={styles.keyMetricsSection}>
-      <h3>{price.shortName || price.longName}</h3>
-      <div className={styles.priceDisplay}>
-        <div className={styles.price}>
+    <div className={styles.dashboardContainer}>
+      {/* Dashboard Header */}
+      <div className={styles.dashboardHeader}>
+        <h3 className={styles.stockName}>{price.shortName || price.longName}</h3>
+        <div className={styles.dashboardControls}>
+          <button 
+            className={styles.iconButton} 
+            title="Learn More"
+            onClick={() => setShowInfoModal(true)}
+          >
+            <FaQuestion />
+          </button>
+        </div>
+      </div>
+
+      {/* Information Modal */}
+      {showInfoModal && (
+        <div className={styles.modalBackdrop} onClick={() => setShowInfoModal(false)}>
+          <div className={styles.modalWindow} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeaderBar}>
+              <h3 className={styles.modalTitle}>Stock Metrics Explained</h3>
+              <button 
+                className={styles.modalCloseButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                <FaTimes />
+              </button>
+            </div>
+            <div className={styles.modalContent}>
+              <div className={styles.infoSection}>
+                <h4 className={styles.infoSectionTitle}>Price Display</h4>
+                <p><strong>Current Price:</strong> The latest market price of the stock.</p>
+                <p><strong>Change:</strong> The price change and percentage change since previous close.</p>
+              </div>
+              
+              <div className={styles.infoSection}>
+                <h4 className={styles.infoSectionTitle}>Trading Details</h4>
+                <p><strong>Open:</strong> The price at which the stock started trading when the market opened.</p>
+                <p><strong>High:</strong> The highest price the stock reached during the current trading day.</p>
+                <p><strong>Low:</strong> The lowest price the stock reached during the current trading day.</p>
+                <p><strong>Prev Close:</strong> The stock's closing price from the previous trading day.</p>
+                <p><strong>Volume:</strong> The number of shares traded during the current trading day.</p>
+              </div>
+              
+              <div className={styles.infoSection}>
+                <h4 className={styles.infoSectionTitle}>Key Financial Metrics</h4>
+                <p><strong>Market Cap:</strong> The total market value of the company's outstanding shares.</p>
+                <p><strong>P/E Ratio:</strong> Price-to-Earnings ratio - compares the current share price to its per-share earnings.</p>
+                <p><strong>Forward P/E:</strong> Price-to-Earnings ratio based on forecasted earnings.</p>
+                <p><strong>P/B Ratio:</strong> Price-to-Book ratio - compares a company's market value to its book value.</p>
+                <p><strong>EPS (TTM):</strong> Earnings Per Share over the Trailing Twelve Months.</p>
+                <p><strong>Dividend Yield:</strong> The dividend payment as a percentage of the stock price.</p>
+                <p><strong>52-Week High/Low:</strong> The highest and lowest price points over the past 52 weeks.</p>
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.primaryButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Price Display */}
+      <div className={styles.priceCard}>
+        <div className={styles.currentPrice}>
           {price.regularMarketPrice?.toFixed(2)} {price.currency}
         </div>
-        <div className={`${styles.change} ${changeClass}`}>
+        <div className={`${styles.priceChange} ${isPositiveChange ? styles.positive : styles.negative}`}>
           {isPositiveChange ? '+' : ''}{price.regularMarketChange?.toFixed(2)} ({formatPercent(price.regularMarketChangePercent)})
         </div>
       </div>
       
-      <div className={styles.tradingDetails}>
-        <div className={styles.tradingInfoItem}>
-          <span className={styles.metricLabel}>Open</span> 
-          <span className={styles.metricValue}>{price.regularMarketOpen?.toFixed(2)}</span>
-        </div>
-        <div className={styles.tradingInfoItem}>
-          <span className={styles.metricLabel}>High</span> 
-          <span className={styles.metricValue}>{price.regularMarketDayHigh?.toFixed(2)}</span>
-        </div>
-        <div className={styles.tradingInfoItem}>
-          <span className={styles.metricLabel}>Low</span> 
-          <span className={styles.metricValue}>{price.regularMarketDayLow?.toFixed(2)}</span>
-        </div>
-        <div className={styles.tradingInfoItem}>
-          <span className={styles.metricLabel}>Prev Close</span> 
-          <span className={styles.metricValue}>{price.regularMarketPreviousClose?.toFixed(2)}</span>
-        </div>
-        <div className={styles.tradingInfoItem}>
-          <span className={styles.metricLabel}>Volume</span> 
-          <span className={styles.metricValue}>{price.regularMarketVolume?.toLocaleString()}</span>
+      {/* Trading Information */}
+      <div className={styles.tradingInfoCard}>
+        <div className={styles.tradingInfoRow}>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Open</span> 
+            <span className={styles.infoValue}>{price.regularMarketOpen?.toFixed(2)}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>High</span> 
+            <span className={styles.infoValue}>{price.regularMarketDayHigh?.toFixed(2)}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Low</span> 
+            <span className={styles.infoValue}>{price.regularMarketDayLow?.toFixed(2)}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Prev Close</span> 
+            <span className={styles.infoValue}>{price.regularMarketPreviousClose?.toFixed(2)}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Volume</span> 
+            <span className={styles.infoValue}>{price.regularMarketVolume?.toLocaleString()}</span>
+          </div>
         </div>
       </div>
 
-      <div className={styles.metricsGrid}>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>Market Cap</span>
-          <span className={styles.metricValue}>{formatLargeNumber(summaryDetail.marketCap)}</span>
-        </div>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>P/E Ratio</span>
-          <span className={styles.metricValue}>{formatNumber(summaryDetail.trailingPE)}</span>
-        </div>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>Forward P/E</span>
-          <span className={styles.metricValue}>{formatNumber(summaryDetail.forwardPE)}</span>
-        </div>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>P/B Ratio</span>
-          <span className={styles.metricValue}>{formatNumber(keyStats.priceToBook)}</span>
-        </div>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>EPS (TTM)</span>
-          <span className={styles.metricValue}>{formatNumber(keyStats.trailingEps)}</span>
-        </div>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>Dividend Yield</span>
-          <span className={styles.metricValue}>{formatPercent(summaryDetail.dividendYield)}</span>
-        </div>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>52-Week High</span>
-          <span className={styles.metricValue}>{formatNumber(summaryDetail.fiftyTwoWeekHigh)}</span>
-        </div>
-        <div className={styles.metricItem}>
-          <span className={styles.metricLabel}>52-Week Low</span>
-          <span className={styles.metricValue}>{formatNumber(summaryDetail.fiftyTwoWeekLow)}</span>
+      {/* Key Financial Metrics */}
+      <div className={styles.metricsCard}>
+        <div className={styles.metricsGrid}>
+          <div className={styles.metricTile}>
+            <span className={styles.metricLabel}>Market Cap</span>
+            <span className={styles.metricValue}>{formatLargeNumber(summaryDetail.marketCap)}</span>
+          </div>
+          <div className={styles.metricTile}>
+            <span className={styles.metricLabel}>P/E Ratio</span>
+            <span className={styles.metricValue}>{formatNumber(summaryDetail.trailingPE)}</span>
+          </div>
+          <div className={styles.metricTile}>
+            <span className={styles.metricLabel}>Forward P/E</span>
+            <span className={styles.metricValue}>{formatNumber(summaryDetail.forwardPE)}</span>
+          </div>
+          <div className={styles.metricTile}>
+            <span className={styles.metricLabel}>P/B Ratio</span>
+            <span className={styles.metricValue}>{formatNumber(keyStats.priceToBook)}</span>
+          </div>
+          <div className={styles.metricTile}>
+            <span className={styles.metricLabel}>EPS (TTM)</span>
+            <span className={styles.metricValue}>{formatNumber(keyStats.trailingEps)}</span>
+          </div>
+          <div className={styles.metricTile}>
+            <span className={styles.metricLabel}>Dividend Yield</span>
+            <span className={styles.metricValue}>{formatPercent(summaryDetail.dividendYield)}</span>
+          </div>
+          <div className={styles.metricTile}>
+            <span className={styles.metricLabel}>52-Week High</span>
+            <span className={styles.metricValue}>{formatNumber(summaryDetail.fiftyTwoWeekHigh)}</span>
+          </div>
+          <div className={styles.metricTile}>
+            <span className={styles.metricLabel}>52-Week Low</span>
+            <span className={styles.metricValue}>{formatNumber(summaryDetail.fiftyTwoWeekLow)}</span>
+          </div>
         </div>
       </div>
     </div>

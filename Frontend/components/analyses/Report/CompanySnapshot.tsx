@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../../styles/Analyses.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
+import { FaQuestion, FaTimes } from 'react-icons/fa';
 
 interface CompanySnapshotProps {
   symbol: string;
@@ -35,6 +36,7 @@ const CompanySnapshot: React.FC<CompanySnapshotProps> = ({ symbol }) => {
   const [insightsData, setInsightsData] = useState<InsightsData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
 
   useEffect(() => {
     const loadInsights = async () => {
@@ -93,13 +95,71 @@ const CompanySnapshot: React.FC<CompanySnapshotProps> = ({ symbol }) => {
 
   return (
     <div className={styles.analysisCard}>
-      <div className={styles.sectionHeadingWithInfo}>
+      <div className={styles.seasonalityHeader} style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        width: '100%' 
+      }}>
         <h3>Company Snapshot</h3>
-        <InfoButton 
-          title="Company Snapshot" 
-          content="This section compares the company's key performance metrics against sector averages. Higher percentages indicate better performance relative to industry peers in that category." 
-        />
+        <div className={styles.chartControls} style={{ marginLeft: 'auto' }}>
+          <button 
+            className={styles.modernIconButton} 
+            title="Learn More"
+            onClick={() => setShowInfoModal(true)}
+          >
+            <FaQuestion />
+          </button>
+        </div>
       </div>
+
+      {/* Information Modal - matching other components */}
+      {showInfoModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Company Snapshot Explained</h3>
+              <button 
+                className={styles.closeButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <h4>What is a Company Snapshot?</h4>
+              <p>
+                The Company Snapshot compares key performance metrics against sector averages, providing 
+                a quick overview of how the company performs in various aspects relative to its peers.
+              </p>
+              
+              <h4>Understanding the Metrics:</h4>
+              <p><strong>Innovativeness:</strong> Measures R&D spending, patent activity, and product innovation relative to industry peers.</p>
+              <p><strong>Hiring:</strong> Tracks employment growth and job posting activity to indicate company expansion.</p>
+              <p><strong>Sustainability:</strong> Evaluates environmental practices, resource management, and long-term sustainability initiatives.</p>
+              <p><strong>Insider Sentiments:</strong> Reflects recent insider buying and selling patterns.</p>
+              <p><strong>Earnings Reports:</strong> Measures earnings performance against expectations.</p>
+              <p><strong>Dividends:</strong> Evaluates dividend yield, growth, and sustainability.</p>
+              
+              <h4>How to Read the Data:</h4>
+              <p>
+                Higher percentages indicate better performance relative to industry peers. Green indicators show
+                where the company outperforms its sector average, while red indicators highlight areas
+                where the company underperforms.
+              </p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button 
+                className={styles.applyButton}
+                onClick={() => setShowInfoModal(false)}
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <p className={styles.sectionDescription}>
         Key metrics comparison between {insightsData.symbol} and {insightsData.companySnapshot.sectorInfo} sector average
       </p>
@@ -121,7 +181,7 @@ const CompanySnapshot: React.FC<CompanySnapshotProps> = ({ symbol }) => {
                 />
               </div>
               <div className={styles.progressBarContainer}>
-                <div className={`${styles.progressBarLabel} ${isHigherThanSector ? styles.positive : ''}`}>
+                <div className={`${styles.progressBarLabel} ${isHigherThanSector ? styles.positive : styles.negative}`}>
                   {percentValue}%
                 </div>
                 <div className={styles.progressBar}>
@@ -129,14 +189,21 @@ const CompanySnapshot: React.FC<CompanySnapshotProps> = ({ symbol }) => {
                     className={styles.progressBarFill} 
                     style={{ width: `${percentValue}%` }}
                   />
+                  {/* Add sector marker on the progress bar */}
+                  <div 
+                    className={styles.sectorMarker} 
+                    style={{ left: `${sectorPercentValue}%` }} 
+                    title={`Sector average: ${sectorPercentValue}%`}
+                  ></div>
                 </div>
               </div>
               <p className={styles.sectorCompare}>
-                Sector: {sectorPercentValue}%
-                {isHigherThanSector ? 
-                  <span className={styles.positive}> (+{percentValue - sectorPercentValue}%)</span> : 
-                  <span className={styles.negative}> ({percentValue - sectorPercentValue}%)</span>
-                }
+                <span className={styles.comparisonLabel}>
+                  {isHigherThanSector ? 'Outperforms sector by:' : 'Behind sector by:'}
+                </span>
+                <span className={isHigherThanSector ? styles.positive : styles.negative}>
+                  {Math.abs(percentValue - sectorPercentValue)}%
+                </span>
               </p>
             </div>
           );

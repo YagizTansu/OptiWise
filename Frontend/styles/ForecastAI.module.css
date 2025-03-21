@@ -1,25 +1,52 @@
 .forecastContainer {
-    
+  padding: 2rem;
+  background-color: #f9fafb;
+  min-height: 100vh;
 }
 
 .sectionTitle {
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 0.75rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  padding-bottom: 1rem;
 }
 
 .sectionTitle h2 {
-  font-size: 1.75rem;
-  font-weight: 600;
-  color: #0f172a;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1e293b;
   margin: 0;
+  letter-spacing: -0.025em;
 }
 
-/* Dashboard Section */
-.dashboardSection {
+/* Common Section Styling */
+.dashboardSection,
+.analysisSection,
+.timeframeSection,
+.rationaleSection,
+.interactiveSection,
+.accuracySection,
+.comparativeSection {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  padding: 1.8rem;
   margin-bottom: 2.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  overflow: hidden;
 }
 
+.dashboardSection:hover,
+.analysisSection:hover,
+.timeframeSection:hover,
+.rationaleSection:hover,
+.interactiveSection:hover,
+.accuracySection:hover,
+.comparativeSection:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Section Headers */
 .dashboardSection h3,
 .analysisSection h3,
 .timeframeSection h3,
@@ -27,12 +54,13 @@
 .interactiveSection h3,
 .accuracySection h3,
 .comparativeSection h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 1.8rem;
   color: #1e293b;
   position: relative;
-  padding-left: 1rem;
+  padding-left: 1.2rem;
+  letter-spacing: -0.01em;
 }
 
 .dashboardSection h3::before,
@@ -47,73 +75,101 @@
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 4px;
-  height: 1.25rem;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  border-radius: 2px;
+  width: 5px;
+  height: 1.5rem;
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  border-radius: 8px;
 }
 
+/* Dashboard Cards */
 .predictionCards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 .predictionCard {
   background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  padding: 1.25rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
   position: relative;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  overflow: hidden;
+}
+
+.predictionCard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #4f46e5, #3b82f6);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
 }
 
 .predictionCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+}
+
+.predictionCard:hover::after {
+  transform: scaleX(1);
 }
 
 .predictionCard h4 {
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: #64748b;
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .predictionValue {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
   color: #0f172a;
+  line-height: 1;
 }
 
+/* Confidence Bar Styling */
 .confidenceBar {
-  height: 6px;
-  background-color: #e2e8f0;
-  border-radius: 3px;
+  height: 8px;
+  background-color: #f1f5f9;
+  border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 
 .confidenceFill {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-  border-radius: 3px;
+  background: linear-gradient(90deg, #4f46e5, #3b82f6);
+  border-radius: 6px;
+  transition: width 0.5s ease;
 }
 
 .confidenceLabel {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   color: #64748b;
   font-weight: 500;
+  display: flex;
+  justify-content: space-between;
 }
 
+/* Trend Indicators */
 .trendIndicator {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
-  color: #0f172a;
+  font-size: 2.6rem;
+  margin-bottom: 1rem;
   display: flex;
   justify-content: center;
+  transition: transform 0.3s ease;
 }
 
 .trendUp {
@@ -128,24 +184,22 @@
   color: #f59e0b;
 }
 
+.predictionCard:hover .trendIndicator {
+  transform: scale(1.1);
+}
+
 .trendLabel {
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
+  font-size: 0.95rem;
+  color: #334155;
 }
 
 /* Analysis Section */
-.analysisSection {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  padding: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
 .analysisSummary {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 @media (min-width: 768px) {
@@ -155,15 +209,18 @@
 }
 
 .summaryText {
-  line-height: 1.6;
+  line-height: 1.7;
   color: #334155;
+  font-size: 1.05rem;
 }
 
+/* Key Findings & Catalysts */
 .keyFindings h4,
 .catalysts h4 {
-  font-size: 1rem;
-  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
   font-weight: 600;
+  color: #1e293b;
 }
 
 .keyFindings ul,
@@ -174,72 +231,78 @@
 
 .keyFindings li,
 .catalysts li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
   color: #334155;
-  line-height: 1.5;
+  line-height: 1.6;
+  position: relative;
 }
 
 /* Timeframe Section */
-.timeframeSection {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  padding: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
 .timeframeSelector {
   display: flex;
   flex-wrap: wrap;
-  margin-bottom: 1rem;
-  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  gap: 0.6rem;
 }
 
 .timeframeButton {
-  padding: 0.5rem 1.25rem;
+  padding: 0.6rem 1.4rem;
   border: none;
   background-color: #f1f5f9;
   color: #64748b;
-  font-weight: 500;
-  border-radius: 6px;
+  font-weight: 600;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .timeframeButton:hover {
   background-color: #e2e8f0;
+  transform: translateY(-2px);
 }
 
 .activeTimeframe {
-  background-color: #3b82f6;
+  background: linear-gradient(90deg, #4f46e5, #3b82f6);
   color: white;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
+
+.activeTimeframe:hover {
+  background: linear-gradient(90deg, #4338ca, #2563eb);
+  transform: translateY(-2px);
 }
 
 .chartContainer {
-  margin: 1.5rem 0 2rem;
-  height: 300px;
+  margin: 2rem 0;
+  height: 320px;
   width: 100%;
   position: relative;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
+/* Level Containers */
 .levelsContainer {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 2rem;
   margin-bottom: 2rem;
 }
 
 .levelGroup {
   background-color: #f8fafc;
-  padding: 1rem;
-  border-radius: 8px;
+  padding: 1.2rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .levelGroup h4 {
   margin-top: 0;
-  margin-bottom: 0.75rem;
-  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
   font-weight: 600;
+  color: #1e293b;
 }
 
 .levelGroup ul {
@@ -249,36 +312,23 @@
 }
 
 .levelGroup li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   font-weight: 500;
   color: #334155;
+  display: flex;
+  justify-content: space-between;
 }
 
 .levelGroup li:last-child {
   border-bottom: none;
 }
 
-.probabilityContainer {
-  height: 250px;
-  margin-top: 2rem;
-  width: 100%;
-  position: relative;
-}
-
-/* Rationale Section */
-.rationaleSection {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  padding: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
+/* Factor Cards */
 .factorsGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 @media (min-width: 768px) {
@@ -289,16 +339,24 @@
 
 .factorCard {
   background-color: #f8fafc;
-  padding: 1.25rem;
-  border-radius: 8px;
+  padding: 1.5rem;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.factorCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
 }
 
 .factorCard h4 {
   margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #0f172a;
+  color: #1e293b;
 }
 
 .factorCard ul {
@@ -308,9 +366,9 @@
 }
 
 .factorCard li {
-  padding: 0.5rem 0;
-  border-bottom: 1px dashed #e2e8f0;
-  font-size: 0.9rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px dashed rgba(226, 232, 240, 0.8);
+  font-size: 0.95rem;
   color: #475569;
 }
 
@@ -319,121 +377,21 @@
 }
 
 .factorCard li strong {
-  color: #334155;
+  color: #1e293b;
   font-weight: 600;
 }
 
 .factorItem {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
 }
 
-.infoIcon {
-  color: #777;
-  cursor: help;
-  font-size: 16px !important;
-  margin-left: 4px;
-}
-
-.infoIcon:hover {
-  color: #444;
-}
-
-/* Interactive Section */
-.interactiveSection {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  padding: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.qaSection, .alertsSection {
-  margin-bottom: 2rem;
-}
-
-.qaSection h4, .alertsSection h4 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.questionForm, .alertForm {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-}
-
-.questionInput, .alertType, .alertValue {
-  flex: 1;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  color: #334155;
-}
-
-.questionInput:focus, .alertType:focus, .alertValue:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-.askButton, .setAlertButton {
-  padding: 0 1.25rem;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.askButton:hover, .setAlertButton:hover {
-  background-color: #2563eb;
-}
-
-.qaResult {
-  background-color: #f8fafc;
-  padding: 1.25rem;
-  border-radius: 8px;
-  margin-top: 1rem;
-}
-
-.qaResult h5 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.qaResult p {
-  margin: 0;
-  line-height: 1.6;
-  color: #334155;
-}
-
-/* Accuracy Section */
-.accuracySection {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  padding: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
+/* Accuracy Section Styling */
 .accuracyOverview {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 @media (min-width: 768px) {
@@ -443,147 +401,65 @@
 }
 
 .accuracyCircle {
-  width: 150px;
+  width: 170px;
   margin: 0 auto;
   text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.accuracyCircle:hover {
+  transform: scale(1.05);
 }
 
 .accuracyCircle svg {
   width: 100%;
   height: auto;
+  filter: drop-shadow(0 4px 6px rgba(79, 70, 229, 0.15));
 }
 
 .accuracyText {
-  font-size: 0.8rem;
-  font-weight: 600;
-  fill: #0f172a;
+  font-size: 0.85rem;
+  font-weight: 700;
+  fill: #1e293b;
   text-anchor: middle;
+  dominant-baseline: middle;
 }
 
 .accuracyDetails {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
   justify-content: center;
 }
 
 .accuracyItem {
   display: grid;
-  grid-template-columns: 130px 1fr 40px;
+  grid-template-columns: 140px 1fr 50px;
   align-items: center;
-  gap: 1rem;
-  font-size: 0.9rem;
+  gap: 1.2rem;
+  font-size: 0.95rem;
+  transition: transform 0.2s ease;
+}
+
+.accuracyItem:hover {
+  transform: translateX(5px);
 }
 
 .accuracyBar {
-  height: 8px;
-  background-color: #e2e8f0;
-  border-radius: 4px;
+  height: 10px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
   overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .accuracyBar > div {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #2563eb);
-  border-radius: 4px;
+  border-radius: 8px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Comparative Section */
-.comparativeSection {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  padding: 1.5rem;
-}
-
-.comparisonTabs {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 0.75rem;
-}
-
-.compTab {
-  background: none;
-  border: none;
-  padding: 0.5rem 0.75rem;
-  font-weight: 500;
-  color: #64748b;
-  cursor: pointer;
-  transition: color 0.2s;
-  border-radius: 6px;
-  position: relative;
-}
-
-.compTab:hover {
-  color: #0f172a;
-}
-
-.activeCompTab {
-  color: #3b82f6;
-  font-weight: 600;
-}
-
-.activeCompTab::after {
-  content: '';
-  position: absolute;
-  bottom: -0.75rem;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: #3b82f6;
-}
-
-.comparisonTable {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.comparisonTable th, .comparisonTable td {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.comparisonTable th {
-  font-weight: 600;
-  color: #64748b;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-}
-
-.comparisonTable td {
-  color: #334155;
-  font-size: 0.95rem;
-}
-
-.positive {
-  color: #10b981;
-  font-weight: 500;
-}
-
-.negative {
-  color: #ef4444;
-  font-weight: 500;
-}
-
-.compareButton {
-  padding: 0.25rem 0.5rem;
-  background-color: #f1f5f9;
-  border: none;
-  border-radius: 4px;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.compareButton:hover {
-  background-color: #3b82f6;
-  color: white;
-}
-
+/* Tooltip Styling */
 .tooltipContainer {
   position: relative;
   display: inline-flex;
@@ -595,18 +471,27 @@
   position: absolute;
   bottom: 100%;
   left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(0, 0, 0, 0.8);
+  transform: translateX(-50%) translateY(10px);
+  background: linear-gradient(145deg, #1e293b, #334155);
   color: #fff;
   text-align: center;
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 12px 16px;
   z-index: 1000;
-  width: 250px;
-  font-size: 0.85rem;
-  margin-bottom: 8px;
-  line-height: 1.4;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  width: 280px;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  line-height: 1.5;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tooltipContainer:hover .tooltipText {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 .tooltipText::after {
@@ -614,44 +499,225 @@
   position: absolute;
   top: 100%;
   left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
+  margin-left: -8px;
+  border-width: 8px;
   border-style: solid;
-  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+  border-color: #334155 transparent transparent transparent;
 }
 
 .infoIcon {
-  cursor: help;
-  color: #777;
+  cursor: pointer;
+  color: #64748b;
   font-size: 14px;
-  margin-left: 4px;
+  margin-left: 6px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   background-color: #f1f5f9;
+  transition: all 0.2s ease;
 }
 
 .infoIcon:hover {
-  color: #444;
-  background-color: #e2e8f0;
+  color: #fff;
+  background: linear-gradient(145deg, #4f46e5, #3b82f6);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
 }
 
+/* Interactive Section */
+.questionForm, .alertForm {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.questionInput, .alertType, .alertValue {
+  flex: 1;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 12px;
+  font-size: 1rem;
+  color: #334155;
+  transition: all 0.2s ease;
+  background-color: #f8fafc;
+}
+
+.questionInput:focus, .alertType:focus, .alertValue:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  background-color: #fff;
+}
+
+.askButton, .setAlertButton {
+  padding: 0 1.5rem;
+  background: linear-gradient(90deg, #4f46e5, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+}
+
+.askButton:hover, .setAlertButton:hover {
+  background: linear-gradient(90deg, #4338ca, #2563eb);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(79, 70, 229, 0.3);
+}
+
+/* Comparison Tabs */
+.comparisonTabs {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  padding-bottom: 1rem;
+}
+
+.compTab {
+  background: none;
+  border: none;
+  padding: 0.6rem 1rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border-radius: 10px;
+  position: relative;
+}
+
+.compTab:hover {
+  color: #1e293b;
+  background-color: #f1f5f9;
+}
+
+.activeCompTab {
+  color: #4f46e5;
+  font-weight: 600;
+  background-color: rgba(79, 70, 229, 0.08);
+}
+
+.activeCompTab::after {
+  content: '';
+  position: absolute;
+  bottom: -1rem;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #4f46e5, #3b82f6);
+  border-radius: 3px 3px 0 0;
+  animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Comparison Table */
+.comparisonTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.comparisonTable th, .comparisonTable td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+}
+
+.comparisonTable tr {
+  transition: background-color 0.2s ease;
+}
+
+.comparisonTable tr:hover {
+  background-color: #f1f5f9;
+}
+
+.comparisonTable th {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: #f8fafc;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.comparisonTable td {
+  color: #334155;
+  font-size: 0.95rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+}
+
+.comparisonTable tr:last-child td {
+  border-bottom: none;
+}
+
+.positive {
+  color: #10b981;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.negative {
+  color: #ef4444;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.compareButton {
+  padding: 0.4rem 0.8rem;
+  background: linear-gradient(90deg, #f1f5f9, #e2e8f0);
+  border: none;
+  border-radius: 8px;
+  color: #475569;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.compareButton:hover {
+  background: linear-gradient(90deg, #4f46e5, #3b82f6);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+}
+
+/* Loading States */
 .loadingContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem;
-  background: linear-gradient(145deg, #f8f9ff, #f1f5fe);
-  border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  min-height: 250px;
+  padding: 3rem;
+  background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  min-height: 300px;
   width: 100%;
   position: relative;
-  border: 1px solid rgba(209, 213, 219, 0.3);
+  border: 1px solid rgba(226, 232, 240, 0.6);
   overflow: hidden;
 }
 
@@ -662,34 +728,34 @@
   left: 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+  background: linear-gradient(90deg, #4f46e5, #60a5fa, #4f46e5);
   background-size: 200% 100%;
-  animation: loadingBarAnimation 2s infinite linear;
+  animation: loadingBarAnimation 2s infinite cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .spinner {
   font-size: 2.5rem;
-  color: #3b82f6;
+  color: #4f46e5;
   animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  margin-bottom: 1.5rem;
-  filter: drop-shadow(0 4px 6px rgba(59, 130, 246, 0.5));
+  margin-bottom: 1.8rem;
+  filter: drop-shadow(0 4px 6px rgba(79, 70, 229, 0.4));
 }
 
 .loadingContainer p {
-  font-size: 1.1rem;
-  color: #374151;
-  font-weight: 500;
+  font-size: 1.2rem;
+  color: #1e293b;
+  font-weight: 600;
   text-align: center;
   margin: 0.5rem 0;
 }
 
 .loadingContainer .loadingInfo {
-  color: #6b7280;
-  font-size: 0.95rem;
+  color: #64748b;
+  font-size: 1rem;
   margin-top: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 
 .loadingContainer .loadingDots {
@@ -701,9 +767,9 @@
   width: 6px;
   height: 6px;
   margin: 0 3px;
-  background-color: #3b82f6;
+  background-color: #4f46e5;
   border-radius: 50%;
-  animation: pulseDot 1.4s infinite ease-in-out;
+  animation: pulseDot 1.4s infinite cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .loadingContainer .loadingDot:nth-child(1) {
@@ -718,6 +784,159 @@
   animation-delay: 0.4s;
 }
 
+/* Error States */
+.errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 2rem;
+  width: 100%;
+}
+
+.errorCard {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  max-width: 550px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+.errorCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.errorIconContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.errorIcon {
+  width: 80px;
+  height: 80px;
+  color: #ef4444;
+  animation: pulse 2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.errorTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  color: #1e293b;
+  letter-spacing: -0.025em;
+}
+
+.errorMessage {
+  font-size: 1.1rem;
+  color: #475569;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+.errorActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.retryButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  background: linear-gradient(90deg, #4f46e5, #3b82f6);
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+  width: 100%;
+  max-width: 280px;
+}
+
+.retryButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.35);
+  background: linear-gradient(90deg, #4338ca, #2563eb);
+}
+
+.retryIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.supportLink {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+}
+
+.supportLink:hover {
+  color: #4338ca;
+  text-decoration: underline;
+  background-color: rgba(79, 70, 229, 0.08);
+}
+
+.errorTips {
+  background-color: #f8fafc;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: left;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.errorTips p {
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #1e293b;
+}
+
+.errorTips ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.errorTips li {
+  padding: 0.6rem 0;
+  color: #475569;
+  position: relative;
+  padding-left: 1.8rem;
+  font-size: 0.95rem;
+}
+
+.errorTips li:before {
+  content: "•";
+  color: #4f46e5;
+  position: absolute;
+  left: 0;
+  font-size: 1.4rem;
+}
+
+/* Animations */
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -729,11 +948,11 @@
 
 @keyframes pulseDot {
   0%, 80%, 100% { 
-    transform: scale(0.8);
-    opacity: 0.6;
+    transform: scale(0.7);
+    opacity: 0.5;
   }
   40% { 
-    transform: scale(1);
+    transform: scale(1.1);
     opacity: 1;
   }
 }
@@ -747,156 +966,10 @@
   }
 }
 
-/* Error display styles */
-.errorContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-  padding: 2rem;
-  width: 100%;
-}
-
-.errorCard {
-  background: white;
-  border-radius: 16px;
-  padding: 2.5rem;
-  max-width: 500px;
-  width: 100%;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  text-align: center;
-  animation: fadeInUp 0.5s ease forwards;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-}
-
-.errorCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, #ff5757, #ff8a5c);
-}
-
-.errorIconContainer {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.errorIcon {
-  width: 70px;
-  height: 70px;
-  color: #ff5757;
-  animation: pulse 2s infinite;
-}
-
-.errorTitle {
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.errorMessage {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 2rem;
-  line-height: 1.5;
-}
-
-.errorActions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.retryButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: linear-gradient(90deg, #2563eb, #3b82f6);
-  color: white;
-  border: none;
-  padding: 0.8rem 2rem;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-  width: 100%;
-  max-width: 250px;
-}
-
-.retryButton:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
-  background: linear-gradient(90deg, #1d4ed8, #2563eb);
-}
-
-.retryIcon {
-  width: 20px;
-  height: 20px;
-}
-
-.supportLink {
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s ease;
-}
-
-.supportLink:hover {
-  color: #1d4ed8;
-  text-decoration: underline;
-}
-
-.errorTips {
-  background-color: #f8fafc;
-  border-radius: 12px;
-  padding: 1.2rem;
-  text-align: left;
-}
-
-.errorTips p {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #555;
-}
-
-.errorTips ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.errorTips li {
-  padding: 0.5rem 0;
-  color: #666;
-  position: relative;
-  padding-left: 1.5rem;
-  font-size: 0.95rem;
-}
-
-.errorTips li:before {
-  content: "•";
-  color: #3b82f6;
-  position: absolute;
-  left: 0;
-  font-size: 1.2rem;
-}
-
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -909,23 +982,42 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.05);
+    transform: scale(1.08);
   }
   100% {
     transform: scale(1);
   }
 }
 
-@media (max-width: 600px) {
-  .errorCard {
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .forecastContainer {
     padding: 1.5rem;
+  }
+
+  .dashboardSection,
+  .analysisSection,
+  .timeframeSection,
+  .rationaleSection,
+  .interactiveSection,
+  .accuracySection,
+  .comparativeSection {
+    padding: 1.5rem;
+  }
+
+  .errorCard {
+    padding: 2rem;
   }
   
   .errorTitle {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
   
   .errorMessage {
     font-size: 1rem;
+  }
+
+  .comparisonTabs {
+    flex-wrap: wrap;
   }
 }
