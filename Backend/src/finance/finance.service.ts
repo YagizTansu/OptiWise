@@ -91,7 +91,27 @@ interface InsightsOptions {
 export class FinanceService implements OnModuleInit {
   private readonly logger = new Logger(FinanceService.name);
   private cache = new Map<string, {data: any, timestamp: number}>();
-  private readonly CACHE_TTL = 60000; // 1 minute cache duration in milliseconds
+  
+  // Different TTLs for different data types
+  private readonly CACHE_TTL = {
+    SEARCH: 60000,           // 1 minute
+    QUOTE: 30000,            // 30 seconds
+    HISTORICAL: 3600000,     // 1 hour
+    TRENDING: 60000,         // 1 minute
+    CHART: 300000,           // 5 minutes
+    QUOTE_SUMMARY: 1800000,  // 30 minutes
+    FUNDAMENTALS: 3600000,   // 1 hour
+    INSIGHTS: 900000,        // 15 minutes
+    DAILY_GAINERS: 60000,    // 1 minute
+  };
+  
+  // Cache statistics
+  private cacheStats = {
+    hits: 0,
+    misses: 0,
+    sets: 0,
+    evictions: 0,
+  };
   
   onModuleInit() {
     this.logger.log('FinanceService initialized');
@@ -104,9 +124,13 @@ export class FinanceService implements OnModuleInit {
     let expiredCount = 0;
     
     for (const [key, value] of this.cache.entries()) {
-      if (now - value.timestamp > this.CACHE_TTL) {
+      const [cacheType] = key.split(':');
+      const ttl = this.CACHE_TTL[cacheType] || this.CACHE_TTL.QUOTE;
+      
+      if (now - value.timestamp > ttl) {
         this.cache.delete(key);
         expiredCount++;
+        this.cacheStats.evictions++;
       }
     }
     
@@ -115,20 +139,60 @@ export class FinanceService implements OnModuleInit {
     }
   }
 
-  private getCachedData(cacheKey: string) {
-    const cachedItem = this.cache.get(cacheKey);
-    if (cachedItem && (Date.now() - cachedItem.timestamp < this.CACHE_TTL)) {
+  private getCachedData(cacheType: string, cacheKey: string) {
+    const fullKey = `${cacheType}:${cacheKey}`;
+    const cachedItem = this.cache.get(fullKey);
+    const ttl = this.CACHE_TTL[cacheType] || this.CACHE_TTL.QUOTE;
+    
+    if (cachedItem && (Date.now() - cachedItem.timestamp < ttl)) {
+      this.cacheStats.hits++;
       return cachedItem.data;
     }
+    
+    this.cacheStats.misses++;
     return null;
   }
 
-  private setCachedData(cacheKey: string, data: any) {
-    this.cache.set(cacheKey, {
+  private setCachedData(cacheType: string, cacheKey: string, data: any) {
+    const fullKey = `${cacheType}:${cacheKey}`;
+    this.cache.set(fullKey, {
       data,
       timestamp: Date.now()
     });
+    this.cacheStats.sets++;
     return data;
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats() {
+    return {
+      ...this.cacheStats,
+      size: this.cache.size,
+    };
+  }
+
+  /**
+   * Clear cache - can be selective by type
+   */
+  clearCache(cacheType?: string) {
+    if (cacheType) {
+      // Clear only specific cache type
+      let count = 0;
+      for (const key of this.cache.keys()) {
+        if (key.startsWith(`${cacheType}:`)) {
+          this.cache.delete(key);
+          count++;
+        }
+      }
+      this.logger.log(`Cleared ${count} items from ${cacheType} cache`);
+    } else {
+      // Clear all cache
+      const size = this.cache.size;
+      this.cache.clear();
+      this.logger.log(`Cleared entire cache (${size} items)`);
+    }
   }
 
   /**
@@ -136,8 +200,8 @@ export class FinanceService implements OnModuleInit {
    */
   async searchSymbols(query: string, options: SearchOptions = {}) {
     try {
-      const cacheKey = `search:${query}:${JSON.stringify(options)}`;
-      const cachedData = this.getCachedData(cacheKey);
+      const cacheKey = `${query}:${JSON.stringify(options)}`;
+      const cachedData = this.getCachedData('SEARCH', cacheKey);
       if (cachedData) return cachedData;
 
       // Use default quotesCount if not explicitly provided
@@ -146,7 +210,7 @@ export class FinanceService implements OnModuleInit {
       }
       
       const result = await yahooFinance.search(query, options);
-      return this.setCachedData(cacheKey, result.quotes);
+      return this.setCachedData('SEARCH', cacheKey, result.quotes);
     } catch (error) {
       this.logger.error(`Failed to search for ${query}`, error);
       throw error;
@@ -166,13 +230,13 @@ export class FinanceService implements OnModuleInit {
   async getQuote(symbol: string | string[], options: QuoteOptions = {}) {
     try {
       const symbolStr = Array.isArray(symbol) ? symbol.join(',') : symbol;
-      const cacheKey = `quote:${symbolStr}:${JSON.stringify(options)}`;
-      const cachedData = this.getCachedData(cacheKey);
+      const cacheKey = `${symbolStr}:${JSON.stringify(options)}`;
+      const cachedData = this.getCachedData('QUOTE', cacheKey);
       if (cachedData) return cachedData;
 
       // Type assertion to handle the type mismatch
       const result = await yahooFinance.quote(symbol, options as any);
-      return this.setCachedData(cacheKey, result);
+      return this.setCachedData('QUOTE', cacheKey, result);
     } catch (error) {
       const symbolStr = Array.isArray(symbol) ? symbol.join(',') : symbol;
       this.logger.error(`Failed to fetch quote for ${symbolStr}`, error);
@@ -195,12 +259,17 @@ export class FinanceService implements OnModuleInit {
     interval: HistoricalInterval = '1d'
   ) {
     try {
-      return await yahooFinance.historical(symbol, {
+      const cacheKey = `${symbol}:${period1.toISOString()}:${period2.toISOString()}:${interval}`;
+      const cachedData = this.getCachedData('HISTORICAL', cacheKey);
+      if (cachedData) return cachedData;
+
+      const result = await yahooFinance.historical(symbol, {
         period1,
         period2,
         interval,
         includeAdjustedClose: true,
       });
+      return this.setCachedData('HISTORICAL', cacheKey, result);
     } catch (error) {
       this.logger.error(`Failed to fetch historical data for ${symbol}`, error);
       throw error;
@@ -212,8 +281,12 @@ export class FinanceService implements OnModuleInit {
    */
   async getTrending(region = 'US') {
     try {
+      const cacheKey = region;
+      const cachedData = this.getCachedData('TRENDING', cacheKey);
+      if (cachedData) return cachedData;
+
       const result = await yahooFinance.trendingSymbols(region);
-      return result.quotes;
+      return this.setCachedData('TRENDING', cacheKey, result.quotes);
     } catch (error) {
       this.logger.error(`Failed to fetch trending symbols for ${region}`, error);
       throw error;
@@ -225,7 +298,12 @@ export class FinanceService implements OnModuleInit {
    */
   async getChartData(symbol: string, options: ChartOptions) {
     try {
-      return await yahooFinance.chart(symbol, options);
+      const cacheKey = `${symbol}:${JSON.stringify(options)}`;
+      const cachedData = this.getCachedData('CHART', cacheKey);
+      if (cachedData) return cachedData;
+
+      const result = await yahooFinance.chart(symbol, options);
+      return this.setCachedData('CHART', cacheKey, result);
     } catch (error) {
       this.logger.error(`Failed to fetch chart data for ${symbol}`, error);
       throw error;
@@ -256,12 +334,14 @@ export class FinanceService implements OnModuleInit {
         options.modules = ['price', 'summaryDetail'];
       }
       
-      // More aggressive type casting to bypass TypeScript checks
-      // This is necessary because the Yahoo Finance library's type definitions 
-      // may not perfectly match our string[] input
-      return await yahooFinance.quoteSummary(symbol, {
+      const cacheKey = `${symbol}:${options.modules.join(',')}`;
+      const cachedData = this.getCachedData('QUOTE_SUMMARY', cacheKey);
+      if (cachedData) return cachedData;
+
+      const result = await yahooFinance.quoteSummary(symbol, {
         modules: options.modules
       } as any);
+      return this.setCachedData('QUOTE_SUMMARY', cacheKey, result);
     } catch (error) {
       this.logger.error(`Failed to fetch quote summary for ${symbol}`, error);
       throw error;
@@ -295,7 +375,12 @@ export class FinanceService implements OnModuleInit {
         padTimeSeries: options.padTimeSeries !== undefined ? options.padTimeSeries : false
       };
 
-      return await yahooFinance.fundamentalsTimeSeries(symbol, queryOptions);
+      const cacheKey = `${symbol}:${JSON.stringify(queryOptions)}`;
+      const cachedData = this.getCachedData('FUNDAMENTALS', cacheKey);
+      if (cachedData) return cachedData;
+
+      const result = await yahooFinance.fundamentalsTimeSeries(symbol, queryOptions);
+      return this.setCachedData('FUNDAMENTALS', cacheKey, result);
     } catch (error) {
       this.logger.error(`Failed to fetch fundamentals time series for ${symbol}`, error);
       throw error;
@@ -322,7 +407,12 @@ export class FinanceService implements OnModuleInit {
         region: options.region || 'US'
       };
 
-      return await yahooFinance.insights(symbol, queryOptions);
+      const cacheKey = `${symbol}:${JSON.stringify(queryOptions)}`;
+      const cachedData = this.getCachedData('INSIGHTS', cacheKey);
+      if (cachedData) return cachedData;
+
+      const result = await yahooFinance.insights(symbol, queryOptions);
+      return this.setCachedData('INSIGHTS', cacheKey, result);
     } catch (error) {
       this.logger.error(`Failed to fetch insights for ${symbol}`, error);
       throw error;
@@ -334,7 +424,12 @@ export class FinanceService implements OnModuleInit {
    */
   async getDailyGainers(options: TrendingQueryOptions = {}) {
     try {
-      return await yahooFinance.dailyGainers(options);
+      const cacheKey = JSON.stringify(options);
+      const cachedData = this.getCachedData('DAILY_GAINERS', cacheKey);
+      if (cachedData) return cachedData;
+
+      const result = await yahooFinance.dailyGainers(options);
+      return this.setCachedData('DAILY_GAINERS', cacheKey, result);
     } catch (error) {
       this.logger.error('Failed to fetch daily gainers', error);
       throw error;
