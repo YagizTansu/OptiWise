@@ -331,22 +331,6 @@ export class FinanceController {
   ) {
     return this.financeService.getDailyGainers({ count, lang, region });
   }
-
-  /**
-   * Get cache statistics
-   */
-  @Get('cache/stats')
-  getCacheStats() {
-    return this.financeService.getCacheStats();
-  }
-
-  /**
-   * Clear cache - optionally by type
-   */
-  @Get('cache/clear')
-  clearCache(@Query('type') type?: string) {
-    return this.financeService.clearCache(type);
-  }
 }
 
 /* 
