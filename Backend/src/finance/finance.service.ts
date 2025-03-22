@@ -90,9 +90,45 @@ interface InsightsOptions {
 @Injectable()
 export class FinanceService implements OnModuleInit {
   private readonly logger = new Logger(FinanceService.name);
+  private cache = new Map<string, {data: any, timestamp: number}>();
+  private readonly CACHE_TTL = 60000; // 1 minute cache duration in milliseconds
   
   onModuleInit() {
     this.logger.log('FinanceService initialized');
+    // Set up periodic cache cleanup to prevent memory growth
+    setInterval(() => this.cleanupCache(), 300000); // Clean cache every 5 minutes
+  }
+
+  private cleanupCache() {
+    const now = Date.now();
+    let expiredCount = 0;
+    
+    for (const [key, value] of this.cache.entries()) {
+      if (now - value.timestamp > this.CACHE_TTL) {
+        this.cache.delete(key);
+        expiredCount++;
+      }
+    }
+    
+    if (expiredCount > 0) {
+      this.logger.debug(`Cleaned up ${expiredCount} expired cache items`);
+    }
+  }
+
+  private getCachedData(cacheKey: string) {
+    const cachedItem = this.cache.get(cacheKey);
+    if (cachedItem && (Date.now() - cachedItem.timestamp < this.CACHE_TTL)) {
+      return cachedItem.data;
+    }
+    return null;
+  }
+
+  private setCachedData(cacheKey: string, data: any) {
+    this.cache.set(cacheKey, {
+      data,
+      timestamp: Date.now()
+    });
+    return data;
   }
 
   /**
@@ -100,13 +136,17 @@ export class FinanceService implements OnModuleInit {
    */
   async searchSymbols(query: string, options: SearchOptions = {}) {
     try {
+      const cacheKey = `search:${query}:${JSON.stringify(options)}`;
+      const cachedData = this.getCachedData(cacheKey);
+      if (cachedData) return cachedData;
+
       // Use default quotesCount if not explicitly provided
       if (!options.quotesCount && typeof options.quotesCount !== 'number') {
         options.quotesCount = 10;
       }
       
       const result = await yahooFinance.search(query, options);
-      return result.quotes;
+      return this.setCachedData(cacheKey, result.quotes);
     } catch (error) {
       this.logger.error(`Failed to search for ${query}`, error);
       throw error;
@@ -125,8 +165,14 @@ export class FinanceService implements OnModuleInit {
    */
   async getQuote(symbol: string | string[], options: QuoteOptions = {}) {
     try {
+      const symbolStr = Array.isArray(symbol) ? symbol.join(',') : symbol;
+      const cacheKey = `quote:${symbolStr}:${JSON.stringify(options)}`;
+      const cachedData = this.getCachedData(cacheKey);
+      if (cachedData) return cachedData;
+
       // Type assertion to handle the type mismatch
-      return await yahooFinance.quote(symbol, options as any);
+      const result = await yahooFinance.quote(symbol, options as any);
+      return this.setCachedData(cacheKey, result);
     } catch (error) {
       const symbolStr = Array.isArray(symbol) ? symbol.join(',') : symbol;
       this.logger.error(`Failed to fetch quote for ${symbolStr}`, error);
