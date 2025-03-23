@@ -15,8 +15,9 @@ export interface ChartDataPoint {
   high: number | undefined;  // Changed from optional to required but can be undefined
   low: number | undefined;   // Changed from optional to required but can be undefined
   volume: number | undefined; // Changed from optional to required but can be undefined
-  date: string | undefined;  // Changed from optional to required but can be undefined
+  date: string;  // Required to be string to match implementation
   fullDate: Date | undefined; // Changed from optional to required but can be undefined
+  currency?: string; // Added currency field
 }
 
 export interface ChartDataResponse {
@@ -58,6 +59,7 @@ export interface PeriodData {
   label: string;
   value: number;
   months: number;
+  currency?: string; // Added currency field
 }
 
 export interface HistoricalDataPoint {
@@ -78,6 +80,7 @@ export interface AnnualReturnData {
     worstYear: string;
     average: string;
   };
+  currency?: string; // Added currency field
 }
 
 // Statistics types
@@ -86,6 +89,7 @@ export interface StatisticsData {
   allTimeLow: string;
   profitDays: string;
   avgHoldPeriod: string;
+  currency?: string; // Added currency field
 }
 
 // Dividend types
@@ -125,6 +129,7 @@ export interface DividendHistoryResponse {
   events: DividendEvent[];
   chartData: DividendChartData | null;
   error: string | null;
+  currency?: string; // Added currency field
 }
 
 // Time Average Returns types
@@ -149,6 +154,7 @@ export interface ReturnStatisticData {
 export interface TimeAverageReturnResponse {
   chartData: TimeAverageReturnData;
   statistics: ReturnStatisticData[];
+  currency?: string; // Added currency field
 }
 
 // Seasonality types
@@ -175,6 +181,7 @@ export interface SeasonalityResponse {
   monthly?: SeasonalityChartData;
   yearly?: SeasonalityChartData;
   error?: string;
+  currency?: string; // Added currency field
 }
 
 // Seasonal Strategy Insights types
@@ -205,6 +212,7 @@ export interface SeasonalStrategyResponse {
   riskPattern: SeasonalPattern | null;
   monthlyDetailedData: Record<string, MonthlyStatistics>;
   error: string | null;
+  currency?: string; // Added currency field
 }
 
 // Pattern Correlation types
@@ -221,6 +229,7 @@ export interface PatternCorrelationData {
       cutout: string;
     }>;
   };
+  currency?: string; // Added currency field
 }
 
 // Report Insights types
@@ -358,6 +367,7 @@ export interface WyckoffIndicatorDataPoint {
 export interface WyckoffIndicatorData {
   labels: string[];
   indicators: number[];
+  currency?: string; // Added currency field
 }
 
 // Price Volume Chart types
@@ -376,6 +386,7 @@ export interface PriceVolumeData {
   maxPrice: number;
   avgVolume: number;
   volumeChange: number;
+  currency?: string; // Added currency field
 }
 
 // =============================================================================
@@ -559,15 +570,28 @@ export async function fetchChartData(
     };
 
     const data = await makeApiRequest<any>('chart', params);
+    
+    // Extract currency information
+    const currency = data?.meta?.currency || 'USD';
         
     // Process the response data based on its format
     if (data && data.meta && data.quotes && Array.isArray(data.quotes)) {
-      return processDirectFormat(data);
+      const chartData = processDirectFormat(data);
+      // Add currency to each data point
+      chartData.forEach(point => {
+        point.currency = currency;
+      });
+      return chartData;
     } 
     // Handle Yahoo Finance API format as fallback
     else if (data && data.chart && data.chart.result && 
         data.chart.result[0] && data.chart.result[0].indicators) {
-      return processYahooFormat(data.chart.result[0]);
+      const chartData = processYahooFormat(data.chart.result[0]);
+      // Add currency to each data point
+      chartData.forEach(point => {
+        point.currency = currency;
+      });
+      return chartData;
     } 
     else {
       console.error('Unrecognized response format:', data);
@@ -628,6 +652,7 @@ export async function fetchPerformanceMetrics(
   try {
     const today = new Date();
     const results: PeriodData[] = [];
+    let currency = 'USD'; // Default currency
     
     // Fetch data for each period
     for (const period of periods) {
@@ -657,6 +682,11 @@ export async function fetchPerformanceMetrics(
       
       const data = await makeApiRequest<any>('chart', params);
       
+      // Extract currency (use the last successful response's currency)
+      if (data?.meta?.currency) {
+        currency = data.meta.currency;
+      }
+      
       if (data && data.quotes && Array.isArray(data.quotes) && data.quotes.length > 0) {
         // Get first and last valid closing prices
         const quotes = data.quotes;
@@ -671,14 +701,16 @@ export async function fetchPerformanceMetrics(
           results.push({
             label: period.label,
             value: performanceValue,
-            months: period.months
+            months: period.months,
+            currency: currency
           });
         } else {
           // Handle case where we don't have valid data points
           results.push({
             label: period.label,
             value: 0,
-            months: period.months
+            months: period.months,
+            currency: currency
           });
         }
       } else {
@@ -686,7 +718,8 @@ export async function fetchPerformanceMetrics(
         results.push({
           label: period.label,
           value: 0,
-          months: period.months
+          months: period.months,
+          currency: currency
         });
       }
     }
@@ -804,6 +837,9 @@ export async function fetchAnnualPerformance(
     // Call the chart API with monthly data
     const data = await makeApiRequest<any>('chart', params);
     
+    // Extract currency information
+    const currency = data?.meta?.currency || 'USD';
+    
     if (!data || !data.quotes || !data.quotes.length) {
       throw new Error('No historical data available');
     }
@@ -827,7 +863,11 @@ export async function fetchAnnualPerformance(
     });
     
     // Calculate annual returns from the data
-    return calculateAnnualReturns(historicalData);
+    const annualReturnData = calculateAnnualReturns(historicalData);
+    // Add currency to the response
+    annualReturnData.currency = currency;
+    
+    return annualReturnData;
     
   } catch (error) {
     console.error('Error fetching annual performance data:', error);
@@ -861,6 +901,9 @@ export async function fetchKeyStatistics(symbol: string, years: number = 20): Pr
     
     const data = await makeApiRequest<any>('chart', params);
     
+    // Extract currency information
+    const currency = data?.meta?.currency || 'USD';
+    
     // Process the chart data to calculate statistics
     if (!data || !data.quotes || !Array.isArray(data.quotes) || data.quotes.length === 0) {
       throw new Error('No historical data available');
@@ -869,11 +912,11 @@ export async function fetchKeyStatistics(symbol: string, years: number = 20): Pr
     const historicalData = data.quotes;
     
     // Calculate All-Time High and All-Time Low
-    let allTimeHigh = Math.max(...historicalData.map(point => point.high || point.close));
-    let allTimeLow = Math.min(...historicalData.map(point => point.low || point.close));
+    let allTimeHigh = Math.max(...historicalData.map((point: { high: any; close: any; }) => point.high || point.close));
+    let allTimeLow = Math.min(...historicalData.map((point: { low: any; close: any; }) => point.low || point.close));
     
     // Calculate Profit Days (days where close > open)
-    const profitDays = historicalData.filter(point => (point.close > point.open) && point.open !== undefined).length;
+    const profitDays = historicalData.filter((point: { close: number; open: number | undefined; }) => point.open !== undefined && (point.close > point.open)).length;
     const profitPercentage = (profitDays / historicalData.length) * 100;
     
     // Calculate Average Hold Period
@@ -883,7 +926,7 @@ export async function fetchKeyStatistics(symbol: string, years: number = 20): Pr
     let inProfitPeriod = false;
     let currentHoldDays = 0;
     
-    historicalData.forEach((point, index) => {
+    historicalData.forEach((point: { close: number; open: any; }, index: number) => {
       if (index > 0) {
         const isUpDay = point.close > (point.open || 0);
         
@@ -918,7 +961,8 @@ export async function fetchKeyStatistics(symbol: string, years: number = 20): Pr
       allTimeHigh: formatCurrency(allTimeHigh),
       allTimeLow: formatCurrency(allTimeLow),
       profitDays: `${profitPercentage.toFixed(1)}%`,
-      avgHoldPeriod: `${avgHoldYears.toFixed(1)} Years`
+      avgHoldPeriod: `${avgHoldYears.toFixed(1)} Years`,
+      currency: currency
     };
   } catch (error) {
     console.error('Error fetching key statistics:', error);
@@ -926,7 +970,8 @@ export async function fetchKeyStatistics(symbol: string, years: number = 20): Pr
       allTimeHigh: 'N/A',
       allTimeLow: 'N/A',
       profitDays: 'N/A',
-      avgHoldPeriod: 'N/A'
+      avgHoldPeriod: 'N/A',
+      currency: 'USD' // Default currency if error
     };
   }
 }
@@ -961,6 +1006,9 @@ export async function fetchDividendHistory(
     
     const data = await makeApiRequest<any>('chart', params);
     
+    // Extract currency information
+    const currency = data?.meta?.currency || 'USD';
+    
     // Process dividend events from chart data
     let dividendEvents: DividendEvent[] = [];
     
@@ -989,7 +1037,8 @@ export async function fetchDividendHistory(
       return {
         events: [],
         chartData: null,
-        error: 'No dividend data available for this stock'
+        error: 'No dividend data available for this stock',
+        currency: currency
       };
     }
     
@@ -1019,14 +1068,16 @@ export async function fetchDividendHistory(
     return {
       events: dividendEvents,
       chartData,
-      error: null
+      error: null,
+      currency: currency
     };
   } catch (error) {
     console.error('Error fetching dividend history:', error);
     return {
       events: [],
       chartData: null,
-      error: `Failed to load dividend data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      error: `Failed to load dividend data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      currency: 'USD' // Default currency if error
     };
   }
 }
@@ -1115,6 +1166,9 @@ export async function fetchTimeAverageReturns(
     // Fetch chart data
     const data = await makeApiRequest<any>('chart', params);
     
+    // Extract currency information
+    const currency = data?.meta?.currency || 'USD';
+    
     if (!data || !data.quotes || !data.quotes.length) {
       throw new Error('No data available for the selected criteria');
     }
@@ -1158,7 +1212,8 @@ export async function fetchTimeAverageReturns(
     
     return {
       chartData: processedChartData,
-      statistics
+      statistics,
+      currency: currency
     };
   } catch (error) {
     console.error('Error fetching time average returns:', error);
@@ -1453,6 +1508,7 @@ export async function fetchSeasonalityData(
     // Process for each period
     const datasets: SeasonalityDataset[] = [];
     let periodLabels: string[] = [];
+    let currency = 'USD'; // Default currency
     
     for (const period of periods) {
       const { years } = period;
@@ -1488,6 +1544,11 @@ export async function fetchSeasonalityData(
       
       // Fetch chart data
       const data = await makeApiRequest<any>('chart', params);
+      
+      // Extract currency information (use the last successful response's currency)
+      if (data?.meta?.currency) {
+        currency = data.meta.currency;
+      }
       
       if (!data || !data.quotes || !data.quotes.length) {
         throw new Error(`No data available for ${symbol} over ${years} years`);
@@ -1554,10 +1615,14 @@ export async function fetchSeasonalityData(
       });
     }
     
-    return {
+    // Add currency to each dataset
+    const result = {
       labels: periodLabels,
-      datasets
+      datasets,
+      currency: currency // Add currency to chart data
     };
+    
+    return result;
   } catch (error) {
     console.error(`Error fetching seasonality data for ${symbol}:`, error);
     throw error;
@@ -1782,7 +1847,9 @@ export async function fetchAllSeasonalityData(
     const timeframes = ['daily', 'weekly', 'monthly', 'yearly'] as const;
     type TimeframeKey = typeof timeframes[number];
     
-    const results: SeasonalityResponse = {};
+    const results: SeasonalityResponse = {
+      currency: 'USD' // Default currency
+    };
     
     // Fetch data for all timeframes in parallel
     const promises = timeframes.map(timeframe => 
@@ -1790,6 +1857,10 @@ export async function fetchAllSeasonalityData(
         .then(data => {
           // Use type assertion for correct assignment
           results[timeframe as TimeframeKey] = data;
+          // Update the currency from any successful response
+          if (data.currency) {
+            results.currency = data.currency;
+          }
         })
         .catch(error => {
           console.error(`Error fetching ${timeframe} data:`, error);
@@ -1803,7 +1874,8 @@ export async function fetchAllSeasonalityData(
   } catch (error) {
     console.error(`Error fetching seasonality data for ${symbol}:`, error);
     return {
-      error: error instanceof Error ? error.message : 'Unknown error fetching seasonality data'
+      error: error instanceof Error ? error.message : 'Unknown error fetching seasonality data',
+      currency: 'USD' // Default currency if error
     };
   }
 }
@@ -1848,12 +1920,16 @@ export async function fetchSeasonalStrategyInsights(
     // Fetch chart data
     const data = await makeApiRequest<any>('chart', params);
     
+    // Extract currency information
+    const currency = data?.meta?.currency || 'USD';
+    
     if (!data || !data.quotes || !data.quotes.length) {
       return {
         strongestPattern: null,
         riskPattern: null,
         monthlyDetailedData: {},
-        error: 'No historical data available'
+        error: 'No historical data available',
+        currency: currency
       };
     }
     
@@ -1876,7 +1952,11 @@ export async function fetchSeasonalStrategyInsights(
     });
     
     // Analyze seasonal patterns
-    return analyzeSeasonalPatterns(historicalData);
+    const result = analyzeSeasonalPatterns(historicalData);
+    // Add currency to result
+    result.currency = currency;
+    
+    return result;
     
   } catch (error) {
     console.error('Error fetching seasonal strategy insights:', error);
@@ -1884,7 +1964,8 @@ export async function fetchSeasonalStrategyInsights(
       strongestPattern: null,
       riskPattern: null,
       monthlyDetailedData: {},
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
+      currency: 'USD' // Default currency if error
     };
   }
 }
@@ -2077,6 +2158,9 @@ export async function fetchPatternCorrelation(
       })
     ]);
     
+    // Extract currency (use the first response's currency)
+    const currency = firstPeriodResponse?.meta?.currency || secondPeriodResponse?.meta?.currency || 'USD';
+    
     // Extract closing prices for correlation calculation
     const firstPeriodData = firstPeriodResponse?.quotes || [];
     const secondPeriodData = secondPeriodResponse?.quotes || [];
@@ -2115,7 +2199,8 @@ export async function fetchPatternCorrelation(
             cutout: '75%'
           }
         ]
-      }
+      },
+      currency: currency
     };
   } catch (error) {
     console.error('Error fetching pattern correlation data:', error);
@@ -2383,6 +2468,9 @@ export async function fetchWyckoffIndicatorData(symbol: string, timeframe: strin
     
     const data = await makeApiRequest<any>('chart', params);
     
+    // Extract currency information
+    const currency = data?.meta?.currency || 'USD';
+    
     // Extract data from response
     if (data && data.quotes && data.quotes.length > 0) {
       // Extract quotes array
@@ -2404,7 +2492,11 @@ export async function fetchWyckoffIndicatorData(symbol: string, timeframe: strin
       };
       
       // Process data for Wyckoff indicator
-      return calculateWyckoffIndicator(timestamps, quoteData);
+      const wyckoffData = calculateWyckoffIndicator(timestamps, quoteData);
+      // Add currency to result
+      wyckoffData.currency = currency;
+      
+      return wyckoffData;
     } else {
       throw new Error('Invalid data format received from API');
     }
@@ -2445,6 +2537,9 @@ export async function fetchPriceVolumeData(
     };
     
     const data = await makeApiRequest<any>('chart', params);
+    
+    // Extract currency information
+    const currency = data?.meta?.currency || 'USD';
     
     // Process the data
     if (!data || !data.quotes || !Array.isArray(data.quotes) || data.quotes.length === 0) {
@@ -2499,7 +2594,8 @@ export async function fetchPriceVolumeData(
       minPrice,
       maxPrice,
       avgVolume,
-      volumeChange
+      volumeChange,
+      currency: currency
     };
   } catch (error) {
     console.error('Error fetching price-volume data:', error);
