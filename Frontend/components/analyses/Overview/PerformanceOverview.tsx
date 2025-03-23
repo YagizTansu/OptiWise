@@ -568,7 +568,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
                       },
                       ticks: {
                         callback: function(value) {
-                          return '$' + value;
+                          return  value;
                         }
                       }
                     },
@@ -604,15 +604,15 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
                           const dataPoint = chartData[context.dataIndex];
                           let label = [];
                           
-                          label.push(`Price: $${dataPoint.close.toFixed(2)}`);
+                          label.push(`Price: ${dataPoint.close.toFixed(2)}`);
                           
                           if (dataPoint.open !== undefined) {
-                            label.push(`Open: $${dataPoint.open.toFixed(2)}`);
+                            label.push(`Open: ${dataPoint.open.toFixed(2)}`);
                           }
                           
                           if (dataPoint.high !== undefined && dataPoint.low !== undefined) {
-                            label.push(`High: $${dataPoint.high.toFixed(2)}`);
-                            label.push(`Low: $${dataPoint.low.toFixed(2)}`);
+                            label.push(`High: ${dataPoint.high.toFixed(2)}`);
+                            label.push(`Low: ${dataPoint.low.toFixed(2)}`);
                           }
                           
                           if (dataPoint.volume !== undefined) {
