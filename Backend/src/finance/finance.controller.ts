@@ -208,20 +208,6 @@ export class FinanceController {
   }
 
   /**
-   * Get historical price data for a symbol
-   * Note: For more flexibility with intervals and events, use the chart endpoint
-   */
-  @Get('historical')
-  async getHistoricalData(
-    @Query('symbol', new DefaultValuePipe('AAPL')) symbol: string,
-    @Query('from', new DefaultValuePipe(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()), ParseDatePipe) from: Date,
-    @Query('to', new DefaultValuePipe(new Date().toISOString()), ParseDatePipe) to: Date,
-    @Query('interval', new DefaultValuePipe('1d'), new HistoricalIntervalValidationPipe()) interval: '1d' | '1wk' | '1mo',
-  ) {
-    return this.financeService.getHistoricalData(symbol, from, to, interval);
-  }
-
-  /**
    * Get real-time quote for one or multiple symbols
    * 
    * Notes: 

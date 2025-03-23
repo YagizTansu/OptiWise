@@ -636,26 +636,32 @@ export async function fetchPerformanceMetrics(
       startDate.setMonth(today.getMonth() - period.months);
       
       // Format dates for API
-      const fromDate = startDate.toISOString().split('T')[0];
-      const toDate = today.toISOString().split('T')[0];
+      const period1 = startDate.toISOString();
+      const period2 = today.toISOString();
       
       // Determine appropriate interval based on period length
       const interval = period.months > 60 ? '1mo' : period.months > 12 ? '1wk' : '1d';
       
-      // Fetch historical data
+      // Fetch chart data with appropriate parameters
       const params = {
         symbol,
-        from: fromDate,
-        to: toDate,
-        interval
+        period1,
+        period2,
+        interval,
+        includePrePost: true,
+        events: 'div|split',
+        lang: 'en-US',
+        return: 'array',
+        useYfid: true
       };
       
-      const data = await makeApiRequest<any[]>('historical', params);
+      const data = await makeApiRequest<any>('chart', params);
       
-      if (data && Array.isArray(data) && data.length > 0) {
+      if (data && data.quotes && Array.isArray(data.quotes) && data.quotes.length > 0) {
         // Get first and last valid closing prices
-        const firstValidDataPoint = data.find(point => point.close !== null);
-        const lastValidDataPoint = [...data].reverse().find(point => point.close !== null);
+        const quotes = data.quotes;
+        const firstValidDataPoint = quotes.find((point: { close: null | undefined; }) => point.close !== null && point.close !== undefined);
+        const lastValidDataPoint = [...quotes].reverse().find(point => point.close !== null && point.close !== undefined);
         
         if (firstValidDataPoint && lastValidDataPoint) {
           const startPrice = firstValidDataPoint.close;
@@ -782,33 +788,52 @@ export async function fetchAnnualPerformance(
   try {
     const { startDate, endDate } = getDateRangeFromYears(years);
     
-    // Format dates as ISO strings
+    // Format dates as ISO strings and update parameters for chart API
     const params = {
       symbol,
-      from: startDate.toISOString(),
-      to: endDate.toISOString(),
-      interval: '1mo'
+      period1: startDate.toISOString(),
+      period2: endDate.toISOString(),
+      interval: '1mo',
+      includePrePost: true,
+      events: 'div|split',
+      lang: 'en-US',
+      return: 'array',
+      useYfid: true
     };
     
-    // Call the historical API with monthly data
-    const data = await makeApiRequest<HistoricalDataPoint[]>('historical', params);
+    // Call the chart API with monthly data
+    const data = await makeApiRequest<any>('chart', params);
     
-    if (!data || !data.length) {
+    if (!data || !data.quotes || !data.quotes.length) {
       throw new Error('No historical data available');
     }
     
+    // Convert to expected HistoricalDataPoint format for calculateAnnualReturns
+    const historicalData = data.quotes.map((quote: any) => {
+      const timestamp = quote.timestamp || quote.date;
+      const date = typeof timestamp === 'number' 
+        ? new Date(timestamp * 1000).toISOString() 
+        : new Date(timestamp).toISOString();
+        
+      return {
+        date,
+        open: quote.open || 0,
+        high: quote.high || 0,
+        low: quote.low || 0,
+        close: quote.close || 0,
+        volume: quote.volume || 0,
+        adjClose: quote.adjClose || quote.close || 0
+      };
+    });
+    
     // Calculate annual returns from the data
-    return calculateAnnualReturns(data);
+    return calculateAnnualReturns(historicalData);
     
   } catch (error) {
     console.error('Error fetching annual performance data:', error);
     throw error;
   }
 }
-
-// =============================================================================
-// STATISTICS FUNCTIONS
-// =============================================================================
 
 /**
  * Fetches and calculates key statistics for a financial symbol
@@ -824,24 +849,31 @@ export async function fetchKeyStatistics(symbol: string, years: number = 20): Pr
     
     const params = {
       symbol,
-      from: startDate.toISOString(),
-      to: endDate.toISOString(),
-      interval: '1d'
+      period1: startDate.toISOString(),
+      period2: endDate.toISOString(),
+      interval: '1d',
+      includePrePost: true,
+      events: 'div|split',
+      lang: 'en-US',
+      return: 'array',
+      useYfid: true
     };
     
-    const historicalData = await makeApiRequest<HistoricalDataPoint[]>('historical', params);
+    const data = await makeApiRequest<any>('chart', params);
     
-    // Process the historical data to calculate statistics
-    if (!historicalData || !Array.isArray(historicalData) || historicalData.length === 0) {
+    // Process the chart data to calculate statistics
+    if (!data || !data.quotes || !Array.isArray(data.quotes) || data.quotes.length === 0) {
       throw new Error('No historical data available');
     }
     
+    const historicalData = data.quotes;
+    
     // Calculate All-Time High and All-Time Low
-    let allTimeHigh = Math.max(...historicalData.map(point => point.high));
-    let allTimeLow = Math.min(...historicalData.map(point => point.low));
+    let allTimeHigh = Math.max(...historicalData.map(point => point.high || point.close));
+    let allTimeLow = Math.min(...historicalData.map(point => point.low || point.close));
     
     // Calculate Profit Days (days where close > open)
-    const profitDays = historicalData.filter(point => point.close > point.open).length;
+    const profitDays = historicalData.filter(point => (point.close > point.open) && point.open !== undefined).length;
     const profitPercentage = (profitDays / historicalData.length) * 100;
     
     // Calculate Average Hold Period
@@ -853,7 +885,7 @@ export async function fetchKeyStatistics(symbol: string, years: number = 20): Pr
     
     historicalData.forEach((point, index) => {
       if (index > 0) {
-        const isUpDay = point.close > point.open;
+        const isUpDay = point.close > (point.open || 0);
         
         if (isUpDay && !inProfitPeriod) {
           // Starting a new profit period
@@ -1065,41 +1097,64 @@ export async function fetchTimeAverageReturns(
     const interval = viewType === 'daily' ? '1d' : '1mo';
     
     // Format dates for API
-    const fromDate = startDate.toISOString().split('T')[0];
-    const toDate = endDate.toISOString().split('T')[0];
+    const period1 = startDate.toISOString();
+    const period2 = endDate.toISOString();
     
     const params = {
       symbol,
-      from: fromDate,
-      to: toDate,
-      interval
+      period1,
+      period2,
+      interval,
+      includePrePost: true,
+      events: 'div|split',
+      lang: 'en-US',
+      return: 'array',
+      useYfid: true
     };
     
-    // Fetch historical data
-    const data = await makeApiRequest<HistoricalDataPoint[]>('historical', params);
+    // Fetch chart data
+    const data = await makeApiRequest<any>('chart', params);
     
-    if (!data || data.length === 0) {
+    if (!data || !data.quotes || !data.quotes.length) {
       throw new Error('No data available for the selected criteria');
     }
+    
+    // Convert to expected HistoricalDataPoint format
+    const historicalData = data.quotes.map((quote: any) => {
+      const timestamp = quote.timestamp || quote.date;
+      const date = typeof timestamp === 'number' 
+        ? new Date(timestamp * 1000).toISOString() 
+        : new Date(timestamp).toISOString();
+        
+      return {
+        date,
+        open: quote.open || 0,
+        high: quote.high || 0,
+        low: quote.low || 0,
+        close: quote.close || 0,
+        volume: quote.volume || 0,
+        adjClose: quote.adjClose || quote.close || 0
+      };
+    });
     
     // Process data based on view type
     let processedChartData;
     switch (viewType) {
       case 'daily':
-        processedChartData = processDailyData(data, period);
+        processedChartData = processDailyData(historicalData, period);
         break;
       case 'monthly':
-        processedChartData = processMonthlyData(data, period);
+        processedChartData = processMonthlyData(historicalData, period);
         break;
       case 'yearly':
-        processedChartData = processYearlyData(data, period);
+        processedChartData = processYearlyData(historicalData, period);
         break;
       default:
-        processedChartData = processMonthlyData(data, period);
+        processedChartData = processMonthlyData(historicalData, period);
     }
     
     // Calculate statistics
-    const statistics = calculateTimeAverageStats(data, viewType);
+    const statistics = calculateTimeAverageStats(historicalData, viewType);
     
     return {
       chartData: processedChartData,
@@ -1415,39 +1470,62 @@ export async function fetchSeasonalityData(
         interval = '1d'; // Need daily data to calculate weekly/monthly performance
       }
       
-      // Format dates for API
-      const fromDate = from.toISOString().split('T')[0];
-      const toDate = to.toISOString().split('T')[0];
+      // Format dates for chart API
+      const period1 = from.toISOString();
+      const period2 = to.toISOString();
       
       const params = {
         symbol,
-        from: fromDate,
-        to: toDate,
-        interval
+        period1,
+        period2,
+        interval,
+        includePrePost: true,
+        events: 'div|split',
+        lang: 'en-US',
+        return: 'array',
+        useYfid: true
       };
       
-      // Fetch historical data
-      const data = await makeApiRequest<HistoricalDataPoint[]>('historical', params);
+      // Fetch chart data
+      const data = await makeApiRequest<any>('chart', params);
       
-      if (!data || data.length === 0) {
+      if (!data || !data.quotes || !data.quotes.length) {
         throw new Error(`No data available for ${symbol} over ${years} years`);
       }
+      
+      // Convert to expected HistoricalDataPoint format
+      const historicalData = data.quotes.map((quote: any) => {
+        const timestamp = quote.timestamp || quote.date;
+        const date = typeof timestamp === 'number' 
+          ? new Date(timestamp * 1000).toISOString() 
+          : new Date(timestamp).toISOString();
+          
+        return {
+          date,
+          open: quote.open || 0,
+          high: quote.high || 0,
+          low: quote.low || 0,
+          close: quote.close || 0,
+          volume: quote.volume || 0,
+          adjClose: quote.adjClose || quote.close || 0
+        };
+      });
       
       // Process data based on timeframe
       let processedData: SeasonalityDataPoint[] = [];
       
       switch (timeframe) {
         case 'daily':
-          processedData = calculateDailySeasonality(data, years);
+          processedData = calculateDailySeasonality(historicalData, years);
           break;
         case 'weekly':
-          processedData = calculateWeeklySeasonality(data, years);
+          processedData = calculateWeeklySeasonality(historicalData, years);
           break;
         case 'monthly':
-          processedData = calculateMonthlySeasonality(data, years);
+          processedData = calculateMonthlySeasonality(historicalData, years);
           break;
         case 'yearly':
-          processedData = calculateYearlySeasonality(data, years);
+          processedData = calculateYearlySeasonality(historicalData, years);
           break;
       }
       
@@ -1752,20 +1830,25 @@ export async function fetchSeasonalStrategyInsights(
     startDate.setFullYear(endDate.getFullYear() - years);
     
     // Format dates for API
-    const fromDate = startDate.toISOString().split('T')[0];
-    const toDate = endDate.toISOString().split('T')[0];
+    const period1 = startDate.toISOString();
+    const period2 = endDate.toISOString();
     
     const params = {
       symbol,
-      from: fromDate,
-      to: toDate,
-      interval: '1mo'
+      period1,
+      period2,
+      interval: '1mo',
+      includePrePost: true,
+      events: 'div|split',
+      lang: 'en-US',
+      return: 'array',
+      useYfid: true
     };
     
-    // Fetch historical data
-    const historicalData = await makeApiRequest<HistoricalDataPoint[]>('historical', params);
+    // Fetch chart data
+    const data = await makeApiRequest<any>('chart', params);
     
-    if (!historicalData || historicalData.length === 0) {
+    if (!data || !data.quotes || !data.quotes.length) {
       return {
         strongestPattern: null,
         riskPattern: null,
@@ -1773,6 +1856,24 @@ export async function fetchSeasonalStrategyInsights(
         error: 'No historical data available'
       };
     }
+    
+    // Convert to expected HistoricalDataPoint format
+    const historicalData = data.quotes.map((quote: any) => {
+      const timestamp = quote.timestamp || quote.date;
+      const date = typeof timestamp === 'number' 
+        ? new Date(timestamp * 1000).toISOString() 
+        : new Date(timestamp).toISOString();
+        
+      return {
+        date,
+        open: quote.open || 0,
+        high: quote.high || 0,
+        low: quote.low || 0,
+        close: quote.close || 0,
+        volume: quote.volume || 0,
+        adjClose: quote.adjClose || quote.close || 0
+      };
+    });
     
     // Analyze seasonal patterns
     return analyzeSeasonalPatterns(historicalData);
@@ -1943,32 +2044,45 @@ export async function fetchPatternCorrelation(
     const secondPeriodMs = periodToMs(secondPeriod);
     
     // First period
-    const firstPeriodStart = new Date(currentDate.getTime() - firstPeriodMs).toISOString();
+    const firstPeriodStart = new Date(currentDate.getTime() - firstPeriodMs);
+    const firstPeriodEnd = new Date(currentDate);
     
     // Second period
-    const secondPeriodStart = new Date(currentDate.getTime() - secondPeriodMs).toISOString();
+    const secondPeriodStart = new Date(currentDate.getTime() - secondPeriodMs);
+    const secondPeriodEnd = new Date(currentDate);
     
-    const currentDateString = currentDate.toISOString();
-    
-    // Make API calls to get historical data
-    const [firstPeriodData, secondPeriodData] = await Promise.all([
-      makeApiRequest<HistoricalDataPoint[]>('historical', {
+    // Make API calls to get chart data
+    const [firstPeriodResponse, secondPeriodResponse] = await Promise.all([
+      makeApiRequest<any>('chart', {
         symbol,
-        from: firstPeriodStart,
-        to: currentDateString,
-        interval: '1d'
+        period1: firstPeriodStart.toISOString(),
+        period2: firstPeriodEnd.toISOString(),
+        interval: '1d',
+        includePrePost: true,
+        events: 'div|split',
+        lang: 'en-US',
+        return: 'array',
+        useYfid: true
       }),
-      makeApiRequest<HistoricalDataPoint[]>('historical', {
+      makeApiRequest<any>('chart', {
         symbol,
-        from: secondPeriodStart,
-        to: currentDateString,
-        interval: '1d'
+        period1: secondPeriodStart.toISOString(),
+        period2: secondPeriodEnd.toISOString(),
+        interval: '1d',
+        includePrePost: true,
+        events: 'div|split',
+        lang: 'en-US',
+        return: 'array',
+        useYfid: true
       })
     ]);
     
     // Extract closing prices for correlation calculation
-    const firstPeriodPrices = firstPeriodData.map(item => item.close);
-    const secondPeriodPrices = secondPeriodData.map(item => item.close);
+    const firstPeriodData = firstPeriodResponse?.quotes || [];
+    const secondPeriodData = secondPeriodResponse?.quotes || [];
+    
+    const firstPeriodPrices = firstPeriodData.map((item: any) => item.close);
+    const secondPeriodPrices = secondPeriodData.map((item: any) => item.close);
     
     // Calculate correlation coefficient
     const coefficient = calculateCorrelation(firstPeriodPrices, secondPeriodPrices);

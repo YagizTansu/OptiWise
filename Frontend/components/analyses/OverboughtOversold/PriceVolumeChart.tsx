@@ -39,15 +39,14 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
   const [isInfoVisible, setIsInfoVisible] = useState(false);
 
   const timeframes = [
-    { label: '1W', value: '1w' },
+    { label: 'MAX', value: 'max' },
+    { label: '10Y', value: '10y' },
     { label: '5Y', value: '5y' },
-    { label: '3Y', value: '3y' },
+    { label: '2Y', value: '2y' },
     { label: '1Y', value: '1y' },
-    { label: '6M', value: '6m' },
-    { label: '1M', value: '1m' },
-    { label: '3D', value: '3d' },
-    { label: 'W', value: 'w' },
-    { label: 'D', value: 'd' },
+    { label: '6M', value: '6mo' },
+    { label: '3M', value: '3mo' },
+    { label: '1M', value: '1mo' },
   ];
 
   useEffect(() => {
