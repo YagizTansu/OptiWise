@@ -73,9 +73,9 @@ export default function Navbar() {
           <Link href="/pricing" className={styles.navLink}>
             Pricing
           </Link>
-          <Link href="/about" className={styles.navLink}>
+          {/* <Link href="/about" className={styles.navLink}>
             About
-          </Link>
+          </Link> */}
         </div>
         
         <div className={styles.navRight}>
@@ -131,16 +131,6 @@ export default function Navbar() {
                       </div>
                     </Link>
                     
-                    <Link href="/hot-topics" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaFire className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Hot Topics</span>
-                        <p className={styles.dropdownItemDesc}>Trending market topics</p>
-                      </div>
-                    </Link>
-                    
                     <Link href="/cot-reports" className={styles.dropdownGridItem}>
                       <div className={styles.dropdownItemIconWrap}>
                         <FaChartArea className={styles.dropdownItemIcon} />
@@ -165,6 +155,16 @@ export default function Navbar() {
                         <p className={styles.dropdownItemDesc}>Get intelligent help</p>
                       </div>
                     </Link>
+
+                    <Link href="/hot-topics" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaFire className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>Hot Topics</span>
+                        <p className={styles.dropdownItemDesc}>Trending market topics</p>
+                      </div>
+                    </Link>
                     
                     <Link href="/country-economics" className={styles.dropdownGridItem}>
                       <div className={styles.dropdownItemIconWrap}>
@@ -186,7 +186,7 @@ export default function Navbar() {
                       </div>
                     </Link>
                     
-                    <Link href="/market-insights" className={styles.dropdownGridItem}>
+                    {/* <Link href="/market-insights" className={styles.dropdownGridItem}>
                       <div className={styles.dropdownItemIconWrap}>
                         <FaLightbulb className={styles.dropdownItemIcon} />
                       </div>
@@ -194,7 +194,7 @@ export default function Navbar() {
                         <span className={styles.dropdownItemTitle}>Insights</span>
                         <p className={styles.dropdownItemDesc}>Market opportunities</p>
                       </div>
-                    </Link>
+                    </Link> */}
                   </div>
                 </div>
               </div>

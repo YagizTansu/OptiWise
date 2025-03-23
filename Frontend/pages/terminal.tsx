@@ -10,6 +10,7 @@ export default function Terminal() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [popularStocks, setPopularStocks] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const searchSectionRef = useRef<HTMLDivElement>(null);
@@ -17,6 +18,33 @@ export default function Terminal() {
 
   // Debounce search input
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch popular stocks when component mounts
+  useEffect(() => {
+    fetchPopularStocks();
+  }, []);
+
+  // Fetch popular stocks
+  const fetchPopularStocks = async () => {
+    try {
+      // This is a placeholder. You should replace this with a real API call to get popular stocks
+      // For now, I'm hardcoding some example popular stocks
+      const popular: SearchResult[] = [
+        { symbol: 'AAPL', shortName: 'Apple Inc.', exchange: 'NASDAQ' },
+        { symbol: 'MSFT', shortName: 'Microsoft Corporation', exchange: 'NASDAQ' },
+        { symbol: 'GOOGL', shortName: 'Alphabet Inc.', exchange: 'NASDAQ' },
+        { symbol: 'AMZN', shortName: 'Amazon.com Inc.', exchange: 'NASDAQ' },
+        { symbol: 'TSLA', shortName: 'Tesla, Inc.', exchange: 'NASDAQ' },
+        { symbol: 'META', shortName: 'Meta Platforms, Inc.', exchange: 'NASDAQ' },
+        { symbol: 'NVDA', shortName: 'NVIDIA Corporation', exchange: 'NASDAQ' },
+        { symbol: 'JPM', shortName: 'JPMorgan Chase & Co.', exchange: 'NYSE' },
+        { symbol: 'V', shortName: 'Visa Inc.', exchange: 'NYSE' },
+      ];
+      setPopularStocks(popular);
+    } catch (error) {
+      console.error('Error fetching popular stocks:', error);
+    }
+  };
 
   // Fetch search results using the imported function
   const fetchSearchResults = async (query: string) => {
@@ -52,6 +80,11 @@ export default function Terminal() {
     debounceTimeout.current = setTimeout(() => {
       fetchSearchResults(query);
     }, 300); // 300ms debounce time
+  };
+
+  // Handle focus on search input
+  const handleSearchFocus = () => {
+    setShowDropdown(true);
   };
 
   // Handle click on a search result item
@@ -98,7 +131,7 @@ export default function Terminal() {
               placeholder="Search..." 
               value={searchQuery}
               onChange={handleSearchChange}
-              onFocus={() => searchQuery && setShowDropdown(true)}
+              onFocus={handleSearchFocus}
             />
             <button 
               type="submit" 
@@ -108,7 +141,7 @@ export default function Terminal() {
             </button>
           </div>
           
-          {showDropdown && (searchResults.length > 0 || isLoading || searchQuery) && (
+          {showDropdown && (
             <div className={styles.searchResults}>
               {isLoading ? (
                 <div className={styles.loadingMessage}>
@@ -143,13 +176,38 @@ export default function Terminal() {
                 <div className={styles.noResults}>
                   No matching stocks found
                 </div>
-              ) : null}
+              ) : (
+                <div>
+                  <ul className={styles.resultsList}>
+                    {popularStocks.map((stock, index) => (
+                      <li 
+                        key={`popular-${stock.symbol || ''}-${index}`}
+                        className={styles.resultItem}
+                        onClick={() => handleResultClick(stock.symbol)}
+                        title={`View analysis for ${stock.symbol}`}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            handleResultClick(stock.symbol);
+                          }
+                        }}
+                      >
+                        <span className={styles.resultSymbol}>{stock.symbol}</span>
+                        <span className={styles.resultName}>{stock.shortName}</span>
+                        {stock.exchange && (
+                          <span className={styles.resultExchange}>{stock.exchange}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>
       </main>
     </Layout>
-        </ProtectedRoute>
-    
+    </ProtectedRoute>
   )
 }

@@ -86,50 +86,15 @@ export default function About() {
           </div>
         </section>
         
-        <section className={styles.storySection}>
-          <div className={styles.storyContent}>
-            <h2>Our Story</h2>
-            <p>
-              OptiWise was founded in 2020 when Sarah Johnson, a seasoned hedge fund manager, 
-              recognized that individual investors lacked access to the sophisticated tools 
-              used by institutional traders. She assembled a team of AI experts, data scientists, 
-              and market strategists with the goal of building a platform that could level the 
-              playing field.
-            </p>
-            <p>
-              What began as a prototype for algorithmic market analysis quickly evolved into a 
-              comprehensive investment intelligence platform. After two years of development and 
-              testing with early adopters, OptiWise launched publicly in 2022 and now serves 
-              thousands of investors across 40 countries.
-            </p>
-          </div>
-        </section>
         
-        <section className={styles.teamSection}>
-          <h2>Meet Our Team</h2>
-          <div className={styles.teamGrid}>
-            {team.map((member, index) => (
-              <div key={index} className={styles.teamMember}>
-                <div className={styles.memberImage}>
-                  {/* Placeholder for team member images */}
-                  <div className={styles.imagePlaceholder}></div>
-                </div>
-                <h3>{member.name}</h3>
-                <p className={styles.memberRole}>{member.role}</p>
-                <p className={styles.memberBio}>{member.bio}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-        
-        <section className={styles.ctaSection}>
+        {/* <section className={styles.ctaSection}>
           <h2>Join Us on Our Mission</h2>
           <p>Ready to transform how you make investment decisions?</p>
           <div className={styles.ctaButtons}>
             <button className={styles.primaryBtn}>Get Started</button>
             <button className={styles.secondaryBtn}>View Careers</button>
           </div>
-        </section>
+        </section> */}
       </div>
     </Layout>
   )

@@ -11,8 +11,8 @@ export default function Footer() {
             <li><Link href="/">Home</Link></li>
             <li><Link href="/features">Features</Link></li>
             <li><Link href="/pricing">Pricing</Link></li>
-            <li><Link href="/about">About</Link></li>
-            <li><Link href="/blog">Blog</Link></li>
+            {/* <li><Link href="/about">About</Link></li> */}
+            {/* <li><Link href="/blog">Blog</Link></li> */}
           </ul>
         </div>
         
@@ -37,9 +37,8 @@ export default function Footer() {
         <div className={styles.footerSection}>
           <h3>CONTACT US</h3>
           <p>OptiWise Ltd.</p>
-          <p>Zurich, Switzerland</p>
-          <p>Email: contact@optiwise.ai</p>
-          <p>Phone: +41 123 456 789</p>
+          <p>Milano, Italy</p>
+          <p>Email: contact@optiwise.com</p>
         </div>
       </div>
       
