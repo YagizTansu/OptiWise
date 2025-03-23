@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { FaFire, FaChartLine, FaTag, FaCalendarAlt, FaNewspaper, FaExternalLinkAlt, FaFilter, FaSearch, FaSort, FaCaretUp, FaTwitter, FaReddit, FaGlobe, FaLightbulb } from 'react-icons/fa';
+import { FaFire, FaChartLine, FaTag, FaCalendarAlt, FaNewspaper, FaExternalLinkAlt, FaFilter, FaSearch, FaSort, FaCaretUp, FaTwitter, FaReddit, FaGlobe, FaLightbulb, FaInfoCircle } from 'react-icons/fa';
 import styles from '../styles/HotTopics.module.css';
 import Layout from '../components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';

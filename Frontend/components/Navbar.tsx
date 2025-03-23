@@ -1,4 +1,4 @@
-import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl, FaSearchDollar, FaBalanceScale } from 'react-icons/fa';
+import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl, FaSearchDollar, FaBalanceScale, FaChartArea } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Navbar.module.css';
@@ -138,6 +138,16 @@ export default function Navbar() {
                       <div>
                         <span className={styles.dropdownItemTitle}>Hot Topics</span>
                         <p className={styles.dropdownItemDesc}>Trending market topics</p>
+                      </div>
+                    </Link>
+                    
+                    <Link href="/cot-reports" className={styles.dropdownGridItem}>
+                      <div className={styles.dropdownItemIconWrap}>
+                        <FaChartArea className={styles.dropdownItemIcon} />
+                      </div>
+                      <div>
+                        <span className={styles.dropdownItemTitle}>COT Reports</span>
+                        <p className={styles.dropdownItemDesc}>Commitment of Traders data</p>
                       </div>
                     </Link>
                   </div>

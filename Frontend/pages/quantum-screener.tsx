@@ -451,30 +451,6 @@ export default function QuantumScreener() {
                 )}
               </div>
             </div>
-
-            <div className={styles.infoSection}>
-              <div className={styles.infoCard}>
-                <h2>Understanding the Quantum Screener</h2>
-                <div className={styles.infoGrid}>
-                  <div className={styles.infoItem}>
-                    <h3>Correlation</h3>
-                    <p>Shows the seasonality (1, 3, 5, 7, 10, 15, 20, etc.) that has the strongest correlation with the current price of the financial instrument being analyzed.</p>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <h3>Win Rate %</h3>
-                    <p>Shows how often an investment or trading strategy has been profitable. For example, if you made money 8 times out of 10 years, your Win Rate% is 80%.</p>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <h3>Average Return %</h3>
-                    <p>Shows the average gain or loss during profitable periods. For example, if you made money 80% of the time over the last 10 years with an average gain of 2% when you were profitable, your Avg Return% is 2%.</p>
-                  </div>
-                  <div className={styles.infoItem}>
-                    <h3>Open Date & Close Date</h3>
-                    <p>These dates mark the beginning and the ending of the trade or investment. For adjustments or to enhance statistics, please visit the instrument page.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </main>
         </div>
       </ProtectedRoute>
