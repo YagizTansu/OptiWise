@@ -33,9 +33,10 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string }>({ 
+  const [assetInfo, setAssetInfo] = useState<{ name: string; symbol: string; currency: string }>({ 
     name: symbol, // Use symbol as initial name
-    symbol: symbol || ''
+    symbol: symbol || '',
+    currency: 'USD' // Default currency
   });
   const [selectedPeriod, setSelectedPeriod] = useState('1Y');
   const [selectedInterval, setSelectedInterval] = useState('1d');
@@ -90,7 +91,16 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
           selectedInterval
         );
         
+        // Update chart data
         setChartData(data);
+        
+        // Extract currency from first data point if available
+        if (data && data.length > 0 && data[0].currency) {
+          setAssetInfo(prev => ({
+            ...prev,
+            currency: data[0].currency || prev.currency // Ensure it falls back to previous currency if undefined
+          }));
+        }
       } catch (err) {
         console.error('Error loading chart data:', err);
         setError(`Failed to load chart data: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -105,14 +115,25 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
       // Also fetch quote data to get the asset name
       fetchQuoteData(symbol)
         .then(quote => {
-          setAssetInfo({
-            name: quote.longname || quote.shortname ||symbol,
-            symbol: quote.symbol
-          });
+          setAssetInfo(prev => ({
+            name: quote.longname || quote.shortname || symbol,
+            symbol: quote.symbol,
+            currency: prev.currency // Keep the currency from chart data
+          }));
         })
         .catch(err => console.error('Error fetching quote data:', err));
     }
   }, [symbol, dateRange, selectedInterval]);
+
+  // Format price with currency
+  const formatPrice = (value: number): string => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: assetInfo.currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  };
 
   // Create chart data from API response
   const realTrendData = useMemo(() => {
@@ -128,7 +149,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
     return {
       labels: labels,
       datasets: [{
-        label: 'Price ($)',
+        label: `Price (${assetInfo.currency})`,
         data: data,
         borderColor: 'rgb(75, 192, 192)',
         backgroundColor: 'rgba(75, 192, 192, 0.1)',
@@ -142,7 +163,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
         pointHoverBorderWidth: 2
       }]
     };
-  }, [chartData]);
+  }, [chartData, assetInfo.currency]);
 
   // Handle period selection
   const handlePeriodChange = (period: string) => {
@@ -462,7 +483,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
               {selectedPeriod === 'custom' 
                 ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
                 : selectedPeriod} 
-              Price Trend for {assetInfo.symbol}
+              Price Trend for {assetInfo.symbol} ({assetInfo.currency})
             </h2>
             <div className={styles.chartControls}>
               <button 
@@ -568,7 +589,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
                       },
                       ticks: {
                         callback: function(value) {
-                          return  value;
+                          return formatPrice(value as number);
                         }
                       }
                     },
@@ -604,15 +625,15 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
                           const dataPoint = chartData[context.dataIndex];
                           let label = [];
                           
-                          label.push(`Price: ${dataPoint.close.toFixed(2)}`);
+                          label.push(`Price: ${formatPrice(dataPoint.close)}`);
                           
                           if (dataPoint.open !== undefined) {
-                            label.push(`Open: ${dataPoint.open.toFixed(2)}`);
+                            label.push(`Open: ${formatPrice(dataPoint.open)}`);
                           }
                           
                           if (dataPoint.high !== undefined && dataPoint.low !== undefined) {
-                            label.push(`High: ${dataPoint.high.toFixed(2)}`);
-                            label.push(`Low: ${dataPoint.low.toFixed(2)}`);
+                            label.push(`High: ${formatPrice(dataPoint.high)}`);
+                            label.push(`Low: ${formatPrice(dataPoint.low)}`);
                           }
                           
                           if (dataPoint.volume !== undefined) {
@@ -658,7 +679,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
               
               <h4>Reading the data:</h4>
               <p>
-                The chart displays the closing price of {assetInfo.symbol} over your selected time period. 
+                The chart displays the closing price of {assetInfo.symbol} in {assetInfo.currency} over your selected time period. 
                 Each data point represents the price at the end of the selected interval (day, week, or month).
               </p>
               <p>

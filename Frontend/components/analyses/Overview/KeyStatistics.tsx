@@ -14,7 +14,8 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
     allTimeHigh: '0',
     allTimeLow: '0',
     profitDays: '0%',
-    avgHoldPeriod: '0 Years'
+    avgHoldPeriod: '0 Years',
+    currency: 'USD' // Add default currency
   });
   
   // Add new state and refs for fullscreen and info modal
@@ -132,7 +133,7 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
         
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
-          <h3>Price Metrics</h3>
+          <h3>Price Metrics ({statisticsData.currency})</h3>
           <div className={styles.chartControls}>
             <button 
               className={styles.modernActionButton} 
@@ -176,14 +177,14 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
           <div className={styles.statCard}>
             <div className={styles.statIcon}><FaArrowUp /></div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>{statisticsData.allTimeHigh}</div>
+              <div className={styles.statValue}>{statisticsData.currency} {statisticsData.allTimeHigh}</div>
               <div className={styles.statLabel}>All Time High</div>
             </div>
           </div>
           <div className={styles.statCard}>
             <div className={styles.statIcon}><FaArrowDown /></div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>{statisticsData.allTimeLow}</div>
+              <div className={styles.statValue}>{statisticsData.currency} {statisticsData.allTimeLow}</div>
               <div className={styles.statLabel}>All Time Low</div>
             </div>
           </div>
@@ -219,15 +220,15 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
               <div className={styles.modalBody}>
                 <h4>Understanding these metrics:</h4>
                 <ul className={styles.infoList}>
-                  <li><strong>All Time High:</strong> The highest price the asset has reached in the available data history</li>
-                  <li><strong>All Time Low:</strong> The lowest price the asset has reached in the available data history</li>
+                  <li><strong>All Time High:</strong> The highest price the asset has reached in {statisticsData.currency}</li>
+                  <li><strong>All Time Low:</strong> The lowest price the asset has reached in {statisticsData.currency}</li>
                   <li><strong>Profit Days:</strong> Percentage of days where the closing price was higher than the opening price</li>
                   <li><strong>Avg Hold Period:</strong> Average duration of profitable holding periods based on historical data</li>
                 </ul>
                 
                 <p>
                   These statistics provide a quick snapshot of the asset's historical performance extremes
-                  and general trading characteristics.
+                  and general trading characteristics in {statisticsData.currency}.
                 </p>
               </div>
               <div className={styles.modalFooter}>

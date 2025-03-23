@@ -85,8 +85,8 @@ export interface AnnualReturnData {
 
 // Statistics types
 export interface StatisticsData {
-  allTimeHigh: string;
-  allTimeLow: string;
+  allTimeHigh: number | string ;
+  allTimeLow: number | string;
   profitDays: string;
   avgHoldPeriod: string;
   currency?: string; // Added currency field
@@ -421,17 +421,6 @@ function formatDate(date: Date): string {
   });
 }
 
-/**
- * Format price to currency
- */
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value);
-}
 
 /**
  * Calculate date range from years back to today
@@ -498,48 +487,6 @@ function processDirectFormat(data: ChartDataResponse): ChartDataPoint[] {
   return formattedData;
 }
 
-/**
- * Process API response in Yahoo Finance format
- */
-function processYahooFormat(result: any): ChartDataPoint[] {
-  const timestamps = result.timestamp || [];
-  const quotes = result.indicators.quote && result.indicators.quote.length > 0 ? 
-                result.indicators.quote[0] : {};
-  
-  if (!timestamps || !timestamps.length || !quotes || !quotes.close) {
-    console.error('Invalid data structure in API response:', { timestamps, quotes });
-    throw new Error('The API returned an invalid data structure');
-  }
-  
-  // Format data for chart - with proper date processing for display and filter out invalid points
-  const formattedData = timestamps
-    .map((timestamp: number, index: number) => {
-      if (quotes.close[index] === null || quotes.close[index] === undefined) {
-        return null;
-      }
-      
-      const fullDate = new Date(timestamp * 1000);
-      const dateStr = formatDate(fullDate);
-      
-      return {
-        timestamp,
-        close: quotes.close[index],
-        open: quotes.open ? quotes.open[index] : undefined,
-        high: quotes.high ? quotes.high[index] : undefined,
-        low: quotes.low ? quotes.low[index] : undefined,
-        volume: quotes.volume ? quotes.volume[index] : undefined,
-        date: dateStr,
-        fullDate
-      };
-    })
-    .filter((point: null): point is ChartDataPoint => point !== null);
-    
-  if (formattedData.length === 0) {
-    throw new Error('No valid data points received for the selected range and interval');
-  }
-  
-  return formattedData;
-}
 
 /**
  * Fetches historical chart data for a given financial symbol
@@ -577,16 +524,6 @@ export async function fetchChartData(
     // Process the response data based on its format
     if (data && data.meta && data.quotes && Array.isArray(data.quotes)) {
       const chartData = processDirectFormat(data);
-      // Add currency to each data point
-      chartData.forEach(point => {
-        point.currency = currency;
-      });
-      return chartData;
-    } 
-    // Handle Yahoo Finance API format as fallback
-    else if (data && data.chart && data.chart.result && 
-        data.chart.result[0] && data.chart.result[0].indicators) {
-      const chartData = processYahooFormat(data.chart.result[0]);
       // Add currency to each data point
       chartData.forEach(point => {
         point.currency = currency;
@@ -958,8 +895,8 @@ export async function fetchKeyStatistics(symbol: string, years: number = 20): Pr
     
     // Format the data
     return {
-      allTimeHigh: formatCurrency(allTimeHigh),
-      allTimeLow: formatCurrency(allTimeLow),
+      allTimeHigh: allTimeHigh,
+      allTimeLow: allTimeLow,
       profitDays: `${profitPercentage.toFixed(1)}%`,
       avgHoldPeriod: `${avgHoldYears.toFixed(1)} Years`,
       currency: currency

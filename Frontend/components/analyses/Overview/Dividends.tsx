@@ -44,6 +44,7 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [currency, setCurrency] = useState<string>('USD'); // Added currency state
   const chartRef = useRef<HTMLDivElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
@@ -54,13 +55,15 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
         setError(null);
         
         // Fetch dividend history data
-        const historyResponse = await fetchDividendHistory(symbol, 5);
+        const historyResponse = await fetchDividendHistory(symbol, 10);
         
         if (historyResponse.error) {
           setError(historyResponse.error);
         } else {
           setDividendEvents(historyResponse.events);
           setDividendData(historyResponse.chartData);
+          // Extract and set currency from response
+          setCurrency(historyResponse.currency || 'USD');
         }
         
         // Fetch dividend summary information
@@ -167,6 +170,20 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
     }
   };
 
+  // Currency symbol display helper
+  const getCurrencySymbol = (currencyCode: string): string => {
+    switch (currencyCode) {
+      case 'USD': return '$';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      case 'JPY': return '¥';
+      case 'CAD': return 'C$';
+      case 'AUD': return 'A$';
+      case 'CHF': return 'CHF';
+      default: return currencyCode;
+    }
+  };
+
   return (
     <div className={styles.cardContainer}>
       <div className={styles.analysisCard} ref={chartContainerRef}>
@@ -180,47 +197,10 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
           </p>
         </div>
 
-        {/* Dividend Summary Section */}
-        {!isLoading && dividendSummary && (
-          <div className={styles.dividendSummaryContainer}>
-            <div className={styles.summaryGrid}>
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>Dividend Rate:</span>
-                <span className={styles.summaryValue}>
-                  {dividendSummary.dividendRate ? `$${dividendSummary.dividendRate.toFixed(2)}` : 'N/A'}
-                </span>
-              </div>
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>Dividend Yield:</span>
-                <span className={styles.summaryValue}>
-                  {formatPercent(dividendSummary.dividendYield)}
-                </span>
-              </div>
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>Payout Ratio:</span>
-                <span className={styles.summaryValue}>
-                  {formatPercent(dividendSummary.payoutRatio)}
-                </span>
-              </div>
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>Ex-Dividend Date:</span>
-                <span className={styles.summaryValue}>
-                  {dividendSummary.exDividendDate || 'N/A'}
-                </span>
-              </div>
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>5Y Avg Dividend Yield:</span>
-                <span className={styles.summaryValue}>
-                  {formatPercent(dividendSummary.fiveYearAvgDividendYield)}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-      
+  
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
-          <h3>Payment History (5 Years)</h3>
+          <h3>Payment History (10 Years)</h3>
           <div className={styles.chartControls}>
             <button 
               className={styles.modernActionButton} 
@@ -299,12 +279,12 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
                     },
                     ticks: {
                       callback: function(value) {
-                        return '$' + value;
+                        return `${getCurrencySymbol(currency)} ${value}`;
                       }
                     },
                     title: {
                       display: true,
-                      text: 'Dividend Amount ($)'
+                      text: `Dividend Amount (${getCurrencySymbol(currency)})`
                     }
                   },
                   x: {
@@ -342,7 +322,7 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
                         if (!event) return '';
                         
                         return [
-                          `Dividend: $${event.amount.toFixed(2)}`,
+                          `Dividend: ${getCurrencySymbol(currency)}${event.amount.toFixed(2)}`,
                           `Quarterly Growth: ${context.dataIndex > 0 
                             ? ((event.amount / dividendEvents[context.dataIndex-1].amount - 1) * 100).toFixed(2) + '%' 
                             : 'N/A'}`
@@ -387,7 +367,7 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
                 
                 <h4>Reading the Chart:</h4>
                 <p>
-                  The chart displays dividend payments over time. Each point represents a dividend distribution.
+                  The chart displays dividend payments over time in {currency}. Each point represents a dividend distribution.
                   Hover over points to see payment details including the amount and quarterly growth rate.
                 </p>
                 <p>
