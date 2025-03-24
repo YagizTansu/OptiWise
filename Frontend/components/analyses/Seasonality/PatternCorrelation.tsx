@@ -55,6 +55,13 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
     return '#9e9e9e';  // Very Weak - gray
   };
 
+  // Fix: Add function to get correlation direction text
+  const getCorrelationDirection = (coefficient: number): string => {
+    if (coefficient > 0) return 'Positive';
+    if (coefficient < 0) return 'Negative';
+    return 'Neutral';
+  };
+
   // Fetch data and calculate correlation
   const fetchDataAndCalculateCorrelation = async () => {
     setLoading(true);
@@ -142,6 +149,13 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
                 Strong correlations may suggest that historical patterns could repeat in the future, potentially 
                 providing insights for trading strategies. However, remember that past performance is not always 
                 indicative of future results.
+              </p>
+              
+              <h4>Understanding Negative Correlation:</h4>
+              <p>
+                A negative correlation (closer to -1) indicates that patterns from one period tend to move in the 
+                opposite direction of patterns from another period. This can be just as valuable for prediction 
+                as positive correlations.
               </p>
               
               <h4>Using the Pattern Correlation tool:</h4>
@@ -252,7 +266,7 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
                   <span className={styles.correlationValue}>
                     {Math.abs(correlationData.coefficient).toFixed(2)}
                   </span>
-                  <span className={styles.correlationDirection}>
+                  <span className={styles.correlationDirection} style={{ color: correlationData.coefficient < 0 ? '#f44336' : '#4caf50' }}>
                     {correlationData.coefficient >= 0 ? '+' : '-'}
                   </span>
                 </div>
@@ -271,7 +285,7 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
                 <div className={styles.quickStatItem}>
                   <span className={styles.quickStatLabel}>Correlation:</span>
                   <span className={styles.quickStatValue} style={{ color: getCorrelationColor(correlationData.coefficient) }}>
-                    {correlationData.coefficient} ({correlationData.coefficient > 0 ? 'Positive' : 'Negative'})
+                    {correlationData.coefficient.toFixed(2)} ({getCorrelationDirection(correlationData.coefficient)})
                   </span>
                 </div>
                 <div className={styles.quickStatItem}>
@@ -300,10 +314,14 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
                 <h3>Correlation</h3>
               </div>
               <p className={styles.statValue} style={{ color: getCorrelationColor(correlationData.coefficient) }}>
-                {correlationData.coefficient}
+                {correlationData.coefficient.toFixed(2)}
               </p>
               <p className={styles.statDescription}>
-                {correlationData.coefficient > 0 ? 'Positive correlation' : 'Negative correlation'}
+                {correlationData.coefficient > 0 
+                  ? 'Positive correlation (patterns move similarly)' 
+                  : correlationData.coefficient < 0 
+                    ? 'Negative correlation (patterns move inversely)' 
+                    : 'No correlation detected'}
               </p>
             </div>
             
@@ -315,7 +333,7 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
                 {correlationData.strength} {getCorrelationEmoji(correlationData.strength)}
               </p>
               <p className={styles.statDescription}>
-                {correlationData.strength === 'Strong' ? 'Consistent patterns' : 'Variable patterns'}
+                {correlationData.strength === 'Strong' ? 'Highly consistent relationship' : 'Variable relationship'}
               </p>
             </div>
             
@@ -332,22 +350,26 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
                   style={{ width: `${correlationData.reliabilityScore}%` }}
                 ></div>
               </div>
-              <p className={styles.statDescription}>Based on historical data</p>
+              <p className={styles.statDescription}>Based on historical data quality</p>
             </div>
           </div>
           
           <div className={styles.insightContainer}>
             <div className={styles.insightHeader}>
-              <FaInfoCircle /> Pattern Insight
+              <FaLightbulb /> Pattern Insight
             </div>
             <p className={styles.insightText}>
-              {correlationData.coefficient > 0.7 ? 
+              {Math.abs(correlationData.coefficient) > 0.7 && correlationData.coefficient > 0 ? 
                 `Strong positive correlation suggests ${symbol} exhibits similar price movements across these time periods. Past patterns may be useful for future predictions.` :
-                correlationData.coefficient < -0.7 ?
-                `Strong negative correlation indicates ${symbol} tends to move in opposite directions when comparing these time periods.` :
+                Math.abs(correlationData.coefficient) > 0.7 && correlationData.coefficient < 0 ?
+                `Strong negative correlation indicates ${symbol} tends to move in opposite directions when comparing these time periods. When one period shows an uptrend, the other typically shows a downtrend.` :
+                Math.abs(correlationData.coefficient) > 0.5 && correlationData.coefficient > 0 ?
+                `Moderate positive correlation detected. ${symbol} shows noticeable pattern similarities between periods, though with some variations.` :
+                Math.abs(correlationData.coefficient) > 0.5 && correlationData.coefficient < 0 ?
+                `Moderate negative correlation detected. ${symbol} shows noticeable inverse patterns between periods.` :
                 Math.abs(correlationData.coefficient) > 0.3 ?
-                `Moderate correlation detected. ${symbol} shows some consistent patterns, but with notable variations between periods.` :
-                `Weak correlation indicates ${symbol} doesn't exhibit consistent patterns between these time periods. Consider analyzing different intervals.`
+                `Weak correlation detected. ${symbol} shows some relationship between periods, but with significant variations.` :
+                `Very weak or no correlation indicates ${symbol} doesn't exhibit consistent pattern relationships between these time periods. Consider analyzing different intervals.`
               }
             </p>
           </div>

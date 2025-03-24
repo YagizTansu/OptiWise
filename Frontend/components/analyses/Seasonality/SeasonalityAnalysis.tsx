@@ -8,6 +8,32 @@ import {
   SeasonalityChartData,
   fetchAllSeasonalityData
 } from '../../../services/api/finance';
+// Import required Chart.js components
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 interface SeasonalityAnalysisProps {
   symbol: string;
@@ -43,23 +69,42 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     yearly: null
   });
 
-  // Chart options with data points toggle
+  // Enhanced chart options with better styling and responsiveness
   const seasonalityChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     elements: {
       point: {
         radius: showDataPoints ? 4 : 0,
-        hoverRadius: showDataPoints ? 6 : 0
+        hoverRadius: showDataPoints ? 6 : 0,
+        backgroundColor: (ctx: any) => {
+          const dataset = ctx.chart.data.datasets[ctx.datasetIndex];
+          return dataset.borderColor;
+        },
+        borderWidth: 2,
+        borderColor: '#fff'
       },
       line: {
         borderWidth: 2,
         tension: 0.3
+      },
+      bar: {
+        borderWidth: 1,
+        borderRadius: 4
       }
     },
     scales: {
       y: {
-        beginAtZero: true,
+        beginAtZero: false,
+        grid: {
+          color: 'rgba(200, 200, 200, 0.1)'
+        },
+        ticks: {
+          callback: (value: number) => `${value.toFixed(1)}%`,
+          font: {
+            size: 11
+          }
+        },
         title: {
           display: true,
           text: 'Percent Change (%)',
@@ -67,21 +112,37 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
             size: 14,
             weight: 'bold' as const
           }
-        },
-        grid: {
-          color: 'rgba(200, 200, 200, 0.1)'
         }
       },
       x: {
         grid: {
           color: 'rgba(200, 200, 200, 0.1)'
+        },
+        ticks: {
+          font: {
+            size: 11
+          },
+          maxRotation: 45,
+          minRotation: 0
         }
       }
     },
     plugins: {
+      legend: {
+        position: 'top' as const,
+        align: 'end' as const,
+        labels: {
+          boxWidth: 15,
+          usePointStyle: true,
+          pointStyle: 'circle',
+          padding: 15,
+          font: {
+            size: 12
+          }
+        }
+      },
       tooltip: {
         backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        padding: 12,
         titleFont: {
           size: 14,
           weight: 700
@@ -89,18 +150,30 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
         bodyFont: {
           size: 13
         },
+        padding: 12,
+        cornerRadius: 4,
         displayColors: true,
-        usePointStyle: true
-      },
-      legend: {
-        position: 'top' as const,
-        align: 'end' as const,
-        labels: {
-          boxWidth: 15,
-          usePointStyle: true,
-          pointStyle: 'circle'
+        usePointStyle: true,
+        callbacks: {
+          label: (context: any) => {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y;
+            return `${label}: ${value.toFixed(2)}%`;
+          }
         }
       }
+    },
+    animation: {
+      duration: 1000,
+      easing: 'easeOutQuart'
+    },
+    interaction: {
+      mode: 'index' as const,
+      intersect: false
+    },
+    hover: {
+      mode: 'index' as const,
+      intersect: false
     }
   };
 
@@ -128,18 +201,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
           years: getPeriodYears(comparisonPeriods.second) 
         };
         
-        // Option 1: Fetch only active timeframe
-        const data = await fetchSeasonalityData(symbol, activeTimeframe, [primaryPeriod, comparisonPeriod]);
-        
-        // Update state with the new data
-        setSeasonalityData(prevData => ({
-          ...prevData,
-          [activeTimeframe]: data
-        }));
-        
-        // Option 2 (for pre-fetching): Fetch all timeframes in the background
-        // Uncomment this to fetch all timeframes at once
-        /*
+        // Fetch all timeframes in the background to prevent loading states when switching tabs
         const allData = await fetchAllSeasonalityData(
           symbol,
           primaryPeriod,
@@ -157,7 +219,6 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
         if (allData.error) {
           setError(allData.error);
         }
-        */
         
         setIsLoading(false);
       } catch (err) {
@@ -168,7 +229,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     };
     
     loadData();
-  }, [activeTimeframe, comparisonPeriods.first, comparisonPeriods.second, symbol]);
+  }, [comparisonPeriods.first, comparisonPeriods.second, symbol]);
 
   // Function to get the current seasonality data based on the timeframe
   const getCurrentSeasonalityData = () => {
@@ -182,7 +243,40 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
       };
     }
     
-    return data;
+    // Apply enhanced dataset styling
+    const enhancedData = {
+      labels: data.labels,
+      datasets: data.datasets.map((dataset, index) => {
+        const isPrimary = index === 0;
+        // Primary dataset gets a blue color scheme, secondary gets orange
+        const color = isPrimary 
+          ? 'rgba(53, 162, 235, 0.7)'
+          : 'rgba(255, 159, 64, 0.7)';
+        
+        const borderColor = isPrimary
+          ? 'rgb(53, 162, 235)'
+          : 'rgb(255, 159, 64)';
+          
+        // Enhanced dataset styling
+        return {
+          ...dataset,
+          borderColor,
+          backgroundColor: viewMode === 'line' ? 'rgba(0, 0, 0, 0.1)' : color,
+          fill: viewMode === 'line' ? false : undefined,
+          pointBackgroundColor: borderColor,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 1.5,
+          pointHoverBackgroundColor: borderColor,
+          pointHoverBorderColor: '#fff',
+          pointHoverBorderWidth: 2,
+          pointHoverRadius: 6,
+          barPercentage: 0.8,
+          categoryPercentage: 0.7
+        };
+      })
+    };
+    
+    return enhancedData;
   };
 
   // Handle fullscreen toggle
@@ -224,7 +318,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     };
   }, []);
 
-  // Download chart as image
+  // Download chart as image with improved quality
   const downloadChart = async () => {
     if (!chartRef.current) return;
     
@@ -234,7 +328,9 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
       
       const canvas = await html2canvas(chartRef.current, {
         backgroundColor: '#ffffff',
-        scale: 2, // Higher scale for better quality
+        scale: 3, // Higher scale for better quality
+        useCORS: true,
+        logging: false
       });
       
       // Create download link
@@ -265,6 +361,31 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     }
   };
 
+  // Loading spinner component
+  const LoadingSpinner = () => (
+    <div className={styles.loadingSpinner}>
+      <div className={styles.spinner}></div>
+      <p>Loading seasonality data...</p>
+    </div>
+  );
+
+  // No data placeholder
+  const NoDataPlaceholder = () => (
+    <div className={styles.noDataPlaceholder}>
+      <div className={styles.noDataIcon}>📊</div>
+      <h3>No seasonality data available</h3>
+      <p>Try selecting a different timeframe or period</p>
+    </div>
+  );
+
+  // Helper to check if we have valid data to display
+  const hasValidData = () => {
+    const data = seasonalityData[activeTimeframe as keyof typeof seasonalityData];
+    return data && data.labels && data.labels.length > 0 && 
+           data.datasets && data.datasets.length > 0 && 
+           data.datasets[0].data && data.datasets[0].data.length > 0;
+  };
+
   return (
     <div className={styles.cardContainer}>
       <div className={styles.analysisCard} ref={containerRef}>
@@ -285,6 +406,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={styles.modernActionButton} 
               title="Download Chart"
               onClick={downloadChart}
+              disabled={isLoading || !hasValidData()}
             >
               <FaDownload className={styles.buttonIcon} /> 
               <span>Download</span>
@@ -293,6 +415,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={styles.modernActionButton} 
               title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
               onClick={toggleFullscreen}
+              disabled={isLoading || !hasValidData()}
             >
               {isFullscreen ? (
                 <>
@@ -323,6 +446,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={`${styles.modernButton} ${viewMode === 'line' ? styles.activeMod : ''}`}
               title="Line Chart View" 
               onClick={() => setViewMode('line')}
+              disabled={isLoading}
             >
               <FaChartLine className={styles.buttonIcon} /> 
               <span>Line</span>
@@ -331,6 +455,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={`${styles.modernButton} ${viewMode === 'bar' ? styles.activeMod : ''}`}
               title="Bar Chart View"
               onClick={() => setViewMode('bar')}
+              disabled={isLoading}
             >
               <FaChartLine className={styles.buttonIcon} /> 
               <span>Bar</span>
@@ -339,6 +464,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={`${styles.modernButton} ${showDataPoints ? styles.activeMod : ''}`}
               title="Toggle Data Points"
               onClick={() => setShowDataPoints(!showDataPoints)}
+              disabled={isLoading || viewMode !== 'line'}
             >
               <FaCircle className={styles.buttonIcon} /> 
               <span>Points</span>
@@ -353,7 +479,9 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                 className={styles.periodSelect}
                 value={comparisonPeriods.first}
                 onChange={(e) => setComparisonPeriods({...comparisonPeriods, first: e.target.value})}
+                disabled={isLoading}
               >
+                <option value="1 Year">1 Year</option>
                 <option value="3 Years">3 Years</option>
                 <option value="5 Years">5 Years</option>
                 <option value="7 Years">7 Years</option>
@@ -374,7 +502,9 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                 className={styles.periodSelect}
                 value={comparisonPeriods.second}
                 onChange={(e) => setComparisonPeriods({...comparisonPeriods, second: e.target.value})}
+                disabled={isLoading}
               >
+                <option value="1 Year">1 Year</option>
                 <option value="3 Years">3 Years</option>
                 <option value="5 Years">5 Years</option>
                 <option value="7 Years">7 Years</option>
@@ -392,6 +522,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={`${styles.modernTabButton} ${activeTimeframe === 'daily' ? styles.activeTab : ''}`}
               title="Daily View"
               onClick={() => setActiveTimeframe('daily')}
+              disabled={isLoading}
             >
               <span>Daily</span>
             </button>
@@ -399,6 +530,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={`${styles.modernTabButton} ${activeTimeframe === 'weekly' ? styles.activeTab : ''}`}
               title="Weekly View"
               onClick={() => setActiveTimeframe('weekly')}
+              disabled={isLoading}
             >
               <span>Weekly</span>
             </button>
@@ -406,6 +538,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={`${styles.modernTabButton} ${activeTimeframe === 'monthly' ? styles.activeTab : ''}`}
               title="Monthly View"
               onClick={() => setActiveTimeframe('monthly')}
+              disabled={isLoading}
             >
               <span>Monthly</span>
             </button>
@@ -413,6 +546,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               className={`${styles.modernTabButton} ${activeTimeframe === 'yearly' ? styles.activeTab : ''}`}
               title="Yearly View"
               onClick={() => setActiveTimeframe('yearly')}
+              disabled={isLoading}
             >
               <span>Yearly</span>
             </button>
@@ -424,22 +558,32 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
           className={`${styles.comparisonChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
           ref={chartRef}
         >
-          {isLoading && <div className={styles.loadingOverlay}>Loading seasonality data...</div>}
+          {isLoading && <LoadingSpinner />}
           
           {error && <div className={styles.errorMessage}>{error}</div>}
           
-          {!isLoading && !error && viewMode === 'line' ? (
-            <Line 
-              data={getCurrentSeasonalityData()}
-              options={seasonalityChartOptions}
-              height={300}
-            />
-          ) : !isLoading && !error && (
-            <Bar
-              data={getCurrentSeasonalityData()}
-              options={seasonalityChartOptions}
-              height={300}
-            />
+          {!isLoading && !error && !hasValidData() && <NoDataPlaceholder />}
+          
+          {!isLoading && !error && hasValidData() && (
+            <div className={styles.chartContainer}>
+              {viewMode === 'line' ? (
+                <Line 
+                  data={getCurrentSeasonalityData()}
+                  options={seasonalityChartOptions}
+                  height={isFullscreen ? 600 : 300}
+                />
+              ) : (
+                <Bar
+                  data={getCurrentSeasonalityData()}
+                  options={seasonalityChartOptions}
+                  height={isFullscreen ? 600 : 300}
+                />
+              )}
+              {/* Optional - you can add a chart watermark or credits here */}
+              <div className={styles.chartCredit}>
+                Data source: Yahoo Finance
+              </div>
+            </div>
           )}
         </div>
         
@@ -448,6 +592,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
           <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
               <div className={styles.modalHeader}>
+                <h3>Understanding Seasonality Analysis</h3>
                 <button 
                   className={styles.closeButton}
                   onClick={() => setShowInfoModal(false)}
@@ -477,6 +622,11 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                   Seasonal patterns can help inform trading and investment decisions, particularly for assets 
                   that show consistent performance during specific periods.
                 </p>
+
+                <div className={styles.infoTip}>
+                  <strong>Pro tip:</strong> Look for consistent patterns across different timeframes 
+                  that might indicate reliable seasonal effects.
+                </div>
               </div>
               <div className={styles.modalFooter}>
                 <button 
