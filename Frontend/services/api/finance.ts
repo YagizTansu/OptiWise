@@ -16,7 +16,7 @@ export interface ChartDataPoint {
   low: number | undefined;   // Changed from optional to required but can be undefined
   volume: number | undefined; // Changed from optional to required but can be undefined
   date: string;  // Required to be string to match implementation
-  fullDate: Date | undefined; // Changed from optional to required but can be undefined
+  fullDate: Date; // Changed to required and non-undefined since we always create a Date object
   currency?: string; // Added currency field
 }
 
@@ -171,6 +171,7 @@ export interface SeasonalityDataset {
 }
 
 export interface SeasonalityChartData {
+  currency: any;
   labels: string[];
   datasets: SeasonalityDataset[];
 }
@@ -2855,6 +2856,7 @@ export interface InsiderHolder {
 }
 
 export interface InsiderTransaction {
+  [x: string]: any;
   maxAge: number;
   shares: number;
   value: number;
