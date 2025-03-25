@@ -2650,55 +2650,6 @@ export async function fetchAnalysisData(
   }
 }
 
-// =============================================================================
-// FINANCIAL STATEMENTS DATA TYPES
-// =============================================================================
-
-export interface FinancialData {
-  incomeStatementHistory?: any;
-  incomeStatementHistoryQuarterly?: any;
-  balanceSheetHistory?: any;
-  balanceSheetHistoryQuarterly?: any;
-  cashflowStatementHistory?: any;
-  cashflowStatementHistoryQuarterly?: any;
-  [key: string]: any;
-}
-
-// =============================================================================
-// FINANCIAL STATEMENTS FUNCTIONS
-// =============================================================================
-
-/**
- * Fetches financial statement data for a given symbol
- * 
- * @param symbol - Stock or asset symbol
- * @param modules - Array of financial statement modules to fetch
- * @returns Financial statement data
- */
-export async function fetchFinancialData(
-  symbol: string,
-  modules: string[] = [
-    'incomeStatementHistory', 
-    'incomeStatementHistoryQuarterly', 
-    'balanceSheetHistory', 
-    'balanceSheetHistoryQuarterly',
-    'cashflowStatementHistory', 
-    'cashflowStatementHistoryQuarterly'
-  ]
-): Promise<FinancialData> {
-  try {
-    const params = {
-      symbol,
-      modules: modules.join(',')
-    };
-    
-    const data = await makeApiRequest<FinancialData>('quoteSummary', params);
-    return data;
-  } catch (error) {
-    console.error('Error fetching financial data:', error);
-    throw error;
-  }
-}
 
 // =============================================================================
 // STOCK DASHBOARD DATA TYPES
@@ -2982,5 +2933,59 @@ export async function fetchInsiderAndInstitutionalData(
       error: error instanceof Error ? error.message : 'Unknown error',
       currency: 'USD' // Default currency if error
     };
+  }
+}
+
+// =============================================================================
+// FUNDAMENTALS TIME SERIES DATA TYPES
+// =============================================================================
+
+export interface FundamentalsTimeSeriesDataPoint {
+  date: string;
+  [key: string]: any; // For all possible financial metrics
+}
+
+// =============================================================================
+// FUNDAMENTALS TIME SERIES FUNCTIONS
+// =============================================================================
+
+/**
+ * Fetches fundamental financial data as a time series
+ * 
+ * @param symbol - Stock symbol
+ * @param period1 - Start date in YYYY-MM-DD format
+ * @param module - Data module to fetch ('all' or specific module name)
+ * @param type - Type of data ('annual', 'quarterly', etc.)
+ * @returns Array of time series data points with financial metrics
+ */
+export async function fetchFundamentalsTimeSeries(
+  symbol: string,
+  period1: string = '2000-01-01',
+  module: string = 'all',
+  type: string = 'annual'
+): Promise<FundamentalsTimeSeriesDataPoint[]> {
+  try {
+    const params = {
+      symbol,
+      period1,
+      module,
+      type
+    };
+    
+    const data = await makeApiRequest<FundamentalsTimeSeriesDataPoint[]>('fundamentals-time-series', params);
+    
+    if (!data || !Array.isArray(data)) {
+      throw new Error('Invalid fundamentals time series data received');
+    }
+    
+    // Sort by date (newest first) if dates are present
+    if (data.length > 0 && data[0].date) {
+      data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('Error fetching fundamentals time series:', error);
+    throw error;
   }
 }
