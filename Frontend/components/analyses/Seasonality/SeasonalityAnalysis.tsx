@@ -579,10 +579,6 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                   height={isFullscreen ? 600 : 300}
                 />
               )}
-              {/* Optional - you can add a chart watermark or credits here */}
-              <div className={styles.chartCredit}>
-                Data source: Yahoo Finance
-              </div>
             </div>
           )}
         </div>

@@ -1,8 +1,11 @@
 import { useRef, useEffect, useState } from 'react';
 import styles from '../../../styles/Analyses.module.css';
-import { FaInfoCircle, FaExpand, FaDownload,FaQuestion } from 'react-icons/fa';
-import { Chart } from 'chart.js';
+import { FaInfoCircle, FaExpand, FaDownload, FaQuestion } from 'react-icons/fa';
+import { Chart, ChartOptions, ChartData, registerables } from 'chart.js';
 import { fetchWyckoffIndicatorData, WyckoffIndicatorData } from '../../../services/api/finance';
+
+// Register ChartJS components
+Chart.register(...registerables);
 
 interface IndicatorChartProps {
   symbol: string;
@@ -48,10 +51,13 @@ const IndicatorChart: React.FC<IndicatorChartProps> = ({ symbol }) => {
     
     try {
       const data = await fetchWyckoffIndicatorData(symbol, timeframe);
+      if (!data || !data.labels || !data.indicators || data.labels.length === 0) {
+        throw new Error('Invalid data format received');
+      }
       setChartData(data);
     } catch (err) {
-      console.error('Failed to load indicator data:', err);
-      setError('Failed to load indicator data. Please try again later.');
+      console.error('Failed to load Wyckoff indicator data:', err);
+      setError('Failed to load Wyckoff indicator data. Please try again later.');
     } finally {
       setIsLoading(false);
     }
@@ -60,6 +66,17 @@ const IndicatorChart: React.FC<IndicatorChartProps> = ({ symbol }) => {
   const createIndicatorChart = (canvas: HTMLCanvasElement, data: WyckoffIndicatorData) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
+
+    // Determine min/max values dynamically with padding
+    const values = [...data.indicators];
+    const minVal = Math.min(...values) * 1.2;
+    const maxVal = Math.max(...values) * 1.2;
+    const dynamicMin = Math.min(-3, minVal);
+    const dynamicMax = Math.max(3, maxVal);
+
+    // Create overbought/oversold zones
+    const overboughtLevel = 5;
+    const oversoldLevel = -5;
 
     return new Chart(ctx, {
       type: 'line',
@@ -74,7 +91,8 @@ const IndicatorChart: React.FC<IndicatorChartProps> = ({ symbol }) => {
             borderWidth: 2,
             tension: 0.4,
             fill: false,
-            pointRadius: 0,
+            pointRadius: 1,
+            pointHoverRadius: 5,
           },
           {
             label: 'Zero Line',
@@ -85,88 +103,98 @@ const IndicatorChart: React.FC<IndicatorChartProps> = ({ symbol }) => {
             tension: 0,
             fill: false,
             pointRadius: 0,
+          },
+          {
+            label: 'Overbought Line',
+            data: data.labels.map(() => overboughtLevel),
+            borderColor: 'rgba(255, 99, 132, 0.5)',
+            borderWidth: 1,
+            borderDash: [3, 3],
+            tension: 0,
+            fill: false,
+            pointRadius: 0,
+          },
+          {
+            label: 'Oversold Line',
+            data: data.labels.map(() => oversoldLevel),
+            borderColor: 'rgba(75, 192, 192, 0.5)',
+            borderWidth: 1,
+            borderDash: [3, 3],
+            tension: 0,
+            fill: false,
+            pointRadius: 0,
           }
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false,
-        },
         scales: {
           y: {
-            min: -15,
-            max: 15,
+            beginAtZero: false,
+            min: dynamicMin,
+            max: dynamicMax,
+            grid: {
+              color: 'rgba(200, 200, 200, 0.2)',
+            },
             title: {
               display: true,
-              text: 'Value',
-              font: {
-                size: 14,
-                weight: 'bold'
-              }
+              text: 'Indicator Value',
             },
-            grid: {
-              color: 'rgba(200, 200, 200, 0.1)'
-            }
           },
           x: {
-            ticks: {
-              maxRotation: 0,
-              autoSkip: true,
-              maxTicksLimit: 10
-            },
             grid: {
-              color: 'rgba(200, 200, 200, 0.1)'
-            }
-          }
+              color: 'rgba(200, 200, 200, 0.2)',
+            },
+            title: {
+              display: true,
+              text: 'Time',
+            },
+          },
         },
         plugins: {
-          tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            padding: 12,
-            titleFont: {
-              size: 14,
-              weight: 700
-            },
-            bodyFont: {
-              size: 13
-            },
-            callbacks: {
-              label: function(context) {
-                const value = context.raw as number;
-                let interpretation = '';
-                
-                if (value > 5) interpretation = 'Strong upward momentum with confirmation';
-                else if (value > 0) interpretation = 'Positive momentum';
-                else if (value > -5) interpretation = 'Weakening momentum';
-                else interpretation = 'Strong downward momentum with confirmation';
-                
-                return [`Value: ${value.toFixed(2)}`, `Interpretation: ${interpretation}`];
-              }
-            }
-          },
           legend: {
+            display: true,
             position: 'top',
-            align: 'end',
-            labels: {
-              boxWidth: 15,
-              usePointStyle: true,
-              pointStyle: 'circle'
-            }
-          }
-        }
-      }
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+          },
+        },
+        interaction: {
+          mode: 'nearest',
+          axis: 'x',
+          intersect: false,
+        },
+      },
     });
   };
 
-  const handleTimeframeChange = (newTimeframe: string) => {
-    setTimeframe(newTimeframe);
+  const handleDownload = () => {
+    if (indicatorChartRef.current) {
+      const url = indicatorChartRef.current.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `wyckoff-indicator-${symbol}-${timeframe}.png`;
+      link.href = url;
+      link.click();
+    }
+  };
+
+  const handleFullscreen = () => {
+    if (indicatorChartRef.current) {
+      if (indicatorChartRef.current.requestFullscreen) {
+        indicatorChartRef.current.requestFullscreen();
+      }
+    }
   };
 
   const toggleInfoDisplay = () => {
     setShowInfo(!showInfo);
+  };
+
+  const handleTimeframeChange = (newTimeframe: string) => {
+    setTimeframe(newTimeframe);
   };
 
   return (
@@ -188,11 +216,19 @@ const IndicatorChart: React.FC<IndicatorChartProps> = ({ symbol }) => {
               <option value="5y">5 Years</option>
             </select>
           </div>
-          <button className={styles.modernActionButton} title="Download Chart">
+          <button 
+            className={styles.modernActionButton} 
+            title="Download Chart"
+            onClick={handleDownload}
+          >
             <FaDownload className={styles.buttonIcon} /> 
             <span>Download</span>
           </button>
-          <button className={styles.modernActionButton} title="Fullscreen">
+          <button 
+            className={styles.modernActionButton} 
+            title="Fullscreen"
+            onClick={handleFullscreen}
+          >
             <FaExpand className={styles.buttonIcon} /> 
             <span>Fullscreen</span>
           </button>
@@ -202,34 +238,51 @@ const IndicatorChart: React.FC<IndicatorChartProps> = ({ symbol }) => {
             title="Show indicator information"
           >
             <FaQuestion />
-            
           </button>
         </div>
       </div>
       
       {showInfo && (
         <div className={styles.modalBody}>
-<p>The Wyckoff indicator shows supply/demand balance based on price and volume.</p>
-          <p>Values above zero suggest accumulation (bullish), while values below zero suggest distribution (bearish).</p>
-          <p>Divergence between indicator and price can signal potential reversals.</p>
+          <h3>Wyckoff Causes/Effects Indicator</h3>
+          <p>
+            The Wyckoff Causes/Effects indicator helps traders interpret charts according to Wyckoff's theory,
+            which analyzes the relationship between price movements and transaction volume to predict future price directions.
+          </p>
+          <p><strong>Key Interpretations:</strong></p>
+          <ul>
+            <li><strong>Above +5:</strong> Strong markup phase, possibly overbought</li>
+            <li><strong>Between 0 and +5:</strong> Accumulation or markup phase (bullish)</li>
+            <li><strong>Between 0 and -5:</strong> Distribution or early markdown phase (bearish)</li>
+            <li><strong>Below -5:</strong> Strong markdown phase, possibly oversold</li>
+          </ul>
+          <p><strong>Trend Confirmation & Divergence:</strong></p>
+          <ul>
+            <li>When indicator values follow the price trend: The trend is solid and likely to continue</li>
+            <li>When indicator values diverge from price action: A potential trend reversal may be imminent</li>
+          </ul>
+          <p>This indicator combines momentum and volume analysis (supply and demand) to help identify the strength and sustainability of market trends.</p>
           <p className={styles.disclaimerText}>Disclaimer: This analysis is for informational purposes only and does not constitute investment advice.</p>
-</div>
-
-        
+        </div>
       )}
 
       {isLoading ? (
         <div className={styles.loadingContainer}>
           <div className={styles.loadingSpinner}></div>
-          <p>Loading indicator...</p>
+          <p>Loading Wyckoff indicator data...</p>
         </div>
       ) : error ? (
         <div className={styles.errorContainer}>
           <p>{error}</p>
-          <button onClick={() => loadChartData(timeframe)}>Retry</button>
+          <button 
+            className={styles.modernActionButton}
+            onClick={() => loadChartData(timeframe)}
+          >
+            Retry
+          </button>
         </div>
       ) : (
-        <div className={styles.chartContainer} style={{ height: '300px' }}>
+        <div className={styles.chartContainer} style={{ height: '400px', position: 'relative' }}>
           <canvas ref={indicatorChartRef}></canvas>
         </div>
       )}
