@@ -177,14 +177,14 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
           <div className={styles.statCard}>
             <div className={styles.statIcon}><FaArrowUp /></div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>{statisticsData.currency} {statisticsData.allTimeHigh}</div>
+              <div className={styles.statValue}>{statisticsData.currency} {statisticsData.allTimeHigh.toFixed(2)}</div>
               <div className={styles.statLabel}>All Time High</div>
             </div>
           </div>
           <div className={styles.statCard}>
             <div className={styles.statIcon}><FaArrowDown /></div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>{statisticsData.currency} {statisticsData.allTimeLow}</div>
+              <div className={styles.statValue}>{statisticsData.currency} {statisticsData.allTimeLow.toFixed(2)}</div>
               <div className={styles.statLabel}>All Time Low</div>
             </div>
           </div>

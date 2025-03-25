@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout'
 import styles from '../styles/Analyses.module.css';
-import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaBalanceScale, FaChartPie, FaFileAlt } from 'react-icons/fa';
+import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaBalanceScale, FaChartPie, FaFileAlt, FaUserTie } from 'react-icons/fa';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, 
   Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import Overview from '../components/analyses/Overview';
@@ -11,6 +11,7 @@ import OverboughtOversold from '../components/analyses/OverboughtOversold';
 import Fundamental from '../components/analyses/Fundamental';
 import ForecastAI from '../components/analyses/ForecastAI';
 import Report from '../components/analyses/Report';
+import Insiders from '../components/analyses/Insiders';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Register ChartJS components
@@ -65,14 +66,18 @@ export default function Analyses() {
           >
             <FaChartPie /> Fundamental
           </button>
-
+          <button 
+            className={`${styles.tabButton} ${activeTab === 'insiders' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('insiders')}
+          >
+            <FaUserTie /> Insiders
+          </button>
           <button 
             className={`${styles.tabButton} ${activeTab === 'report' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('report')}
           >
             <FaFileAlt /> Report
           </button>
-
           <button 
             className={`${styles.tabButton} ${activeTab === 'ai-forecast' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('ai-forecast')}
@@ -103,6 +108,13 @@ export default function Analyses() {
           {/* Fundamental Analysis Tab */}
           {activeTab === 'fundamental' && (
             <Fundamental 
+              symbol={symbol as string}
+            />
+          )}
+
+          {/* Insiders Tab */}
+          {activeTab === 'insiders' && (
+            <Insiders 
               symbol={symbol as string}
             />
           )}
