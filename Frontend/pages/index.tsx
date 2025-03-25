@@ -1,6 +1,8 @@
 import Layout from '../components/Layout'
 import Link from 'next/link'
+import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { useState, useEffect } from 'react'
 import { 
   FaChartLine, 
   FaGlobe, 
@@ -16,6 +18,26 @@ import {
 } from 'react-icons/fa'
 
 export default function Home() {
+  // Define chart images for the carousel
+  const chartImages = [
+    "/images/chart1.png",
+    "/images/chart2.png",
+    "/images/chart3.png",
+    "/images/chart4.png",
+    "/images/chart5.png",
+  ];
+  
+  const [currentChart, setCurrentChart] = useState(0);
+  
+  // Rotate through charts automatically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentChart(prevChart => (prevChart + 1) % chartImages.length);
+    }, 3000); // Change chart every 3 seconds
+    
+    return () => clearInterval(interval);
+  }, [chartImages.length]);
+
   return (
     <Layout title="OptiWise - Intelligent Financial Analysis Platform">
       <main className={styles.landingPage}>
@@ -41,7 +63,35 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.heroImage}>
-            {/* You can add an image here showing the platform */}
+            {/* Chart carousel display */}
+            <div className={styles.chartCarousel}>
+              {chartImages.map((src, index) => (
+                <div 
+                  key={index}
+                  className={`${styles.chartSlide} ${index === currentChart ? styles.activeChart : ''}`}
+                >
+                  <Image 
+                    src={src} 
+                    alt={`OptiWise chart example ${index + 1}`}
+                    fill={true}
+                    priority={index === currentChart}
+                    style={{ 
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                    }}
+                  />
+                </div>
+              ))}
+              <div className={styles.chartIndicators}>
+                {chartImages.map((_, index) => (
+                  <span 
+                    key={index}
+                    className={`${styles.indicator} ${index === currentChart ? styles.activeIndicator : ''}`}
+                    onClick={() => setCurrentChart(index)}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </section>
         

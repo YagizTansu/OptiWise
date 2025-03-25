@@ -18,7 +18,7 @@
 }
 
 .main {
-  composes: variables;
+  color-scheme: variables;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -1295,7 +1295,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-fill-color: transparent;
+  text-emphasis-color: transparent;
   position: relative;
   padding-bottom: 0.75rem;
 }
@@ -1319,7 +1319,7 @@
   margin-top: 0.5rem;
   color: #4a5b8c;
   -webkit-text-fill-color: #4a5b8c;
-  text-fill-color: #4a5b8c;
+  text-emphasis-color: #4a5b8c;
 }
 
 @media (min-width: 768px) {
@@ -1455,13 +1455,15 @@
 
 .heroImage {
   flex: 1;
-  max-width: 550px;
+  max-width: 750px;
   height: 450px;
   background: url('/analytics-dashboard.svg') no-repeat center center;
   background-size: contain;
   position: relative;
   z-index: 2;
   animation: float 6s ease-in-out infinite;
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margin */
 }
 
 @keyframes float {
@@ -1798,5 +1800,137 @@
   
   .ctaSection p {
     font-size: 1rem;
+  }
+}
+
+/* Add these styles to your existing CSS file */
+
+.heroSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.heroContent {
+  flex: 1;
+}
+
+.heroImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chartCarousel {
+  position: relative;
+  width: 100%;
+  max-width: 900px; /* Increased from 500px */
+  height: 400px; /* Increased from 300px */
+  overflow: hidden;
+  border-radius: 12px; /* Slightly increased for better look */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+  transform: perspective(1000px) rotateY(-5deg); /* Adding subtle 3D effect */
+  transition: transform 0.5s ease;
+}
+
+.chartCarousel:hover {
+  transform: perspective(1000px) rotateY(0deg);
+}
+
+.chartSlide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chartSlide img {
+  width: 100% !important; /* Force full width */
+  height: 100% !important; /* Force full height */
+  object-fit: cover !important; /* Cover the entire area */
+  padding: 0 !important; /* Remove padding */
+  margin: 0 !important; /* Remove margin */
+}
+
+.activeChart {
+  opacity: 1;
+  z-index: 1;
+}
+
+.chartIndicators {
+  position: absolute;
+  bottom: 20px; /* Moved down slightly */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px; /* Increased spacing */
+  z-index: 2;
+  padding: 5px 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+}
+
+.indicator {
+  width: 12px; /* Slightly larger */
+  height: 12px; /* Slightly larger */
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.activeIndicator {
+  background-color: white;
+  transform: scale(1.2);
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .chartCarousel {
+    max-width: 550px;
+    height: 350px;
+  }
+}
+
+@media (max-width: 992px) {
+  .chartCarousel {
+    max-width: 500px;
+    height: 320px;
+    transform: perspective(1000px) rotateY(0deg); /* Remove 3D effect on smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .heroImage {
+    margin-top: 0rem;
+    margin-left: 0;
+  }
+  
+  .chartCarousel {
+    max-width: 100%;
+    height: 350px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chartCarousel {
+    height: 280px;
   }
 }
