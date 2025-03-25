@@ -13,6 +13,7 @@ import ForecastAI from '../components/analyses/ForecastAI';
 import Report from '../components/analyses/Report';
 import Insiders from '../components/analyses/Insiders';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import UpcomingEvents from '../components/UpcomingEvents';
 
 // Register ChartJS components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -34,7 +35,9 @@ export default function Analyses() {
       <div className={styles.analysesContainer}>
         {/* Header with Asset Name and AI Button */}
         <div className={styles.header}>
-          <h1 className={styles.assetName}>{symbol as string}</h1>
+        <h1 className={styles.assetName}>{symbol as string}</h1>
+          {symbol && <UpcomingEvents symbol={symbol as string} />}
+
           <button className={styles.aiButton} onClick={handleAIButtonClick}>
             <FaRobot /> Forecast AI AGENT
           </button>

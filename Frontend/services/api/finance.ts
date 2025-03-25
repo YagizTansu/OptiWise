@@ -2775,7 +2775,7 @@ export async function searchSymbols(
     };
     
     const data = await makeApiRequest<any[]>('search', params);
-    debugger
+
     if (data && Array.isArray(data) && data.length > 0) {
       return data.map(quote => ({
         symbol: quote.symbol,
@@ -2900,7 +2900,7 @@ export async function fetchInsiderAndInstitutionalData(
     // Process institutional owners data
     const institutionalOwners: InstitutionalOwner[] = [];
     if (data?.institutionOwnership?.ownershipList) {
-      debugger
+      
       data.institutionOwnership.ownershipList.forEach((owner: any) => {
         const reportDate = owner.reportDate?.raw 
           ? new Date(owner.reportDate.raw * 1000) 
