@@ -128,14 +128,16 @@ export default function Terminal() {
           <div className={styles.searchBar}>
             <input 
               type="text" 
-              placeholder="Search..." 
+              placeholder="Search symbols..." 
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={handleSearchFocus}
+              aria-label="Search for stocks, forex, indices and more"
             />
             <button 
               type="submit" 
               className={styles.searchButton}
+              aria-label="Search"
             >
               <FaSearch className={styles.searchIcon} />
             </button>

@@ -1,4 +1,4 @@
-import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl, FaSearchDollar, FaBalanceScale, FaChartArea } from 'react-icons/fa';
+import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl, FaSearchDollar, FaBalanceScale, FaChartArea, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Navbar.module.css';
@@ -29,6 +29,13 @@ export default function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Close mobile menu when features dropdown is opened
+  useEffect(() => {
+    if (featuresDropdownOpen) {
+      setMobileMenuOpen(false);
+    }
+  }, [featuresDropdownOpen]);
   
   // Get user initials
   const getUserInitials = () => {
@@ -91,113 +98,131 @@ export default function Navbar() {
             </button>
             
             {featuresDropdownOpen && (
-              <div className={styles.featuresDropdown} role="menu">
-                <div className={styles.dropdownHeader}>
-                  <span className={styles.dropdownHeaderTitle}>Tools & Features</span>
-                  <p className={styles.dropdownHeaderDesc}>Explore our powerful tools</p>
-                </div>
+              <>
+                {/* Mobile backdrop overlay */}
+                <div className={styles.mobileBackdrop} onClick={() => setFeaturesDropdownOpen(false)}></div>
                 
-                <div className={styles.categorySection}>
-                  <div className={styles.categoryTitle}>Market Intelligence</div>
-                  <div className={styles.dropdownGrid}>
-                    
-                    <Link href="/rankings" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaListOl className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Global Market Rankings</span>
-                        <p className={styles.dropdownItemDesc}>World indexes fair value</p>
-                      </div>
-                    </Link>
-                    
-                    <Link href="/breakeven" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaBalanceScale className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Breakeven</span>
-                        <p className={styles.dropdownItemDesc}>Stocks turning profitable</p>
-                      </div>
-                    </Link>
-
-                    <Link href="/quantum-screener" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaSearchDollar className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Quantum Screener</span>
-                        <p className={styles.dropdownItemDesc}>Seasonality analysis</p>
-                      </div>
-                    </Link>
-                    
-                    <Link href="/cot-reports" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaChartArea className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>COT Reports</span>
-                        <p className={styles.dropdownItemDesc}>Commitment of Traders data</p>
-                      </div>
-                    </Link>
+                <div className={styles.featuresDropdown} role="menu">
+                  {/* Mobile handle and header */}
+                  <div className={styles.mobileMenuHandle}></div>
+                  <div className={styles.mobileMenuHeader}>
+                    <div className={styles.mobileMenuTitle}>Tools & Features</div>
+                    <button 
+                      className={styles.mobileCloseButton}
+                      onClick={() => setFeaturesDropdownOpen(false)}
+                      aria-label="Close menu"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                  
+                  <div className={styles.dropdownHeader}>
+                    <span className={styles.dropdownHeaderTitle}>Tools & Features</span>
+                    <p className={styles.dropdownHeaderDesc}>Explore our powerful tools</p>
+                  </div>
+                  
+                  <div className={styles.categorySection}>
+                    <div className={styles.categoryTitle}>Market Intelligence</div>
+                    <div className={styles.dropdownGrid}>
+                      
+                      <Link href="/rankings" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaListOl className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>Global Market Rankings</span>
+                          <p className={styles.dropdownItemDesc}>World indexes fair value</p>
+                        </div>
+                      </Link>
+                      
+                      <Link href="/breakeven" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaBalanceScale className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>Breakeven</span>
+                          <p className={styles.dropdownItemDesc}>Stocks turning profitable</p>
+                        </div>
+                      </Link>
+  
+                      <Link href="/quantum-screener" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaSearchDollar className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>Quantum Screener</span>
+                          <p className={styles.dropdownItemDesc}>Seasonality analysis</p>
+                        </div>
+                      </Link>
+                      
+                      <Link href="/cot-reports" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaChartArea className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>COT Reports</span>
+                          <p className={styles.dropdownItemDesc}>Commitment of Traders data</p>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
+                  
+                  <div className={styles.categorySection}>
+                    <div className={styles.categoryTitle}>AI-Powered Analysis</div>
+                    <div className={styles.dropdownGrid}>
+                      <Link href="/ai-assistant" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaRobot className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>AI Assistant</span>
+                          <p className={styles.dropdownItemDesc}>Get intelligent help</p>
+                        </div>
+                      </Link>
+  
+                      <Link href="/hot-topics" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaFire className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>Hot Topics</span>
+                          <p className={styles.dropdownItemDesc}>Trending market topics</p>
+                        </div>
+                      </Link>
+                      
+                      <Link href="/country-economics" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaFlag className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>Country Economics</span>
+                          <p className={styles.dropdownItemDesc}>AI economic analysis</p>
+                        </div>
+                      </Link>
+                      
+                      <Link href="/currency-forecasting" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaMoneyBillWave className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>Currency Strength</span>
+                          <p className={styles.dropdownItemDesc}>AI forecasting</p>
+                        </div>
+                      </Link>
+                      
+                      {/* <Link href="/market-insights" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaLightbulb className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>Insights</span>
+                          <p className={styles.dropdownItemDesc}>Market opportunities</p>
+                        </div>
+                      </Link> */}
+                    </div>
                   </div>
                 </div>
-                
-                <div className={styles.categorySection}>
-                  <div className={styles.categoryTitle}>AI-Powered Analysis</div>
-                  <div className={styles.dropdownGrid}>
-                    <Link href="/ai-assistant" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaRobot className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>AI Assistant</span>
-                        <p className={styles.dropdownItemDesc}>Get intelligent help</p>
-                      </div>
-                    </Link>
-
-                    <Link href="/hot-topics" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaFire className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Hot Topics</span>
-                        <p className={styles.dropdownItemDesc}>Trending market topics</p>
-                      </div>
-                    </Link>
-                    
-                    <Link href="/country-economics" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaFlag className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Country Economics</span>
-                        <p className={styles.dropdownItemDesc}>AI economic analysis</p>
-                      </div>
-                    </Link>
-                    
-                    <Link href="/currency-forecasting" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaMoneyBillWave className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Currency Strength</span>
-                        <p className={styles.dropdownItemDesc}>AI forecasting</p>
-                      </div>
-                    </Link>
-                    
-                    {/* <Link href="/market-insights" className={styles.dropdownGridItem}>
-                      <div className={styles.dropdownItemIconWrap}>
-                        <FaLightbulb className={styles.dropdownItemIcon} />
-                      </div>
-                      <div>
-                        <span className={styles.dropdownItemTitle}>Insights</span>
-                        <p className={styles.dropdownItemDesc}>Market opportunities</p>
-                      </div>
-                    </Link> */}
-                  </div>
-                </div>
-              </div>
+              </>
             )}
           </div>
           

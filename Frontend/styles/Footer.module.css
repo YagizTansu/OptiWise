@@ -63,11 +63,31 @@
 @media (max-width: 768px) {
   .footerContainer {
     grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  
+  .footerSection h3 {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  .footerSection a, .footerSection p {
+    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 480px) {
   .footerContainer {
     grid-template-columns: 1fr;
+    padding: 0 1.5rem;
+  }
+  
+  .footer {
+    padding: 2rem 0 1rem;
+  }
+  
+  .footerBottom {
+    padding: 1rem 1rem 0;
+    margin-top: 1.5rem;
   }
 }
