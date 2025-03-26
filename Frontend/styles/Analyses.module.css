@@ -6916,3 +6916,92 @@
   }
 }
 /* ...existing code... */
+
+/* Period Selection Styling */
+.periodsSelectionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.periodsSelectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.periodsSelectionHeader .infoIcon {
+  color: #3b82f6;
+  font-size: 0.9rem;
+}
+
+.periodsSelectionGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.periodToggleButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.periodToggleButton:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.periodToggleButton.active {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+  font-weight: 500;
+}
+
+.periodCheckmark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.periodLabel {
+  flex: 1;
+  text-align: center;
+}
+
+/* Responsive adjustments for period selection */
+@media (max-width: 768px) {
+  .periodsSelectionContainer {
+    width: 100%;
+  }
+  
+  .periodToggleButton {
+    flex: 1;
+    min-width: auto;
+  }
+}
+
+/* ...existing code... */

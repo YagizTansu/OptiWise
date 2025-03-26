@@ -39,10 +39,29 @@ interface SeasonalityAnalysisProps {
   symbol: string;
 }
 
+// Define interface for period selection
+interface PeriodOption {
+  label: string;
+  years: number;
+  selected: boolean;
+  isCurrentYear?: boolean;  // New property to identify the "Current Year" option
+}
+
 const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => {
-  // Internal state management - moved from parent
-  const [comparisonPeriods, setComparisonPeriods] = useState({ first: '3 Years', second: '5 Years' });
-  const [activeTimeframe, setActiveTimeframe] = useState('monthly');
+  // Available period options - updated with Current Year option
+  const periodOptions: PeriodOption[] = [
+    { label: 'Past Year', years: 1, selected: true },
+    { label: '3 Years', years: 3, selected: false },
+    { label: '5 Years', years: 5, selected: false },
+    { label: '10 Years', years: 10, selected: false },
+    { label: '15 Years', years: 15, selected: false },
+    { label: '20 Years', years: 20, selected: false },
+  ];
+  
+  // Internal state management with multi-period selection
+  const [selectedPeriods, setSelectedPeriods] = useState<PeriodOption[]>(periodOptions);
+  // Use 'monthly' as default timeframe and don't expose the selector
+  const [activeTimeframe] = useState('monthly'); 
   const [showDataPoints, setShowDataPoints] = useState(true);
   const [viewMode, setViewMode] = useState('line');
 
@@ -56,17 +75,17 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
   const chartRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // State for API data
+  // State for API data - now tracking multiple datasets per timeframe
   const [seasonalityData, setSeasonalityData] = useState<{
-    monthly: SeasonalityChartData | null;
-    daily: SeasonalityChartData | null;
-    weekly: SeasonalityChartData | null;
-    yearly: SeasonalityChartData | null;
+    monthly: { [key: string]: SeasonalityChartData | null };
+    daily: { [key: string]: SeasonalityChartData | null };
+    weekly: { [key: string]: SeasonalityChartData | null };
+    yearly: { [key: string]: SeasonalityChartData | null };
   }>({
-    monthly: null,
-    daily: null,
-    weekly: null,
-    yearly: null
+    monthly: {},
+    daily: {},
+    weekly: {},
+    yearly: {}
   });
 
   // Enhanced chart options with better styling and responsiveness
@@ -177,49 +196,102 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     }
   };
 
-  // Parse period string to get number of years
-  const getPeriodYears = (period: string): number => {
-    return parseInt(period.split(' ')[0]);
+  // Handle toggling period selection
+  const togglePeriodSelection = (label: string) => {
+    setSelectedPeriods(prevPeriods => {
+      const updatedPeriods = prevPeriods.map(period => {
+        if (period.label === label) {
+          return { ...period, selected: !period.selected };
+        }
+        return period;
+      });
+      
+      // Ensure at least one period is selected
+      const hasSelected = updatedPeriods.some(p => p.selected);
+      if (!hasSelected) {
+        return prevPeriods; // Return original state if trying to deselect all
+      }
+      
+      return updatedPeriods;
+    });
   };
 
   // Load data when component mounts or when parameters change
   useEffect(() => {
+    // Only proceed if we have selected periods
+    const activePeriods = selectedPeriods.filter(p => p.selected);
+    if (activePeriods.length === 0) return;
+    
     // Reset error state
     setError(null);
     setIsLoading(true);
     
     const loadData = async () => {
       try {
-        // Create periods with years
-        const primaryPeriod = { 
-          label: comparisonPeriods.first, 
-          years: getPeriodYears(comparisonPeriods.first) 
+        // We'll track all the data we're fetching
+        const newData = {
+          daily: { ...seasonalityData.daily },
+          weekly: { ...seasonalityData.weekly },
+          monthly: { ...seasonalityData.monthly },
+          yearly: { ...seasonalityData.yearly }
         };
         
-        const comparisonPeriod = { 
-          label: comparisonPeriods.second, 
-          years: getPeriodYears(comparisonPeriods.second) 
-        };
-        
-        // Fetch all timeframes in the background to prevent loading states when switching tabs
-        const allData = await fetchAllSeasonalityData(
-          symbol,
-          primaryPeriod,
-          comparisonPeriod
-        );
-        
-        // Update state with all timeframe data
-        setSeasonalityData({
-          daily: allData.daily || null,
-          weekly: allData.weekly || null, 
-          monthly: allData.monthly || null,
-          yearly: allData.yearly || null
+        // Create a queue of promises for each period
+        const promises = activePeriods.map(async period => {
+          // Create a special key for Current Year to differentiate from Past Year
+          const periodKey = period.isCurrentYear 
+            ? 'current_year' 
+            : `${period.years}_years`;
+          
+          // If we don't have data for this period, fetch it
+          if (!newData[activeTimeframe as keyof typeof newData][periodKey]) {
+            try {
+              // Special handling for Current Year (Jan 1 to today)
+              const periodParam = period.isCurrentYear 
+                ? { 
+                    label: period.label, 
+                    years: period.years,
+                    isCurrentYear: true  // Pass this flag to API
+                  }
+                : { 
+                    label: period.label, 
+                    years: period.years 
+                  };
+              
+              const allData = await fetchSeasonalityData(
+                symbol,
+                activeTimeframe,
+                [periodParam]
+              );
+              
+              if (allData && allData.labels && allData.datasets && allData.datasets.length > 0) {
+                // Update the dataset label to match the period
+                const updatedDataset = {
+                  ...allData,
+                  datasets: allData.datasets.map(ds => ({
+                    ...ds,
+                    label: period.label
+                  }))
+                };
+                
+                // Store data for this period
+                if (activeTimeframe === 'daily') newData.daily[periodKey] = updatedDataset;
+                if (activeTimeframe === 'weekly') newData.weekly[periodKey] = updatedDataset;
+                if (activeTimeframe === 'monthly') newData.monthly[periodKey] = updatedDataset;
+                if (activeTimeframe === 'yearly') newData.yearly[periodKey] = updatedDataset;
+              }
+            } catch (error) {
+              console.error(`Error fetching data for ${period.label}:`, error);
+              // Don't set global error here, continue with other periods
+            }
+          }
         });
         
-        if (allData.error) {
-          setError(allData.error);
-        }
+        // Wait for all fetches to complete
+        await Promise.all(promises);
         
+        // Update state with all the data
+        setSeasonalityData(newData);
         setIsLoading(false);
       } catch (err) {
         console.error(`Error loading seasonality data:`, err);
@@ -229,54 +301,82 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     };
     
     loadData();
-  }, [comparisonPeriods.first, comparisonPeriods.second, symbol]);
+  }, [selectedPeriods, activeTimeframe, symbol]);
 
   // Function to get the current seasonality data based on the timeframe
   const getCurrentSeasonalityData = () => {
-    const data = seasonalityData[activeTimeframe as keyof typeof seasonalityData];
+    const timeframeData = seasonalityData[activeTimeframe as keyof typeof seasonalityData];
     
-    if (!data || data.datasets.length === 0) {
-      // Return empty data structure while loading
+    // Get active periods
+    const activePeriods = selectedPeriods.filter(p => p.selected);
+    
+    // Check if we have any data
+    if (Object.keys(timeframeData).length === 0) {
       return {
         labels: [],
         datasets: []
       };
     }
     
-    // Apply enhanced dataset styling
-    const enhancedData = {
-      labels: data.labels,
-      datasets: data.datasets.map((dataset, index) => {
-        const isPrimary = index === 0;
-        // Primary dataset gets a blue color scheme, secondary gets orange
-        const color = isPrimary 
-          ? 'rgba(53, 162, 235, 0.7)'
-          : 'rgba(255, 159, 64, 0.7)';
-        
-        const borderColor = isPrimary
-          ? 'rgb(53, 162, 235)'
-          : 'rgb(255, 159, 64)';
-          
-        // Enhanced dataset styling
-        return {
-          ...dataset,
-          borderColor,
-          backgroundColor: viewMode === 'line' ? 'rgba(0, 0, 0, 0.1)' : color,
-          fill: viewMode === 'line' ? false : undefined,
-          pointBackgroundColor: borderColor,
-          pointBorderColor: '#fff',
-          pointBorderWidth: 1.5,
-          pointHoverBackgroundColor: borderColor,
-          pointHoverBorderColor: '#fff',
-          pointHoverBorderWidth: 2,
-          pointHoverRadius: 6,
-          barPercentage: 0.8,
-          categoryPercentage: 0.7
-        };
-      })
-    };
+    // Find the first dataset with data to use as a template for labels
+    let labels: string[] = [];
+    let allDatasets: any[] = [];
     
-    return enhancedData;
+    // Color palette for multiple datasets
+    const colorPalette = [
+      { border: 'rgb(76, 175, 80)', background: 'rgba(76, 175, 80, 0.7)' },  // Green for Current Year
+      { border: 'rgb(53, 162, 235)', background: 'rgba(53, 162, 235, 0.7)' },
+      { border: 'rgb(255, 99, 132)', background: 'rgba(255, 99, 132, 0.7)' },
+      { border: 'rgb(75, 192, 192)', background: 'rgba(75, 192, 192, 0.7)' },
+      { border: 'rgb(255, 159, 64)', background: 'rgba(255, 159, 64, 0.7)' },
+      { border: 'rgb(153, 102, 255)', background: 'rgba(153, 102, 255, 0.7)' },
+      { border: 'rgb(255, 205, 86)', background: 'rgba(255, 205, 86, 0.7)' },
+    ];
+    
+    // Loop through active periods and add their datasets if available
+    activePeriods.forEach((period, index) => {
+      // Use a special key for Current Year
+      const periodKey = period.isCurrentYear 
+        ? 'current_year' 
+        : `${period.years}_years`;
+        
+      const periodData = timeframeData[periodKey];
+      
+      if (periodData && periodData.labels && periodData.datasets && periodData.datasets.length > 0) {
+        // Use the first dataset with data as the source of labels
+        if (labels.length === 0) {
+          labels = periodData.labels;
+        }
+        
+        // Add dataset with styling
+        const colorIndex = index % colorPalette.length;
+        const color = colorPalette[colorIndex];
+        
+        periodData.datasets.forEach(dataset => {
+          allDatasets.push({
+            ...dataset,
+            label: period.label,
+            borderColor: color.border,
+            backgroundColor: viewMode === 'line' ? 'rgba(0, 0, 0, 0.1)' : color.background,
+            fill: viewMode === 'line' ? false : undefined,
+            pointBackgroundColor: color.border,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1.5,
+            pointHoverBackgroundColor: color.border,
+            pointHoverBorderColor: '#fff',
+            pointHoverBorderWidth: 2,
+            pointHoverRadius: 6,
+            barPercentage: 0.8,
+            categoryPercentage: 0.7
+          });
+        });
+      }
+    });
+    
+    return {
+      labels: labels,
+      datasets: allDatasets
+    };
   };
 
   // Handle fullscreen toggle
@@ -380,10 +480,9 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
 
   // Helper to check if we have valid data to display
   const hasValidData = () => {
-    const data = seasonalityData[activeTimeframe as keyof typeof seasonalityData];
-    return data && data.labels && data.labels.length > 0 && 
-           data.datasets && data.datasets.length > 0 && 
-           data.datasets[0].data && data.datasets[0].data.length > 0;
+    const data = getCurrentSeasonalityData();
+    return data.labels && data.labels.length > 0 && 
+           data.datasets && data.datasets.length > 0;
   };
 
   return (
@@ -400,7 +499,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
         
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
-          <h3>{getChartTitle()} Comparison</h3>
+          <h3>{getChartTitle()}</h3>
           <div className={styles.chartControls}>
             <button 
               className={styles.modernActionButton} 
@@ -471,99 +570,37 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
             </button>
           </div>
           
-          <div className={styles.comparisonSelector}>
-            <div className={styles.periodSelectorWrapper}>
-              <label htmlFor="firstPeriod">Primary Period:</label>
-              <select 
-                id="firstPeriod"
-                className={styles.periodSelect}
-                value={comparisonPeriods.first}
-                onChange={(e) => setComparisonPeriods({...comparisonPeriods, first: e.target.value})}
-                disabled={isLoading}
-              >
-                <option value="1 Year">1 Year</option>
-                <option value="3 Years">3 Years</option>
-                <option value="5 Years">5 Years</option>
-                <option value="7 Years">7 Years</option>
-                <option value="10 Years">10 Years</option>
-                <option value="15 Years">15 Years</option>
-                <option value="20 Years">20 Years</option>
-                <option value="25 Years">25 Years</option>
-                <option value="30 Years">30 Years</option>
-              </select>
+          {/* Multi-period selection */}
+          <div className={styles.periodsSelectionContainer}>
+            <div className={styles.periodsSelectionHeader}>
+              <FaInfoCircle className={styles.infoIcon} />
+              <span>Select Periods:</span>
             </div>
-            
-            <div className={styles.vsIndicator}>vs</div>
-            
-            <div className={styles.periodSelectorWrapper}>
-              <label htmlFor="secondPeriod">Compare With:</label>
-              <select 
-                id="secondPeriod"
-                className={styles.periodSelect}
-                value={comparisonPeriods.second}
-                onChange={(e) => setComparisonPeriods({...comparisonPeriods, second: e.target.value})}
-                disabled={isLoading}
-              >
-                <option value="1 Year">1 Year</option>
-                <option value="3 Years">3 Years</option>
-                <option value="5 Years">5 Years</option>
-                <option value="7 Years">7 Years</option>
-                <option value="10 Years">10 Years</option>
-                <option value="15 Years">15 Years</option>
-                <option value="20 Years">20 Years</option>
-                <option value="25 Years">25 Years</option>
-                <option value="30 Years">30 Years</option>
-              </select>
+            <div className={styles.periodsSelectionGroup}>
+              {selectedPeriods.map(period => (
+                <button 
+                  key={period.label}
+                  className={`${styles.periodToggleButton} ${period.selected ? styles.active : ''}`}
+                  onClick={() => togglePeriodSelection(period.label)}
+                  type="button"
+                >
+                  {period.selected && <span className={styles.periodCheckmark}>✓</span>}
+                  <span className={styles.periodLabel}>{period.label}</span>
+                </button>
+              ))}
             </div>
           </div>
-          
-          <div className={styles.seasonalityTimeframeSelector}>
-            <button 
-              className={`${styles.modernTabButton} ${activeTimeframe === 'daily' ? styles.activeTab : ''}`}
-              title="Daily View"
-              onClick={() => setActiveTimeframe('daily')}
-              disabled={isLoading}
-            >
-              <span>Daily</span>
-            </button>
-            <button 
-              className={`${styles.modernTabButton} ${activeTimeframe === 'weekly' ? styles.activeTab : ''}`}
-              title="Weekly View"
-              onClick={() => setActiveTimeframe('weekly')}
-              disabled={isLoading}
-            >
-              <span>Weekly</span>
-            </button>
-            <button 
-              className={`${styles.modernTabButton} ${activeTimeframe === 'monthly' ? styles.activeTab : ''}`}
-              title="Monthly View"
-              onClick={() => setActiveTimeframe('monthly')}
-              disabled={isLoading}
-            >
-              <span>Monthly</span>
-            </button>
-            <button 
-              className={`${styles.modernTabButton} ${activeTimeframe === 'yearly' ? styles.activeTab : ''}`}
-              title="Yearly View"
-              onClick={() => setActiveTimeframe('yearly')}
-              disabled={isLoading}
-            >
-              <span>Yearly</span>
-            </button>
-          </div>
+          {/* Removed the timeframe selector section */}
         </div>
-
+        
         {/* Chart */}
         <div 
           className={`${styles.comparisonChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
           ref={chartRef}
         >
           {isLoading && <LoadingSpinner />}
-          
           {error && <div className={styles.errorMessage}>{error}</div>}
-          
           {!isLoading && !error && !hasValidData() && <NoDataPlaceholder />}
-          
           {!isLoading && !error && hasValidData() && (
             <div className={styles.chartContainer}>
               {viewMode === 'line' ? (
@@ -598,30 +635,26 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               </div>
               <div className={styles.modalBody}>
                 <h4>Understanding Seasonality:</h4>
-
                 <ul className={styles.infoList}>
                   <li><strong>Daily:</strong> Performance trends by day of month</li>
                   <li><strong>Weekly:</strong> Performance by day of the week (Mon-Fri)</li>
                   <li><strong>Monthly:</strong> Performance patterns across months of the year</li>
                   <li><strong>Yearly:</strong> Year-to-year performance comparison</li>
                 </ul>
-                
                 <h4>How to use this chart:</h4>
                 <ul className={styles.infoList}>
-                  <li>Select different time periods to compare historical performance patterns</li>
+                  <li>Select multiple time periods to overlay historical performance patterns</li>
                   <li>Toggle between line and bar chart views for different visualizations</li>
                   <li>Show or hide data points for clearer reading</li>
                   <li>Download the chart as an image using the download button</li>
                 </ul>
-                
                 <p>
                   Seasonal patterns can help inform trading and investment decisions, particularly for assets 
                   that show consistent performance during specific periods.
                 </p>
-
                 <div className={styles.infoTip}>
-                  <strong>Pro tip:</strong> Look for consistent patterns across different timeframes 
-                  that might indicate reliable seasonal effects.
+                  <strong>Pro tip:</strong> Compare patterns across different time horizons to identify 
+                  which seasonal effects are consistent over time versus those that might be temporary. 
                 </div>
               </div>
               <div className={styles.modalFooter}>
