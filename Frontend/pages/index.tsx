@@ -73,7 +73,6 @@ export default function Home() {
                   <Image 
                     src={src} 
                     alt={`OptiWise chart example ${index + 1}`}
-                    fill={true}
                     priority={index === currentChart}
                     style={{ 
                       objectFit: 'cover',

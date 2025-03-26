@@ -304,7 +304,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
       <div className={styles.analysisCard}>
         {/* Overview Header Section */}
         <div className={styles.seasonalityHeader}>
-          <h1>Performance Overview for {assetInfo.name}</h1>
+          <h2>Performance Overview for {assetInfo.name}</h2>
           <p className={styles.seasonalityDescription}>
             <FaInfoCircle className={styles.infoIcon} /> 
             Track historical performance trends and compare returns across different timeframes to make 
