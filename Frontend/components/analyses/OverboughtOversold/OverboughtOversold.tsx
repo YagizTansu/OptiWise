@@ -1,6 +1,5 @@
-import styles from '../../styles/Analyses.module.css';
-import PriceVolumeChart from './OverboughtOversold/PriceVolumeChart';
-import IndicatorChart from './OverboughtOversold/IndicatorChart';
+import PriceVolumeChart from './PriceVolumeChart';
+import IndicatorChart from './IndicatorChart';
 
 interface OverboughtOversoldProps {
   symbol: string;
@@ -8,7 +7,7 @@ interface OverboughtOversoldProps {
 
 const OverboughtOversold: React.FC<OverboughtOversoldProps> = ({ symbol }) => {
   return (
-    <div className={styles.overboughtOversoldTab}>
+    <div>
       <PriceVolumeChart symbol={symbol} />
       <IndicatorChart symbol={symbol} />
     </div>

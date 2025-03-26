@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/fundamental/FinancialStatements.module.css';
 import { FaQuestionCircle, FaChartLine, FaBalanceScale, FaMoneyBillWave, FaRegCalendarAlt, FaRegCalendar, FaInfoCircle } from 'react-icons/fa';
 import { fetchFundamentalsTimeSeries } from '../../../services/api/finance';
 

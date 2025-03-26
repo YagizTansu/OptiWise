@@ -1,0 +1,247 @@
+/* Analysis Card */
+.analysisCard {
+  flex: 1;
+  min-width: 600px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 16px;
+  margin-top: 1%;
+}
+
+/* Section heading with info button */
+.sectionHeadingWithInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* Info Button Styling */
+.infoButtonContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.infoButton {
+  background: rgba(59, 130, 246, 0.08);
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px; /* Prevent shrinking */
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  padding: 0;
+  margin-left: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.infoButton:hover {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.infoButton:active {
+  transform: translateY(0);
+}
+
+.infoIcon {
+  font-size: 12px;
+  line-height: 1;
+  font-weight: bold;
+}
+
+/* Info Tooltip Styling */
+.infoTooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -8px;
+  width: 280px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 14px;
+  z-index: 100;
+  font-size: 0.9rem;
+  color: #334155;
+  text-align: left;
+  transform-origin: top right;
+  animation: tooltipFadeIn 0.2s ease;
+}
+
+.infoTooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  width: 12px;
+  height: 12px;
+  background-color: #ffffff;
+  border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+  transform: rotate(45deg);
+}
+
+.tooltipTitle {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 6px;
+}
+
+.tooltipContent {
+  line-height: 1.6;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Reports Table Styling */
+.reportsTable {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.reportsTable table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.reportsTable th {
+  background-color: #f1f5f9;
+  text-align: left;
+  padding: 16px 20px;
+  color: #334155;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.reportsTable td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.reportsTable tr:hover td {
+  background-color: #f8fafc;
+}
+
+.reportsTable tr:last-child td {
+  border-bottom: none;
+}
+
+.reportTitle {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Style Classes for Investment Ratings */
+.positive {
+  color: #10b981;
+}
+
+.negative {
+  color: #ef4444;
+}
+
+.neutral {
+  color: #6b7280;
+}
+
+/* Loading and Error States */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #666;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #0066cc;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #d32f2f;
+}
+
+.errorIcon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .analysisCard {
+    min-width: 100%;
+  }
+  
+  .infoTooltip {
+    width: 240px;
+    right: -10px;
+  }
+  
+  .infoTooltip::before {
+    right: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .reportsTable th, 
+  .reportsTable td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .sectionHeadingWithInfo h3 {
+    font-size: 1.2rem;
+  }
+  
+  .infoTooltip {
+    width: 220px;
+    max-width: calc(100vw - 40px);
+  }
+}

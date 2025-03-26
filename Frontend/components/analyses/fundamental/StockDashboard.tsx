@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/fundamental/StockDashboard.module.css';
 import { fetchStockDashboardData, QuoteSummaryData } from '../../../services/api/finance';
 import { FaExpand, FaQuestion, FaDownload, FaCompress, FaInfoCircle, FaTimes } from 'react-icons/fa';
 

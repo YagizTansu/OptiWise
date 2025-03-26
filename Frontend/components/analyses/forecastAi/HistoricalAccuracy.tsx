@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from '../../../styles/ForecastAI.module.css';
+import styles from '../../../styles/forecastAi/ForecastAI.module.css';
 
 // Custom Info icon component to replace react-feather dependency
 const InfoIcon = ({ size = 16, className = '', onClick }: { size?: number, className?: string, onClick?: () => void }) => (

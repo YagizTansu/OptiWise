@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaQuestion, FaSpinner } from 'react-icons/fa';
-import styles from '../../../styles/InteractiveFeatures.module.css';
+import styles from '../../../styles/forecastAi/InteractiveFeatures.module.css';
 import technicalAnalysisAI from '../../../services/analysis/technicalAnalysisAI';
 
 interface InteractiveFeaturesProps {

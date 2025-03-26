@@ -1,0 +1,469 @@
+/* Analysis Card Styles */
+.analysisCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+/* Section Heading with Info Button */
+.sectionHeadingWithInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+/* Section Description */
+.sectionDescription {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Loading Container */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #64748b;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #0066cc;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error Container */
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #d32f2f;
+}
+
+.errorIcon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.retryButton {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.retryButton:hover {
+  background-color: #dc2626;
+}
+
+/* Table Explanation */
+.tableExplanation {
+  background-color: #e8f4fd;
+  border-left: 4px solid #4a90e2;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border-radius: 0 4px 4px 0;
+}
+
+.tableExplanation p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Reports Table */
+.reportsTable {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+/* Color Classes */
+.positive {
+  color: #10b981;
+}
+
+.negative {
+  color: #ef4444;
+}
+
+.neutral {
+  color: #6b7280;
+}
+
+/* No Statement Data */
+.noStatementData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Recommendation Summary */
+.recommendationSummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.summaryBox, .chartBox {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 20px;
+  flex: 1;
+  min-width: 300px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.summaryBox h5, .chartBox h5 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.sentimentDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.sentimentValue {
+  font-size: 26px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.analystCount {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.sentimentDescription {
+  text-align: center;
+  font-size: 15px;
+  color: #475569;
+  line-height: 1.4;
+}
+
+/* Recommendation Bar Chart */
+.recommendationBar {
+  display: flex;
+  height: 36px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
+.barSegment {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  min-width: 24px; /* Ensure at least some visibility for small percentages */
+}
+
+.barSegment:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.strongBuySegment {
+  background-color: #22c55e;
+}
+
+.buySegment {
+  background-color: #4ade80;
+}
+
+.holdSegment {
+  background-color: #fcd34d;
+  color: #78350f;
+  text-shadow: none;
+}
+
+.sellSegment {
+  background-color: #fb7185;
+}
+
+.strongSellSegment {
+  background-color: #ef4444;
+}
+
+.segmentValue {
+  font-size: 13px;
+}
+
+/* Legend for Recommendation Bar */
+.legendContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.legendColor {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  margin-right: 5px;
+}
+
+.strongBuyColor {
+  background-color: #22c55e;
+}
+
+.buyColor {
+  background-color: #4ade80;
+}
+
+.holdColor {
+  background-color: #fcd34d;
+}
+
+.sellColor {
+  background-color: #fb7185;
+}
+
+.strongSellColor {
+  background-color: #ef4444;
+}
+
+/* Trend Analysis */
+.trendAnalysis {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 18px;
+  margin-top: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.trendAnalysis h5 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.trendAnalysis p {
+  margin: 0;
+  line-height: 1.5;
+  color: #475569;
+  font-size: 15px;
+}
+
+/* Current Period Row */
+.currentPeriodRow {
+  background-color: rgba(59, 130, 246, 0.05);
+  font-weight: 500;
+}
+
+.currentPeriodRow td {
+  border-left: 3px solid #3b82f6;
+}
+
+/* Earnings Summary */
+.earningsSummary, .forecastSummary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.surpriseValue {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.quarterSummary {
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.surpriseExplanation {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Earnings Forecast */
+.forecastSummary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.highlightBox, .growthProjection {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 20px;
+  flex: 1;
+  min-width: 300px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.highlightBox h5, .growthProjection h5 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.keyMetric {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.metricLabel {
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.metricValue {
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.growthTag {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 10px;
+}
+
+.analystConsensus {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+.growthChart {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.yearLabel {
+  font-size: 14px;
+  color: #666;
+}
+
+.yearValue {
+  font-weight: bold;
+  font-size: 18px;
+  margin: 5px 0;
+}
+
+.growthArrow {
+  font-size: 24px;
+}
+
+.growthPercentage {
+  grid-column: 1 / span 3;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* Calendar Events */
+.eventsContainer {
+  margin-bottom: 30px;
+}
+
+.eventCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 18px;
+}
+
+.eventCard {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.eventCard:hover {
+  transform: translateY(-4px);
+}
+
+.eventType {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #334155;
+  margin-bottom: 12px;
+}
+
+.eventDetails p {
+  margin: 8px 0;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .recommendationSummary, .earningsSummary, .forecastSummary {
+    flex-direction: column;
+  }
+  
+  .summaryBox, .chartBox, .highlightBox, .growthProjection {
+    width: 100%;
+  }
+  
+  .sentimentValue {
+    font-size: 22px;
+  }
+  
+  .eventCards {
+    grid-template-columns: 1fr;
+  }
+}

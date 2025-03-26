@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../../styles/Analyses.module.css';
+import styles from '../../../styles/insider/Insiders.module.css';
 import { FaInfoCircle, FaFileDownload, FaSort, FaSortUp, FaSortDown, FaChartLine, FaExclamationTriangle, FaFilter, FaSearch, FaEye } from 'react-icons/fa';
 import { 
   fetchInsiderAndInstitutionalData, 
   InsiderHolder, 
   InsiderTransaction, 
   InstitutionalOwner 
-} from '../../services/api/finance';
+} from '../../../services/api/finance';
 
 interface InsidersProps {
   symbol: string;

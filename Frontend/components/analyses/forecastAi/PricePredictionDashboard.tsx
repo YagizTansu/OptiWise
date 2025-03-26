@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaArrowUp, FaArrowDown, FaArrowRight } from 'react-icons/fa';
-import styles from '../../../styles/PricePredictionDashboard.module.css';
+import styles from '../../../styles/forecastAi/PricePredictionDashboard.module.css';
 
 interface PredictionData {
   shortTerm: {

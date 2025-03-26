@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import styles from '../../styles/seasonality/Seasonality.module.css';
-import SeasonalityAnalysis from './Seasonality/SeasonalityAnalysis';
-import PatternCorrelation from './Seasonality/PatternCorrelation';
-import TimeAverageReturns from './Seasonality/TimeAverageReturns';
-import SeasonalStrategyInsights from './Seasonality/SeasonalStrategyInsights';
+import SeasonalityAnalysis from './SeasonalityAnalysis';
+import PatternCorrelation from './PatternCorrelation';
+import TimeAverageReturns from './TimeAverageReturns';
+import SeasonalStrategyInsights from './SeasonalStrategyInsights';
 
 interface SeasonalityProps {
   symbol: string;
@@ -17,7 +16,7 @@ const Seasonality: React.FC<SeasonalityProps> = ({ symbol }) => {
   });
 
   return (
-    <div className={styles.seasonalityTab}>
+    <div >
    
       <SeasonalityAnalysis symbol={symbol} />
 

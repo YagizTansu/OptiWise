@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../../styles/SmartAnalysisSummary.module.css';
+import styles from '../../../styles/forecastAi/SmartAnalysisSummary.module.css';
 
 interface SmartAnalysisSummaryProps {
   analysis: {

@@ -1,0 +1,318 @@
+/* Stock Dashboard Styles */
+.dashboardContainer {
+  background-color: var(--card-bg, #fff);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.dashboardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color, #eaeaea);
+}
+
+.stockName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+  margin: 0;
+}
+
+.dashboardControls {
+  display: flex;
+  gap: 8px;
+}
+
+.iconButton {
+  background: var(--button-bg, #f5f5f5);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary, #555);
+}
+
+.iconButton:hover {
+  background: var(--button-hover-bg, #e9e9e9);
+  color: var(--text-primary, #333);
+}
+
+/* Price Display */
+.priceCard {
+  background-color: var(--price-card-bg, #f8fafc);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.currentPrice {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary, #333);
+  margin-bottom: 4px;
+}
+
+.priceChange {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.positive {
+  color: var(--positive-color, #22c55e);
+}
+
+.negative {
+  color: var(--negative-color, #ef4444);
+}
+
+/* Trading Information */
+.tradingInfoCard {
+  background-color: var(--card-bg, #fff);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color, #eaeaea);
+}
+
+.tradingInfoRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.infoItem {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.infoLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 4px;
+}
+
+.infoValue {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+/* Metrics Grid */
+.metricsCard {
+  background-color: var(--card-bg, #fff);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--border-color, #eaeaea);
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.metricTile {
+  background-color: var(--metric-tile-bg, #f8fafc);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s;
+}
+
+.metricTile:hover {
+  background-color: var(--metric-tile-hover-bg, #f1f5f9);
+  transform: translateY(-2px);
+}
+
+.metricLabel {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 6px;
+}
+
+.metricValue {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary, #333);
+}
+
+/* Modal Styles */
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.modalWindow {
+  background-color: var(--card-bg, #fff);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeaderBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color, #eaeaea);
+}
+
+.modalTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary, #333);
+}
+
+.modalCloseButton {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary, #64748b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.modalCloseButton:hover {
+  background-color: var(--button-hover-bg, #f1f5f9);
+  color: var(--text-primary, #333);
+}
+
+.modalContent {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.infoSection {
+  margin-bottom: 20px;
+}
+
+.infoSectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-primary, #333);
+  border-bottom: 1px solid var(--border-light, #f1f5f9);
+  padding-bottom: 8px;
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-color, #eaeaea);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.primaryButton {
+  background-color: var(--primary-color, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.primaryButton:hover {
+  background-color: var(--primary-color-dark, #2563eb);
+}
+
+/* Loading spinner */
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.loader::after {
+  content: '';
+  width: 30px;
+  height: 30px;
+  margin-left: 10px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.error {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 20px 0;
+  font-weight: 500;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 768px) {
+  .metricsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  }
+  
+  .tradingInfoRow {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .infoItem {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-light, #f1f5f9);
+  }
+  
+  .currentPrice {
+    font-size: 1.8rem;
+  }
+}

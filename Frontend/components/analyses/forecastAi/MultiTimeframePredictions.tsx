@@ -1,6 +1,6 @@
 import React from 'react';
 import { Line, Bar } from 'react-chartjs-2';
-import styles from '../../../styles/ForecastAI.module.css';
+import styles from '../../../styles/forecastAi/ForecastAI.module.css';
 
 interface MultiTimeframePredictionsProps {
   chartData: any;

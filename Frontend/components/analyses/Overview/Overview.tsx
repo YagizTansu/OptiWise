@@ -1,13 +1,12 @@
 import React from 'react';
-import styles from '../../styles/overview/Overview.module.css';
 
 // Import new components
-import CompanyProfile from './Overview/CompanyProfile'; // Add this new import
-import PerformanceOverview from './Overview/PerformanceOverview';
-import PerformanceMetrics from './Overview/PerformanceMetrics';
-import AnnualPerformance from './Overview/AnnualPerformance';
-import KeyStatistics from './Overview/KeyStatistics';
-import Dividends from './Overview/Dividends'; // Ensure this path is correct or update it to the correct path
+import CompanyProfile from './CompanyProfile'; // Add this new import
+import PerformanceOverview from './PerformanceOverview';
+import PerformanceMetrics from './PerformanceMetrics';
+import AnnualPerformance from './AnnualPerformance';
+import KeyStatistics from './KeyStatistics';
+import Dividends from './Dividends'; // Ensure this path is correct or update it to the correct path
 
 interface OverviewProps {
   symbol: string;
@@ -15,7 +14,7 @@ interface OverviewProps {
 
 const Overview: React.FC<OverviewProps> = ({ symbol }) => {
   return (
-    <div className={styles.overviewTab}>
+    <div >
       {/* Company Profile Component */}
       <CompanyProfile symbol={symbol} />
       

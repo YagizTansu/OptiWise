@@ -5,13 +5,13 @@ import styles from '../styles/Analyses.module.css';
 import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaBalanceScale, FaChartPie, FaFileAlt, FaUserTie } from 'react-icons/fa';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, 
   Title, Tooltip, Legend, ArcElement } from 'chart.js';
-import Overview from '../components/analyses/Overview';
-import Seasonality from '../components/analyses/Seasonality';
-import OverboughtOversold from '../components/analyses/OverboughtOversold';
-import Fundamental from '../components/analyses/Fundamental';
-import ForecastAI from '../components/analyses/ForecastAI';
-import Report from '../components/analyses/Report';
-import Insiders from '../components/analyses/Insiders';
+import Overview from '../components/analyses/Overview/Overview';
+import Seasonality from '../components/analyses/Seasonality/Seasonality';
+import OverboughtOversold from '../components/analyses/OverboughtOversold/OverboughtOversold';
+import Fundamental from '../components/analyses/fundamental/Fundamental';
+import ForecastAI from '../components/analyses/forecastAi/ForecastAI';
+import Report from '../components/analyses/Report/Report';
+import Insiders from '../components/analyses/Insider/Insiders';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import UpcomingEvents from '../components/UpcomingEvents';
 

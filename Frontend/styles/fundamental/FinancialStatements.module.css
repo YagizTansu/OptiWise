@@ -1,0 +1,333 @@
+/* Financial Statement Card Styles */
+.financialStatementCard {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  padding: 24px;
+  margin-top: 2%;
+}
+
+.financialStatementCard:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.modernCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modernCardHeader h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+}
+
+.cardTitleIcon {
+  background-color: #dbeafe;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: #3b82f6;
+}
+
+.controlsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.statementTypeControls, .periodTypeControls {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+.statementTypeButton, .periodButton {
+  padding: 10px 16px;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.statementTypeButton:hover, .periodButton:hover {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+.activeStatementType, .activePeriod {
+  background-color: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.activeStatementType:hover, .activePeriod:hover {
+  background-color: #2563eb;
+  color: white;
+}
+
+/* Table Styling */
+.tableContainer {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  overflow-x: auto;
+  width: 100%;
+}
+
+.financialTableContainer {
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  width: 100%;
+}
+
+.financialTable {
+  width: 100%;
+  min-width: 900px; /* Ensure table has a good minimum width */
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.financialTable thead tr {
+  background-color: #f1f5f9;
+}
+
+.financialTable th {
+  padding: 16px 24px; /* Increased horizontal padding */
+  text-align: left;
+  color: #334155;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.financialTable td {
+  padding: 14px 24px; /* Increased horizontal padding */
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.financialTable tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.financialTable tr:last-child td {
+  border-bottom: none;
+}
+
+.numericCell {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.highlightRow {
+  background-color: rgba(219, 234, 254, 0.4) !important;
+}
+
+.highlightRow:hover {
+  background-color: rgba(219, 234, 254, 0.6) !important;
+}
+
+.subItem {
+  padding-left: 20px;
+  font-style: italic;
+  color: #64748b;
+}
+
+/* Values styling */
+.positive {
+  color: #10b981 !important;
+}
+
+.negative {
+  color: #ef4444 !important;
+}
+
+.neutral {
+  color: #f59e0b !important;
+}
+
+/* Info Button & Tooltip Styling */
+.infoButtonContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.infoButton {
+  background: rgba(59, 130, 246, 0.08);
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px; /* Prevent shrinking */
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  padding: 0;
+  margin-left: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.infoButton:hover {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.infoIcon {
+  font-size: 12px;
+  line-height: 1;
+  font-weight: bold;
+}
+
+/* Enhanced Info Tooltip */
+.enhancedInfoTooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: -8px;
+  width: 300px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  z-index: 100;
+  font-size: 0.9rem;
+  color: #334155;
+  text-align: left;
+  transform-origin: top right;
+  animation: tooltipFadeIn 0.2s ease;
+  border-left: 4px solid #3b82f6;
+}
+
+.enhancedInfoTooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  transform: rotate(45deg);
+  box-shadow: -3px -3px 5px rgba(0, 0, 0, 0.04);
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading, Error, and No Data States */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #64748b;
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #d32f2f;
+}
+
+.noDataContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Footer Styles */
+.statementFooter {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.statementDisclaimer {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .controlsRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .statementTypeControls, .periodTypeControls {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  
+  .statementTypeControls {
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .financialTable th, .financialTable td {
+    padding: 12px 10px;
+    font-size: 0.85rem;
+  }
+}

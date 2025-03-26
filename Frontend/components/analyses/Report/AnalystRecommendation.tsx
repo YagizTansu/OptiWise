@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/reports/AnalystRecommendation.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
 
 interface AnalystRecommendationProps {

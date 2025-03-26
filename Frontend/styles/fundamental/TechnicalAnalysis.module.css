@@ -1,0 +1,417 @@
+/* Technical Analysis Component Styles */
+.analysisCard {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
+  background-color: #fff;
+  transition: box-shadow 0.3s ease;
+}
+
+.seasonalityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eaeaea;
+  background-color: #f9fafb;
+}
+
+.chartControls {
+  margin-left: auto;
+}
+
+.iconButton {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.iconButton:hover {
+  color: #000;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s;
+}
+
+.modalContent {
+  background-color: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  animation: slideIn 0.3s;
+}
+
+.modalHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  z-index: 1;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: background-color 0.2s;
+}
+
+.modalBody {
+  padding: 24px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #444;
+}
+
+.modalFooter {
+  padding: 16px 24px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: flex-end;
+  position: sticky;
+  bottom: 0;
+  background-color: #fff;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.applyButton {
+  background-color: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.applyButton:hover {
+  background-color: #0069d9;
+}
+
+/* Metrics Grid */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.metricCard {
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #eaeaea;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background-color: #f8f9fa;
+}
+
+.metricCard:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.metricCard.positive {
+  background-color: #f4fbf6;
+}
+
+.metricCard.negative {
+  background-color: #fff5f5;
+}
+
+.metricCard.neutral {
+  background-color: #f8f9fa;
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.metricValue {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 10px 0;
+}
+
+.metricSubtitle {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+}
+
+.positive .metricValue {
+  color: #2e7d32;
+}
+
+.negative .metricValue {
+  color: #d32f2f;
+}
+
+.neutral .metricValue {
+  color: #666;
+}
+
+/* Outlooks Container */
+.outlooksContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 0 20px 20px;
+}
+
+.outlookCard {
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #eaeaea;
+  transition: transform 0.2s, box-shadow 0.2s;
+  background-color: #fff;
+}
+
+.outlookCard:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.outlookDescription {
+  font-size: 14px;
+  color: #555;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+/* Score Indicator */
+.scoreIndicatorWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.scoreBar {
+  width: 25%;
+  height: 8px;
+  margin: 0 2px;
+  border-radius: 2px;
+  background-color: #e0e0e0;
+  transition: background-color 0.3s;
+  opacity: 0.5;
+}
+
+.scoreBar.positive {
+  background-color: #4caf50;
+  opacity: 1;
+}
+
+.scoreBar.negative {
+  background-color: #f44336;
+  opacity: 1;
+}
+
+.scoreBar.neutral {
+  background-color: #9e9e9e;
+  opacity: 1;
+}
+
+/* Loading State */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0,0,0,0.1);
+  border-top-color: #4a90e2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Error State */
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px;
+  background-color: #fff5f5;
+  border-radius: 8px;
+  border: 1px solid #ffe5e5;
+}
+
+.errorIcon {
+  font-size: 32px;
+  margin-bottom: 15px;
+}
+
+/* Info Button & Tooltip */
+.infoButtonContainer {
+  position: relative;
+}
+
+.infoButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.infoIcon {
+  font-size: 14px;
+  color: #4a90e2;
+  font-weight: bold;
+}
+
+.infoTooltip {
+  position: absolute;
+  z-index: 100;
+  width: 220px;
+  right: -10px;
+  top: calc(100% + 5px);
+  background-color: #fff;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 13px;
+  transition: opacity 0.3s, transform 0.3s;
+  opacity: 1;
+  transform: translateY(0);
+  animation: fadeIn 0.3s;
+}
+
+.tooltipTitle {
+  font-weight: bold;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  color: #333;
+}
+
+.tooltipContent {
+  line-height: 1.4;
+  color: #555;
+}
+
+/* Comparison Section */
+.comparisonData {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.comparisonItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.comparisonLabel {
+  font-weight: 500;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .outlooksContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  .metricsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modalContent {
+    width: 95%;
+  }
+}

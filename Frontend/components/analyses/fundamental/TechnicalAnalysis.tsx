@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/fundamental/TechnicalAnalysis.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
 import { FaQuestion, FaTimes } from 'react-icons/fa';
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/reports/AnalysisTools.module.css';
 import { fetchAnalysisData, AnalysisData } from '../../../services/api/finance';
 
 interface AnalysisToolsProps {

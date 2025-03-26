@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FiInfo } from 'react-icons/fi';
-import styles from '../../../styles/AnalysisRationale.module.css';
+import styles from '../../../styles/forecastAi/AnalysisRationale.module.css';
 
 interface AnalysisRationaleProps {
   technicalFactors: {
