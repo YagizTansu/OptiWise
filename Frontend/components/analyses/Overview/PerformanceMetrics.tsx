@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaArrowUp, FaArrowDown, FaQuestion, FaDownload, FaExpand, FaCompress, FaInfoCircle } from 'react-icons/fa';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/overview/PerformanceMetrics.module.css';
 import html2canvas from 'html2canvas';
 import { PeriodData, fetchPerformanceMetrics } from '../../../services/api/finance';
 

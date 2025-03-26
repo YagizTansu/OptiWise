@@ -10,7 +10,7 @@ import {
   Tooltip, 
   Legend 
 } from 'chart.js';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/overview/Dividends.module.css';
 import { FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
 import html2canvas from 'html2canvas';
 import { 

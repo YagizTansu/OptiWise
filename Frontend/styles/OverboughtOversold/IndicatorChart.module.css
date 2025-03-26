@@ -1,0 +1,172 @@
+.chartCard {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chartHeader h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #333;
+}
+
+.chartControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chartContainer {
+  background: rgb(248, 246, 246);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  margin-bottom: 32px;
+  width: 100%;
+  overflow-x: auto;
+  transition: all 0.3s ease;
+  height: 400px;
+  position: relative;
+}
+
+.chartContainer:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+.indicatorControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.modernSelect {
+  appearance: none;
+  background: #f0f2f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  color: #333;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 10px 14px;
+  padding-right: 34px;
+  transition: all 0.2s ease;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+}
+
+.modernSelect:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+}
+
+.modernSelect:focus {
+  background-color: #fff;
+  border-color: #4d8bf0;
+  box-shadow: 0 0 0 3px rgba(77, 139, 240, 0.15);
+  outline: none;
+}
+
+.modernActionButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f0f9ff;
+  color: #0288d1;
+  border: 1px solid #bbdefb;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernActionButton:hover {
+  background-color: #e1f5fe;
+  box-shadow: 0 2px 5px rgba(2,136,209,0.15);
+}
+
+.modernIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernIconButton:hover {
+  background-color: #eeeeee;
+  color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.buttonIcon {
+  font-size: 16px;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.modalBody h3 {
+  margin-top: 0;
+}
+
+.modalBody ul {
+  padding-left: 20px;
+}
+
+.disclaimerText {
+  font-size: 12px;
+  color: #777;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #666;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #0066cc;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #d32f2f;
+}

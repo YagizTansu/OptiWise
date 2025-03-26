@@ -1,0 +1,521 @@
+/* Card container styles */
+.cardContainer {
+  width: 100%;
+  margin: 20px 0;
+}
+
+.analysisCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+/* Header styles */
+.seasonalityHeader {
+  margin-bottom: 24px;
+}
+
+.seasonalityHeader h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.seasonalityDescription {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.infoIcon {
+  color: #2196f3;
+  flex-shrink: 0;
+}
+
+/* Chart header and controls */
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chartHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.chartControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Strategy cards */
+.strategyCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.strategyCard {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.strategyCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.cardIconContainer {
+  background-color: #ebf4ff;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.strategyCard:nth-child(2) .cardIconContainer {
+  background-color: #feebef;
+}
+
+.strategyCard:nth-child(3) .cardIconContainer {
+  background-color: #e6fffa;
+}
+
+.cardIcon {
+  font-size: 1.5rem;
+  color: #3182ce;
+}
+
+.strategyCard:nth-child(2) .cardIcon {
+  color: #e53e3e;
+}
+
+.strategyCard:nth-child(3) .cardIcon {
+  color: #2c7a7b;
+}
+
+.strategyCard h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #2d3748;
+  text-align: center;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex-grow: 1;
+}
+
+.cardContent p {
+  color: #4a5568;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.dataHighlight {
+  background: #ebf8ff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #2b6cb0;
+  margin: 8px 0 16px;
+  font-size: 0.95rem;
+}
+
+.strategyCard:nth-child(2) .dataHighlight {
+  background: #fff5f5;
+  color: #c53030;
+}
+
+.strategyCard:nth-child(3) .dataHighlight {
+  background: #e6fffa;
+  color: #2c7a7b;
+}
+
+/* Button styles */
+.modernPrimaryButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: auto;
+  width: 100%;
+}
+
+.modernPrimaryButton:hover {
+  background-color: #2c5282;
+}
+
+.buttonIcon {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.modernPrimaryButton:hover .buttonIcon {
+  transform: translateX(3px);
+}
+
+.modernPrimaryButton:disabled {
+  background-color: #cbd5e0;
+  cursor: not-allowed;
+}
+
+.modernActionButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f0f9ff;
+  color: #0288d1;
+  border: 1px solid #bbdefb;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernActionButton:hover {
+  background-color: #e1f5fe;
+  box-shadow: 0 2px 5px rgba(2,136,209,0.15);
+}
+
+.modernIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernIconButton:hover {
+  background-color: #eeeeee;
+  color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.applyButton {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.applyButton:hover {
+  background-color: #0069d9;
+}
+
+/* Modal styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modalHeader {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.modalFooter {
+  padding: 15px 20px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.infoList {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.infoList li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Strategy analysis components */
+.strategyAnalysis {
+  margin-top: 1rem;
+}
+
+.strategyAnalysis h3 {
+  margin: 1.5rem 0 1rem;
+  font-size: 1.2rem;
+}
+
+.monthlyTable {
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.monthlyTable table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.monthlyTable th {
+  background-color: #f8f9fc;
+  padding: 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #eaeaea;
+}
+
+.monthlyTable td {
+  padding: 0.8rem;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.positive {
+  color: #28a745;
+}
+
+.negative {
+  color: #dc3545;
+}
+
+.tradingStrategy {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f8f9fc;
+  border-left: 4px solid #3d7aed;
+  border-radius: 4px;
+}
+
+.riskMetrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.riskMetric {
+  padding: 1rem;
+  background-color: #f8f9fc;
+  border-radius: 6px;
+}
+
+.metricLabel {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 0.5rem;
+}
+
+.metricValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.aiRecommendations {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.aiRecommendation {
+  padding: 1rem;
+  background-color: #f8f9fc;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.aiRecommendation h4 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.recReturn {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.recConfidence {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.recAction {
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.aiDisclaimer {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fc;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+}
+
+.infoDisclaimer {
+  background-color: #fff9e6;
+  border-left: 4px solid #ffd43b;
+  padding: 16px;
+  margin-top: 20px;
+  border-radius: 4px;
+}
+
+.infoDisclaimer p {
+  margin: 0;
+  color: #664d03;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.strategyDescription {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: #777;
+  line-height: 1.5;
+}
+
+/* Loading and Error States */
+.loadingContainer, .errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #64748b;
+  text-align: center;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  color: #3182ce;
+}
+
+.errorIcon {
+  color: #dc3545;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Fullscreen mode */
+.fullscreenMetrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .strategyCards {
+    grid-template-columns: 1fr;
+  }
+  
+  .modalContent {
+    max-width: 95%;
+  }
+  
+  .riskMetrics, .aiRecommendations {
+    grid-template-columns: 1fr;
+  }
+  
+  .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .chartControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

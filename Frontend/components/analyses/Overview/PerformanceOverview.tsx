@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/overview/PerformanceOverview.module.css';
 import html2canvas from 'html2canvas';
 import { FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
 import { fetchChartData, fetchQuoteData, ChartDataPoint } from '../../../services/api/finance';

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaQuestion, FaChartLine, FaExchangeAlt, FaInfoCircle, FaTimes, FaLightbulb } from 'react-icons/fa';
 import { Doughnut } from 'react-chartjs-2';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/seasonality/PatternCorrelation.module.css';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { fetchPatternCorrelation, PatternCorrelationData } from '../../../services/api/finance';
 

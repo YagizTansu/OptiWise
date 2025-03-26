@@ -1,0 +1,341 @@
+/* Chart Card and Header */
+.chartCard {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chartHeader h2 {
+  font-size: 1.25rem;
+  margin: 0;
+  color: #333;
+}
+
+.chartControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Chart Container */
+.chartContainer {
+  background: rgb(248, 246, 246);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  margin-bottom: 32px;
+  width: 100%;
+  overflow-x: auto;
+  transition: all 0.3s ease;
+  height: 550px;
+}
+
+.chartContainer:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Modern Button Styles */
+.modernButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  color: #333;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.modernButton:hover {
+  background-color: #eeeeee;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.modernButton.activeMod {
+  background-color: #e1f5fe;
+  border-color: #29b6f6;
+  color: #0277bd;
+  box-shadow: 0 1px 3px rgba(41,182,246,0.2);
+}
+
+.buttonIcon {
+  font-size: 16px;
+}
+
+.modernTabButton {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernTabButton:hover {
+  color: #333;
+}
+
+.modernTabButton.activeTab {
+  background-color: #e3f2fd;
+  border-bottom: 2px solid #2196f3;
+  color: #2196f3;
+}
+
+.modernActionButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f0f9ff;
+  color: #0288d1;
+  border: 1px solid #bbdefb;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernActionButton:hover {
+  background-color: #e1f5fe;
+  box-shadow: 0 2px 5px rgba(2,136,209,0.15);
+}
+
+.modernIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modernIconButton:hover {
+  background-color: #eeeeee;
+  color: #333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Header controls and timeframe buttons */
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeframeButtons {
+  display: flex;
+  gap: 8px;
+}
+
+/* Info Box Styling */
+.infoBox {
+  background-color: rgba(240, 240, 240, 0.95);
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.infoBox p {
+  margin: 5px 0;
+}
+
+/* Volume toggle button styles */
+.volumeToggle {
+  background-color: #f0f9ff;
+  border: 1px solid #bbdefb;
+}
+
+.volumeToggle.active {
+  background-color: #e1f5fe;
+  color: #0288d1;
+  box-shadow: 0 1px 3px rgba(2,136,209,0.3);
+}
+
+.volumeToggle:hover {
+  background-color: #e1f5fe;
+  box-shadow: 0 2px 5px rgba(2,136,209,0.15);
+}
+
+/* DPO toggle button styles */
+.dpoToggle {
+  background-color: #f0f9ff;
+  border: 1px solid #bbdefb;
+}
+
+.dpoToggle.active {
+  background-color: #e1f5fe;
+  color: #0288d1;
+  box-shadow: 0 1px 3px rgba(2,136,209,0.3);
+}
+
+.dpoToggle:hover {
+  background-color: #e1f5fe;
+  box-shadow: 0 2px 5px rgba(2,136,209,0.15);
+}
+
+/* Loading and error states */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #666;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #0066cc;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #d32f2f;
+}
+
+.errorIcon {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Fullscreen mode styling */
+.fullscreenCard {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  margin: 0;
+  border-radius: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.fullscreenChart {
+  height: calc(100vh - 100px) !important;
+}
+
+/* Modal styles for info popup */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modalHeader {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.modalBody {
+  padding: 20px;
+}
+
+.modalFooter {
+  padding: 15px 20px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.infoList {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.infoList li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  color: #555;
+}
+
+/* Advanced DPO info */
+.advancedDpoInfo {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f8fafc;
+  border-radius: 6px;
+  border-left: 4px solid #3b82f6;
+}
+
+.advancedDpoInfo h4 {
+  margin-top: 0;
+  color: #334155;
+  font-size: 16px;
+}
+
+.advancedDpoInfo p {
+  color: #475569;
+  margin: 8px 0;
+  line-height: 1.5;
+}

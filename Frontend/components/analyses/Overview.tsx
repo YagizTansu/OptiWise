@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/Analyses.module.css';
+import styles from '../../styles/overview/Overview.module.css';
 
 // Import new components
 import CompanyProfile from './Overview/CompanyProfile'; // Add this new import

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaChartLine, FaExclamationTriangle, FaRobot, FaArrowRight, FaSpinner, FaTimes, FaInfoCircle, FaDownload, FaExpand, FaCompress, FaQuestion } from 'react-icons/fa';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/seasonality/SeasonalStrategyInsights.module.css';
 import html2canvas from 'html2canvas';
 import { 
   fetchSeasonalStrategyInsights,

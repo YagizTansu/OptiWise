@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { FaExpand, FaQuestion, FaDownload, FaCompress, FaInfoCircle } from 'react-icons/fa';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/overview/AnnualPerformance.module.css';
 import html2canvas from 'html2canvas';
 import { fetchAnnualPerformance } from '../../../services/api/finance';
 

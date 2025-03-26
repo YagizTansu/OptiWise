@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/overview/CompanyProfile.module.css';
 import { fetchCompanyProfile, CompanyProfile as CompanyProfileType } from '../../../services/api/finance';
 
 interface CompanyProfileProps {

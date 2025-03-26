@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaArrowUp, FaArrowDown, FaChartLine, FaCalendarAlt, FaInfoCircle, FaDownload, FaExpand, FaCompress, FaQuestion } from 'react-icons/fa';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/overview/KeyStatistics.module.css';
 import html2canvas from 'html2canvas';
 import { StatisticsData, fetchKeyStatistics } from '../../../services/api/finance';
 

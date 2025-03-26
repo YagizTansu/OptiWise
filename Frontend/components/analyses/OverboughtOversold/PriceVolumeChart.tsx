@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/OverboughtOversold/PriceVolumeChart.module.css';
 import { FaChartLine, FaChartBar, FaEyeSlash, FaInfoCircle, FaArrowLeft, FaArrowRight, FaSyncAlt, FaDownload, FaExpand, FaQuestion, FaTimes } from 'react-icons/fa';
 import { Chart, ChartDataset } from 'chart.js';
 import { fetchPriceVolumeData, PriceVolumeData } from '../../../services/api/finance';
@@ -223,7 +223,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
   };
 
   // Function to calculate Advanced DPO indicator
-  const calculateAdvancedDPO = (prices) => {
+  const calculateAdvancedDPO = (prices: any[]) => {
     if (!prices || prices.length < 100) {
         throw new Error("Yeterli fiyat verisi yok. En az 200 veri noktası gereklidir.");
     }

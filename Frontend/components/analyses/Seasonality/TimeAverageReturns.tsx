@@ -1,7 +1,7 @@
 import { FaExpand, FaInfoCircle, FaCompress, FaTimes, FaDownload, FaQuestion } from 'react-icons/fa';
 import { Bar } from 'react-chartjs-2';
 import { useState, useEffect, useRef } from 'react';
-import styles from '../../../styles/Analyses.module.css';
+import styles from '../../../styles/seasonality/TimeAverageReturns.module.css';
 import html2canvas from 'html2canvas';
 import { 
   fetchTimeAverageReturns, 

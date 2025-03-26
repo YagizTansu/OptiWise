@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { FaInfoCircle } from 'react-icons/fa';
-import styles from '../../styles/Analyses.module.css';
+import styles from '../../styles/seasonality/Seasonality.module.css';
 import SeasonalityAnalysis from './Seasonality/SeasonalityAnalysis';
 import PatternCorrelation from './Seasonality/PatternCorrelation';
 import TimeAverageReturns from './Seasonality/TimeAverageReturns';
