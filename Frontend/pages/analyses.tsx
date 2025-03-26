@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '../components/Layout'
-import styles from '../styles/Analyses.module.css';
+import styles from '../styles/analysesGeneral.module.css';
 import { FaRobot, FaChartLine, FaCalendarAlt, FaUsers, FaBalanceScale, FaChartPie, FaFileAlt, FaUserTie } from 'react-icons/fa';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, 
   Title, Tooltip, Legend, ArcElement } from 'chart.js';
