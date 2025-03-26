@@ -2,8 +2,9 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import styles from '../../../styles/overview/PerformanceOverview.module.css';
 import html2canvas from 'html2canvas';
-import { FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress } from 'react-icons/fa';
+import { FaDownload, FaExpand, FaQuestion, FaInfoCircle, FaCompress, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { fetchChartData, fetchQuoteData, ChartDataPoint } from '../../../services/api/finance';
+import { TooltipItem } from 'chart.js';
 
 // Performance periods data
 const performancePeriods = [
@@ -49,6 +50,25 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
   const [showInfoModal, setShowInfoModal] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
+
+  // Add a state to track screen size for responsive adjustments
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if screen is mobile on component mount and window resize
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Initial check
+    checkIsMobile();
+    
+    // Add event listener
+    window.addEventListener('resize', checkIsMobile);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   // Make selectedPeriod available to other components if needed
   useEffect(() => {
@@ -299,6 +319,207 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
     return date.toISOString().split('T')[0];
   };
 
+  // Modify chart options for better mobile display
+  const getChartOptions = () => {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index' as const,
+        intersect: false,
+      },
+      elements: {
+        line: {
+          tension: 0.2
+        },
+        point: {
+          radius: chartData.length > 100 ? 0 : (isMobile ? 1 : 2),
+          hoverRadius: isMobile ? 4 : 5
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(200, 200, 200, 0.1)'
+          },
+          ticks: {
+            callback: function(value: number) {
+              return formatPrice(value as number);
+            },
+            // Use smaller font on mobile
+            font: {
+              size: isMobile ? 10 : 12
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            maxTicksLimit: isMobile ? 6 : Math.min(12, chartData.length),
+            autoSkip: true,
+            // Use smaller font on mobile
+            font: {
+              size: isMobile ? 10 : 12
+            }
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          padding: 12,
+          titleFont: {
+            size: 14,
+            weight: 'bold'
+          },
+          bodyFont: {
+            size: 13
+          },
+          callbacks: {
+            title: function(tooltipItems: TooltipItem<'line'>[]) {
+              // Ensure dataIndex is a valid index
+              const index = tooltipItems[0].dataIndex;
+              if (chartData && index >= 0 && index < chartData.length) {
+                return chartData[index].date;
+              }
+              return '';
+            },
+            label: function(context: TooltipItem<'line'>) {
+              // Ensure dataIndex is a valid index
+              const index = context.dataIndex;
+              if (!chartData || index < 0 || index >= chartData.length) {
+                return '';
+              }
+              
+              const dataPoint = chartData[index];
+              const label: string[] = [];
+              
+              label.push(`Price: ${formatPrice(dataPoint.close)}`);
+              
+              if (dataPoint.open !== undefined) {
+                label.push(`Open: ${formatPrice(dataPoint.open)}`);
+              }
+              
+              if (dataPoint.high !== undefined && dataPoint.low !== undefined) {
+                label.push(`High: ${formatPrice(dataPoint.high)}`);
+                label.push(`Low: ${formatPrice(dataPoint.low)}`);
+              }
+              
+              if (dataPoint.volume !== undefined) {
+                label.push(`Volume: ${new Intl.NumberFormat().format(dataPoint.volume)}`);
+              }
+              
+              return label;
+            }
+          }
+        }
+      }
+    };
+  };
+
+  // Add refs for scroll containers
+  const periodScrollRef = useRef<HTMLDivElement>(null);
+  const intervalScrollRef = useRef<HTMLDivElement>(null);
+  
+  // Add states to track scroll shadows
+  const [showLeftShadow, setShowLeftShadow] = useState({ period: false, interval: false });
+  const [showRightShadow, setShowRightShadow] = useState({ period: true, interval: true });
+
+  // Add handlers to update scroll shadows
+  const handleScroll = (
+    element: HTMLDivElement | null, 
+    setLeftShadow: (show: boolean) => void, 
+    setRightShadow: (show: boolean) => void
+  ) => {
+    if (!element) return;
+    
+    const scrollLeft = element.scrollLeft;
+    const scrollWidth = element.scrollWidth;
+    const clientWidth = element.clientWidth;
+    
+    // Show left shadow if scrolled right
+    setLeftShadow(scrollLeft > 5);
+    
+    // Show right shadow if there's more to scroll
+    setRightShadow(scrollLeft + clientWidth < scrollWidth - 5);
+  };
+  
+  // Set up scroll event listeners
+  useEffect(() => {
+    const periodEl = periodScrollRef.current;
+    const intervalEl = intervalScrollRef.current;
+    
+    // Initialize shadow states
+    if (periodEl) {
+      handleScroll(
+        periodEl, 
+        (show) => setShowLeftShadow(prev => ({ ...prev, period: show })),
+        (show) => setShowRightShadow(prev => ({ ...prev, period: show }))
+      );
+    }
+    
+    if (intervalEl) {
+      handleScroll(
+        intervalEl, 
+        (show) => setShowLeftShadow(prev => ({ ...prev, interval: show })),
+        (show) => setShowRightShadow(prev => ({ ...prev, interval: show }))
+      );
+    }
+    
+    // Add event listeners
+    const periodScrollHandler = () => handleScroll(
+      periodEl,
+      (show) => setShowLeftShadow(prev => ({ ...prev, period: show })),
+      (show) => setShowRightShadow(prev => ({ ...prev, period: show }))
+    );
+    
+    const intervalScrollHandler = () => handleScroll(
+      intervalEl,
+      (show) => setShowLeftShadow(prev => ({ ...prev, interval: show })),
+      (show) => setShowRightShadow(prev => ({ ...prev, interval: show }))
+    );
+    
+    periodEl?.addEventListener('scroll', periodScrollHandler);
+    intervalEl?.addEventListener('scroll', intervalScrollHandler);
+    
+    // Clean up
+    return () => {
+      periodEl?.removeEventListener('scroll', periodScrollHandler);
+      intervalEl?.removeEventListener('scroll', intervalScrollHandler);
+    };
+  }, []);
+  
+  // Scroll to selected period/interval to ensure it's visible
+  useEffect(() => {
+    if (!periodScrollRef.current) return;
+    
+    // Find the active button
+    const activeButton = periodScrollRef.current.querySelector(`.${styles.activeTab}`) as HTMLElement;
+    if (activeButton) {
+      // Calculate scroll position to center the active button
+      const scrollLeft = activeButton.offsetLeft - (periodScrollRef.current.clientWidth / 2) + (activeButton.offsetWidth / 2);
+      periodScrollRef.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  }, [selectedPeriod]);
+  
+  useEffect(() => {
+    if (!intervalScrollRef.current) return;
+    
+    // Find the active button
+    const activeButton = intervalScrollRef.current.querySelector(`.${styles.activeTab}`) as HTMLElement;
+    if (activeButton) {
+      // Calculate scroll position to center the active button
+      const scrollLeft = activeButton.offsetLeft - (intervalScrollRef.current.clientWidth / 2) + (activeButton.offsetWidth / 2);
+      intervalScrollRef.current.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  }, [selectedInterval]);
+
   return (
     <div className={styles.cardContainer}>
       <div className={styles.analysisCard}>
@@ -317,36 +538,54 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
           <div className={styles.selectionGroup}>
             <h2>Time Period</h2>
             <div className={styles.periodToggle}>
-              {performancePeriods.map((period) => (
-                <button 
-                  key={period.label}
-                  className={`${styles.modernTabButton} ${selectedPeriod === period.label ? styles.activeTab : ''}`}
-                  onClick={() => handlePeriodChange(period.label)}
-                >
-                  {period.label}
-                </button>
-              ))}
-              <button 
-                className={`${styles.modernTabButton} ${selectedPeriod === 'custom' ? styles.activeTab : ''}`}
-                onClick={() => handlePeriodChange('custom')}
+              {showLeftShadow.period && <div className={`${styles.scrollGradient} ${styles.scrollGradientLeft}`}></div>}
+              
+              <div 
+                className={`${styles.periodToggle} ${styles.periodToggleScroll}`} 
+                ref={periodScrollRef}
               >
-                Custom
-              </button>
+                {performancePeriods.map((period) => (
+                  <button 
+                    key={period.label}
+                    className={`${styles.modernTabButton} ${selectedPeriod === period.label ? styles.activeTab : ''}`}
+                    onClick={() => handlePeriodChange(period.label)}
+                  >
+                    {period.label}
+                  </button>
+                ))}
+                <button 
+                  className={`${styles.modernTabButton} ${selectedPeriod === 'custom' ? styles.activeTab : ''}`}
+                  onClick={() => handlePeriodChange('custom')}
+                >
+                  Custom
+                </button>
+              </div>
+              
+              {showRightShadow.period && <div className={`${styles.scrollGradient} ${styles.scrollGradientRight}`}></div>}
             </div>
           </div>
           
           <div className={styles.selectionGroup}>
             <h2>Interval</h2>
             <div className={styles.periodToggle}>
-              {availableIntervals.map((interval) => (
-                <button 
-                  key={interval.value}
-                  className={`${styles.modernTabButton} ${selectedInterval === interval.value ? styles.activeTab : ''}`}
-                  onClick={() => setSelectedInterval(interval.value)}
-                >
-                  {interval.label}
-                </button>
-              ))}
+              {showLeftShadow.interval && <div className={`${styles.scrollGradient} ${styles.scrollGradientLeft}`}></div>}
+              
+              <div 
+                className={`${styles.periodToggle} ${styles.periodToggleScroll}`} 
+                ref={intervalScrollRef}
+              >
+                {availableIntervals.map((interval) => (
+                  <button 
+                    key={interval.value}
+                    className={`${styles.modernTabButton} ${selectedInterval === interval.value ? styles.activeTab : ''}`}
+                    onClick={() => setSelectedInterval(interval.value)}
+                  >
+                    {interval.label}
+                  </button>
+                ))}
+              </div>
+              
+              {showRightShadow.interval && <div className={`${styles.scrollGradient} ${styles.scrollGradientRight}`}></div>}
             </div>
           </div>
         </div>
@@ -480,10 +719,12 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
         <div className={styles.chartCard} ref={chartContainerRef}>
           <div className={styles.chartHeader}>
             <h2>
-              {selectedPeriod === 'custom' 
-                ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
-                : selectedPeriod} 
-              Price Trend for {assetInfo.symbol} ({assetInfo.currency})
+              {isMobile && selectedPeriod !== 'custom' 
+                ? `${selectedPeriod} Trend - ${assetInfo.symbol}`
+                : selectedPeriod === 'custom' 
+                  ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
+                  : selectedPeriod} 
+              {!isMobile && `Price Trend for ${assetInfo.symbol} (${assetInfo.currency})`}
             </h2>
             <div className={styles.chartControls}>
               <button 
@@ -565,88 +806,8 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
             ) : (
               <Line 
                 data={realTrendData!}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  interaction: {
-                    mode: 'index',
-                    intersect: false,
-                  },
-                  elements: {
-                    line: {
-                      tension: 0.2
-                    },
-                    point: {
-                      radius: chartData.length > 100 ? 0 : 2,
-                      hoverRadius: 5
-                    }
-                  },
-                  scales: {
-                    y: {
-                      beginAtZero: false,
-                      grid: {
-                        color: 'rgba(200, 200, 200, 0.1)'
-                      },
-                      ticks: {
-                        callback: function(value) {
-                          return formatPrice(value as number);
-                        }
-                      }
-                    },
-                    x: {
-                      grid: {
-                        display: false
-                      },
-                      ticks: {
-                        maxTicksLimit: Math.min(12, chartData.length),
-                        autoSkip: true
-                      }
-                    }
-                  },
-                  plugins: {
-                    legend: {
-                      display: false
-                    },
-                    tooltip: {
-                      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                      padding: 12,
-                      titleFont: {
-                        size: 14,
-                        weight: 'bold'
-                      },
-                      bodyFont: {
-                        size: 13
-                      },
-                      callbacks: {
-                        title: function(tooltipItems) {
-                          return chartData[tooltipItems[0].dataIndex].date;
-                        },
-                        label: function(context) {
-                          const dataPoint = chartData[context.dataIndex];
-                          let label = [];
-                          
-                          label.push(`Price: ${formatPrice(dataPoint.close)}`);
-                          
-                          if (dataPoint.open !== undefined) {
-                            label.push(`Open: ${formatPrice(dataPoint.open)}`);
-                          }
-                          
-                          if (dataPoint.high !== undefined && dataPoint.low !== undefined) {
-                            label.push(`High: ${formatPrice(dataPoint.high)}`);
-                            label.push(`Low: ${formatPrice(dataPoint.low)}`);
-                          }
-                          
-                          if (dataPoint.volume !== undefined) {
-                            label.push(`Volume: ${new Intl.NumberFormat().format(dataPoint.volume)}`);
-                          }
-                          
-                          return label;
-                        }
-                      }
-                    }
-                  }
-                }}
-                height={400}
+                options={getChartOptions()}
+                height={isMobile ? 200 : 400}
               />
             )}
           </div>

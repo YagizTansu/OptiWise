@@ -50,6 +50,7 @@
   background-color: #f9fafb;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  flex-wrap: wrap;
 }
 
 .periodSelectionBar h2 {
@@ -63,6 +64,46 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 280px;
+}
+
+.periodToggle {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  position: relative;
+}
+
+.periodToggleScroll {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 3px 0;
+}
+
+.periodToggleScroll::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.scrollGradient {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 24px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.scrollGradientLeft {
+  left: 0;
+  background: linear-gradient(to right, rgba(249, 250, 251, 0.9), rgba(249, 250, 251, 0));
+}
+
+.scrollGradientRight {
+  right: 0;
+  background: linear-gradient(to left, rgba(249, 250, 251, 0.9), rgba(249, 250, 251, 0));
 }
 
 .periodToggle {
@@ -506,21 +547,30 @@
   .periodSelectionBar {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
+    padding: 16px 12px;
   }
   
   .periodToggle {
     width: 100%;
     overflow-x: auto;
     padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+  }
+  
+  .periodToggle::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
   }
   
   .dateInputGroup {
     flex-direction: column;
+    width: 100%;
   }
   
   .dateSeparator {
     align-self: center;
+    margin: 8px 0;
   }
   
   .chartHeader {
@@ -529,7 +579,266 @@
     gap: 10px;
   }
   
+  .chartHeader h2 {
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+  
   .trendChart {
     min-width: 100%;
+    height: 250px; /* Smaller height for mobile */
   }
+  
+  .chartControls {
+    width: 100%;
+  }
+  
+  .modernTabButton {
+    padding: 6px 12px;
+    font-size: 13px;
+    min-width: 40px;
+    white-space: nowrap;
+  }
+  
+  .modernActionButton {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  .modalContent {
+    width: 95%;
+    margin: 0 10px;
+  }
+  
+  .modalHeader h3 {
+    font-size: 18px;
+  }
+  
+  .customDatePanel {
+    padding: 15px;
+  }
+  
+  .dateRangeHeader h3 {
+    font-size: 16px;
+  }
+  
+  .dateInputWrapper {
+    min-width: 100%;
+  }
+  
+  .analysisCard {
+    padding: 16px;
+  }
+  
+  .seasonalityHeader h1 {
+    font-size: 1.3rem;
+  }
+  
+  /* Better touch target sizes */
+  .closeButton, 
+  .modernIconButton {
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .buttonGroup {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  
+  .applyButton, 
+  .cancelButton, 
+  .suggestedPeriodButton {
+    width: 100%;
+    padding: 12px 16px; /* Larger touch targets */
+  }
+  
+  .selectionGroup {
+    width: 100%;
+    min-width: unset;
+  }
+  
+  .periodToggle {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .periodToggleScroll {
+    width: 100%;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+
+  .modernTabButton {
+    padding: 8px 12px;
+    font-size: 13px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    min-width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modernTabButton.activeTab {
+    background-color: #2196f3;
+    color: #fff;
+    border-bottom: none;
+    box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
+  }
+  
+  .periodSelectionBar h2 {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+}
+
+/* Add smaller screen adjustments */
+@media (max-width: 480px) {
+  .chartHeader h2 {
+    font-size: 1rem;
+  }
+  
+  .seasonalityHeader h1 {
+    font-size: 1.2rem;
+  }
+  
+  .seasonalityDescription {
+    font-size: 13px;
+  }
+  
+  .periodSelectionBar h2 {
+    font-size: 0.9rem;
+  }
+  
+  .trendChart {
+    height: 200px;
+  }
+  
+  .modernActionButton span {
+    display: none; /* Hide text and only show icons on very small screens */
+  }
+  
+  .modernActionButton {
+    padding: 8px;
+  }
+  
+  .buttonIcon {
+    margin: 0;
+  }
+  
+  .dateQuickOptions {
+    justify-content: center;
+  }
+  
+  .quickOptionButton {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  
+  .noDataContainer {
+    padding: 15px;
+    font-size: 14px;
+  }
+  
+  .noDataSuggestions {
+    font-size: 13px;
+  }
+  
+  .noDataSuggestions ul {
+    padding-left: 15px;
+  }
+  
+  .loadingContainer {
+    height: 200px;
+  }
+  
+  .loadingSpinner {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .periodSelectionBar {
+    padding: 12px 10px;
+  }
+  
+  .modernTabButton {
+    padding: 7px 10px;
+    font-size: 12px;
+    min-width: 40px;
+  }
+  
+  .periodSelectionBar h2 {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+}
+
+/* Add intermediate breakpoint for tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+  .chartControls {
+    justify-content: flex-start;
+  }
+  
+  .buttonGroup {
+    flex-direction: row;
+  }
+  
+  .modernActionButton span {
+    display: inline; /* Show text on tablet size */
+  }
+}
+
+/* Add landscape orientation specific styles */
+@media (max-height: 480px) and (orientation: landscape) {
+  .trendChart {
+    height: 180px;
+  }
+  
+  .modalContent {
+    max-height: 85vh;
+  }
+  
+  .customDatePanel {
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  
+  .dateQuickOptions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+/* Add smooth transitions for all interactive elements */
+.modernTabButton,
+.modernActionButton,
+.modernIconButton,
+.applyButton,
+.cancelButton,
+.quickOptionButton,
+.suggestedPeriodButton {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Prevent overscrolling issues on mobile */
+.modalBody,
+.customDatePanel {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure all clickable elements have proper touch area */
+.closeButton,
+.modernIconButton,
+.quickOptionButton,
+.retryButton {
+  min-height: 44px; /* Apple's recommended minimum touch target size */
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
