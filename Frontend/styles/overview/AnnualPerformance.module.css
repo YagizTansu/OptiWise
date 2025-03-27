@@ -47,12 +47,15 @@
   align-items: center;
   margin-bottom: 16px;
   position: relative;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .chartControls {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .modernActionButton {
@@ -151,6 +154,7 @@
   margin-top: 16px;
   padding-top: 16px;
   border-top: 1px solid #f0f0f0;
+  gap: 12px;
 }
 
 .summaryItem {
@@ -158,6 +162,7 @@
   flex-direction: column;
   align-items: center;
   padding: 0 16px;
+  min-width: 90px;
 }
 
 .summaryLabel {
@@ -191,7 +196,7 @@
   background-color: white;
   border-radius: 8px;
   max-width: 600px;
-  width: 100%;
+  width: 90%;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -254,4 +259,102 @@
 
 .applyButton:hover {
   background-color: #0069d9;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+  .analysisCard {
+    padding: 16px;
+  }
+  
+  .seasonalityHeader h2 {
+    font-size: 1.3rem;
+  }
+  
+  .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .chartControls {
+    margin-top: 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .modernActionButton {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .modernActionButton span {
+    display: none;
+  }
+  
+  .buttonIcon {
+    margin: 0;
+  }
+  
+  .annualChart {
+    height: 250px;
+  }
+  
+  .chartSummary {
+    justify-content: space-between;
+  }
+  
+  .summaryItem {
+    padding: 8px;
+  }
+  
+  .modalHeader h3 {
+    font-size: 18px;
+  }
+  
+  .modalBody {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .analysisCard {
+    padding: 12px;
+  }
+  
+  .seasonalityHeader h2 {
+    font-size: 1.1rem;
+  }
+  
+  .seasonalityDescription {
+    font-size: 12px;
+  }
+  
+  .infoIcon {
+    font-size: 14px;
+  }
+  
+  .annualChart {
+    height: 200px;
+  }
+  
+  .chartSummary {
+    justify-content: center;
+  }
+  
+  .summaryItem {
+    width: 45%;
+    margin-bottom: 8px;
+  }
+  
+  .loadingContainer, .errorContainer {
+    height: 200px;
+  }
+  
+  .modalContent {
+    width: 95%;
+  }
+  
+  .modalHeader, .modalFooter {
+    padding: 12px 15px;
+  }
 }

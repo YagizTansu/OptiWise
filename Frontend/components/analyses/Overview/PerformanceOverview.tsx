@@ -346,6 +346,8 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
             callback: function(value: number) {
               return formatPrice(value as number);
             },
+            // Hide y-axis labels on mobile
+            display: !isMobile,
             // Use smaller font on mobile
             font: {
               size: isMobile ? 10 : 12
@@ -359,6 +361,8 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
           ticks: {
             maxTicksLimit: isMobile ? 6 : Math.min(12, chartData.length),
             autoSkip: true,
+            // Hide x-axis labels on mobile
+            display: !isMobile,
             // Use smaller font on mobile
             font: {
               size: isMobile ? 10 : 12
@@ -564,29 +568,32 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
             </div>
           </div>
           
-          <div className={styles.selectionGroup}>
-            <h2>Interval</h2>
-            <div className={styles.periodToggle}>
-              {showLeftShadow.interval && <div className={`${styles.scrollGradient} ${styles.scrollGradientLeft}`}></div>}
-              
-              <div 
-                className={`${styles.periodToggle} ${styles.periodToggleScroll}`} 
-                ref={intervalScrollRef}
-              >
-                {availableIntervals.map((interval) => (
-                  <button 
-                    key={interval.value}
-                    className={`${styles.modernTabButton} ${selectedInterval === interval.value ? styles.activeTab : ''}`}
-                    onClick={() => setSelectedInterval(interval.value)}
-                  >
-                    {interval.label}
-                  </button>
-                ))}
+          {/* Hide Interval selection on mobile */}
+          {!isMobile && (
+            <div className={styles.selectionGroup}>
+              <h2>Interval</h2>
+              <div className={styles.periodToggle}>
+                {showLeftShadow.interval && <div className={`${styles.scrollGradient} ${styles.scrollGradientLeft}`}></div>}
+                
+                <div 
+                  className={`${styles.periodToggle} ${styles.periodToggleScroll}`} 
+                  ref={intervalScrollRef}
+                >
+                  {availableIntervals.map((interval) => (
+                    <button 
+                      key={interval.value}
+                      className={`${styles.modernTabButton} ${selectedInterval === interval.value ? styles.activeTab : ''}`}
+                      onClick={() => setSelectedInterval(interval.value)}
+                    >
+                      {interval.label}
+                    </button>
+                  ))}
+                </div>
+                
+                {showRightShadow.interval && <div className={`${styles.scrollGradient} ${styles.scrollGradientRight}`}></div>}
               </div>
-              
-              {showRightShadow.interval && <div className={`${styles.scrollGradient} ${styles.scrollGradientRight}`}></div>}
             </div>
-          </div>
+          )}
         </div>
 
         {/* Custom Date Range Panel - Enhanced UI */}
@@ -714,102 +721,101 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
           </div>
         )}
 
-        {/* Main Trend Chart */}
-        <div className={styles.chartCard} ref={chartContainerRef}>
-          <div className={styles.chartHeader}>
-            <h2>
-              {isMobile && selectedPeriod !== 'custom' 
-                ? `${selectedPeriod} Trend - ${assetInfo.symbol}`
-                : selectedPeriod === 'custom' 
-                  ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
-                  : selectedPeriod} 
-              {!isMobile && `Price Trend for ${assetInfo.symbol} (${assetInfo.currency})`}
-            </h2>
-            <div className={styles.chartControls}>
+        {/* Chart Header */}
+        <div className={styles.chartHeader}>
+          <h2>
+            {isMobile && selectedPeriod !== 'custom' 
+              ? `${selectedPeriod} Trend - ${assetInfo.symbol}`
+              : selectedPeriod === 'custom' 
+                ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
+                : selectedPeriod} 
+            {!isMobile && `Price Trend for ${assetInfo.symbol} (${assetInfo.currency})`}
+          </h2>
+          <div className={`${styles.chartControls} ${isMobile ? styles.mobileChartControls : ''}`}>
+            <button 
+              className={`${styles.modernActionButton} ${isMobile ? styles.mobileActionButton : ''}`}
+              title="Download Chart"
+              onClick={downloadChart}
+            >
+              <FaDownload className={styles.buttonIcon} /> 
+              <span>Download</span>
+            </button>
+            <button 
+              className={`${styles.modernActionButton} ${isMobile ? styles.mobileActionButton : ''}`}
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+              onClick={toggleFullscreen}
+            >
+              {isFullscreen ? (
+                <>
+                  <FaCompress className={styles.buttonIcon} /> 
+                  <span>Exit Fullscreen</span>
+                </>
+              ) : (
+                <>
+                  <FaExpand className={styles.buttonIcon} /> 
+                  <span>Fullscreen</span>
+                </>
+              )}
+            </button>
+            <button 
+              className={`${styles.modernIconButton} ${isMobile ? styles.mobileIconButton : ''}`}
+              title="Learn More"
+              onClick={() => setShowInfoModal(true)}
+            >
+              <FaQuestion />
+            </button>
+          </div>
+        </div>
+
+        {/* Chart Content - Directly in the parent div */}
+        <div ref={chartContainerRef} className={isFullscreen ? styles.fullscreenContainer : ''}>
+          {isLoading ? (
+            <div className={styles.loadingContainer}>
+              <div className={styles.loadingSpinner}></div>
+              <p>Loading chart data...</p>
+            </div>
+          ) : error ? (
+            <div className={styles.errorContainer}>
+              <p>{error}</p>
               <button 
-                className={styles.modernActionButton} 
-                title="Download Chart"
-                onClick={downloadChart}
+                className={styles.retryButton} 
+                onClick={() => window.location.reload()}
               >
-                <FaDownload className={styles.buttonIcon} /> 
-                <span>Download</span>
-              </button>
-              <button 
-                className={styles.modernActionButton} 
-                title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                onClick={toggleFullscreen}
-              >
-                {isFullscreen ? (
-                  <>
-                    <FaCompress className={styles.buttonIcon} /> 
-                    <span>Exit Fullscreen</span>
-                  </>
-                ) : (
-                  <>
-                    <FaExpand className={styles.buttonIcon} /> 
-                    <span>Fullscreen</span>
-                  </>
-                )}
-              </button>
-              <button 
-                className={styles.modernIconButton} 
-                title="Learn More"
-                onClick={() => setShowInfoModal(true)}
-              >
-                <FaQuestion />
+                Retry
               </button>
             </div>
-          </div>
-          <div 
-            className={`${styles.trendChart} ${isFullscreen ? styles.fullscreenChart : ''}`}
-            ref={chartRef}
-          >
-            {isLoading ? (
-              <div className={styles.loadingContainer}>
-                <div className={styles.loadingSpinner}></div>
-                <p>Loading chart data...</p>
-              </div>
-            ) : error ? (
-              <div className={styles.errorContainer}>
-                <p>{error}</p>
+          ) : (!chartData || chartData.length === 0) ? (
+            <div className={styles.noDataContainer}>
+              <p>No data available for the selected time period and interval.</p>
+              <p>Try adjusting your selection or check if the symbol has data for this range.</p>
+              <div className={styles.noDataSuggestions}>
+                <p>Suggestions:</p>
+                <ul>
+                  <li>Use daily interval (1d) for longer time periods</li>
+                  <li>Use minute intervals (15m, 30m, 1h) only for recent data (less than 7 days)</li>
+                  <li>Check that the symbol is valid and has historical data</li>
+                  <li>Some exchanges may have limited historical data</li>
+                </ul>
                 <button 
-                  className={styles.retryButton} 
-                  onClick={() => window.location.reload()}
+                  className={styles.suggestedPeriodButton}
+                  onClick={() => {
+                    setSelectedPeriod('1Y');
+                    setSelectedInterval('1d');
+                  }}
                 >
-                  Retry
+                  Try 1 Year Daily Data
                 </button>
               </div>
-            ) : (!chartData || chartData.length === 0) ? (
-              <div className={styles.noDataContainer}>
-                <p>No data available for the selected time period and interval.</p>
-                <p>Try adjusting your selection or check if the symbol has data for this range.</p>
-                <div className={styles.noDataSuggestions}>
-                  <p>Suggestions:</p>
-                  <ul>
-                    <li>Use daily interval (1d) for longer time periods</li>
-                    <li>Use minute intervals (15m, 30m, 1h) only for recent data (less than 7 days)</li>
-                    <li>Check that the symbol is valid and has historical data</li>
-                    <li>Some exchanges may have limited historical data</li>
-                  </ul>
-                  <button 
-                    className={styles.suggestedPeriodButton}
-                    onClick={() => {
-                      setSelectedPeriod('1Y');
-                      setSelectedInterval('1d');
-                    }}
-                  >
-                    Try 1 Year Daily Data
-                  </button>
-                </div>
-              </div>
-            ) : (
+            </div>
+          ) : (
+            <div ref={chartRef} style={{ height: isMobile ? '200px' : '400px' }}>
               <Line 
                 data={realTrendData!}
                 options={getChartOptions()}
                 height={isMobile ? 200 : 400}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
       

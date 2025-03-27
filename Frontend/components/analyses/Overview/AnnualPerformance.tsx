@@ -16,6 +16,22 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== 'undefined' ? window.innerWidth : 0);
+
+  // Handle window resize to track viewport width
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // Determine if device is mobile
+  const isMobile = windowWidth <= 768;
   
   // Default annual data structure (will be populated with real data)
   const [annualData, setAnnualData] = useState({
@@ -221,17 +237,28 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
                       color: 'rgba(200, 200, 200, 0.1)'
                     },
                     title: {
-                      display: true,
+                      display: !isMobile,
                       text: 'Annual Return (%)',
                       font: {
-                        size: 14,
+                        size: isMobile ? 12 : 14,
                         weight: 'bold'
+                      }
+                    },
+                    ticks: {
+                      font: {
+                        size: isMobile ? 11 : 12
                       }
                     }
                   },
                   x: {
                     grid: {
                       display: false
+                    },
+                    ticks: {
+                      font: {
+                        size: isMobile ? 10 : 12
+                      },
+                      maxRotation: isMobile ? 45 : 0
                     }
                   }
                 },
@@ -241,18 +268,18 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
                   },
                   tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
+                    padding: isMobile ? 8 : 12,
                     titleFont: {
-                      size: 14,
+                      size: isMobile ? 12 : 14,
                       weight: 'bold'
                     },
                     bodyFont: {
-                      size: 13
+                      size: isMobile ? 11 : 13
                     }
                   }
                 }
               }}
-              height={300}
+              height={isMobile ? 200 : 300}
             />
           )}
         </div>

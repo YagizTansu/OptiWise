@@ -169,6 +169,66 @@
   
   .eventItem {
     width: 100%;
+    padding: 12px;
+  }
+  
+  .eventHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .eventTypeAndDate {
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  
+  .upcomingTag {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  
+  .eventDetailsPopup {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    top: auto;
+    margin-top: 0;
+    z-index: 1000;
+    max-width: calc(100vw - 32px);
+  }
+  
+  .eventDetailsPopup::before {
+    display: none;
+  }
+  
+  .exclamationIcon {
+    font-size: 1rem;
+    margin-top: 2px;
+  }
+  
+  .eventType {
+    font-size: 0.9rem;
+  }
+  
+  .eventDate, .daysRemaining {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .eventTypeAndDate {
+    gap: 6px;
+  }
+  
+  .eventDetails p {
+    font-size: 0.85rem;
+  }
+  
+  .dateInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
 }
 

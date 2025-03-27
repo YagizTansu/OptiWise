@@ -14,6 +14,13 @@
   margin-bottom: 20px;
 }
 
+/* Responsive padding for mobile */
+@media (max-width: 768px) {
+  .analysisCard {
+    padding: 16px;
+  }
+}
+
 .analysisCard:hover {
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.12);
 }
@@ -28,6 +35,13 @@
   color: #333;
 }
 
+/* Responsive text size for mobile */
+@media (max-width: 768px) {
+  .seasonalityHeader h2 {
+    font-size: 1.25rem;
+  }
+}
+
 .seasonalityDescription {
   display: flex;
   align-items: center;
@@ -35,6 +49,14 @@
   color: #666;
   font-size: 14px;
   margin: 0;
+}
+
+/* Adjust description text size for mobile */
+@media (max-width: 768px) {
+  .seasonalityDescription {
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
 }
 
 .infoIcon {
@@ -49,16 +71,41 @@
   margin-bottom: 16px;
 }
 
+/* Stack header elements vertically on mobile */
+@media (max-width: 768px) {
+  .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
 .chartHeader h3 {
   margin: 0;
   font-size: 1.25rem;
   color: #333;
 }
 
+/* Responsive header text size */
+@media (max-width: 768px) {
+  .chartHeader h3 {
+    font-size: 1.1rem;
+  }
+}
+
 .chartControls {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+/* Adjust controls layout for mobile */
+@media (max-width: 768px) {
+  .chartControls {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
 }
 
 .modernActionButton {
@@ -74,6 +121,22 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+/* Make buttons more touch-friendly on mobile */
+@media (max-width: 768px) {
+  .modernActionButton {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .modernActionButton span {
+    display: none; /* Hide button text on mobile */
+  }
+  
+  .buttonIcon {
+    margin-right: 0;
+  }
 }
 
 .modernActionButton:hover {
@@ -99,6 +162,14 @@
   transition: all 0.2s ease;
 }
 
+/* Increase touch target size on mobile */
+@media (max-width: 768px) {
+  .modernIconButton {
+    width: 36px;
+    height: 36px;
+  }
+}
+
 .modernIconButton:hover {
   background-color: #eeeeee;
   color: #333;
@@ -114,8 +185,43 @@
   margin-top: 16px;
 }
 
+/* Responsive grid adjustments */
+@media (max-width: 992px) {
+  .metricsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .metricsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
 .fullscreenMetrics {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* Adjust fullscreen metrics on mobile */
+@media (max-width: 992px) {
+  .fullscreenMetrics {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .fullscreenMetrics {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
 }
 
 .metricCard {
@@ -128,6 +234,13 @@
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+}
+
+/* Reduce padding on mobile */
+@media (max-width: 768px) {
+  .metricCard {
+    padding: 12px 10px;
+  }
 }
 
 .metricCard:hover {
@@ -148,11 +261,26 @@
   position: relative;
 }
 
+/* Stack period label and badge on very small screens */
+@media (max-width: 480px) {
+  .metricHeader {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
 .periodLabel {
   font-size: 1rem;
   font-weight: 500;
   color: #6b7280;
   display: block;
+}
+
+/* Smaller font size on mobile */
+@media (max-width: 768px) {
+  .periodLabel {
+    font-size: 0.9rem;
+  }
 }
 
 .activeBadge {
@@ -164,6 +292,14 @@
   font-weight: 500;
 }
 
+/* Smaller badge on mobile */
+@media (max-width: 480px) {
+  .activeBadge {
+    font-size: 0.7rem;
+    padding: 1px 4px;
+  }
+}
+
 .returnValue {
   display: flex;
   align-items: center;
@@ -171,6 +307,13 @@
   gap: 4px;
   font-size: 1.25rem;
   font-weight: 700;
+}
+
+/* Adjust return value size on mobile */
+@media (max-width: 768px) {
+  .returnValue {
+    font-size: 1.1rem;
+  }
 }
 
 .positive .returnValue {
@@ -194,6 +337,14 @@
   font-size: 0.75rem;
   color: #666;
   text-align: center;
+}
+
+/* Smaller footer text on mobile */
+@media (max-width: 768px) {
+  .metricFooter {
+    font-size: 0.7rem;
+    margin-top: 6px;
+  }
 }
 
 /* Modal styles for info popup */
@@ -221,6 +372,18 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
+/* Mobile modal adjustments */
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 10px;
+  }
+  
+  .modalContent {
+    max-width: 100%;
+    max-height: 95vh;
+  }
+}
+
 .modalHeader {
   padding: 15px 20px;
   display: flex;
@@ -229,10 +392,24 @@
   border-bottom: 1px solid #eaeaea;
 }
 
+/* Smaller modal padding on mobile */
+@media (max-width: 768px) {
+  .modalHeader {
+    padding: 12px 15px;
+  }
+}
+
 .modalHeader h3 {
   margin: 0;
   font-size: 20px;
   color: #333;
+}
+
+/* Smaller header on mobile */
+@media (max-width: 768px) {
+  .modalHeader h3 {
+    font-size: 18px;
+  }
 }
 
 .closeButton {
@@ -243,8 +420,23 @@
   color: #666;
 }
 
+/* Larger close button on mobile for easier tapping */
+@media (max-width: 768px) {
+  .closeButton {
+    font-size: 28px;
+    padding: 5px;
+  }
+}
+
 .modalBody {
   padding: 20px;
+}
+
+/* Smaller padding on mobile */
+@media (max-width: 768px) {
+  .modalBody {
+    padding: 15px;
+  }
 }
 
 .modalFooter {
@@ -252,6 +444,12 @@
   border-top: 1px solid #eaeaea;
   display: flex;
   justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .modalFooter {
+    padding: 12px 15px;
+  }
 }
 
 .infoList {
@@ -276,6 +474,14 @@
   transition: background-color 0.2s;
 }
 
+/* Make button larger on mobile for easier tapping */
+@media (max-width: 768px) {
+  .applyButton {
+    padding: 12px 24px;
+    width: 100%;
+  }
+}
+
 .applyButton:hover {
   background-color: #0069d9;
 }
@@ -297,4 +503,12 @@
   justify-content: center;
   height: 200px;
   color: #d32f2f;
+}
+
+/* Adjust loading container height on mobile */
+@media (max-width: 768px) {
+  .loadingContainer,
+  .errorContainer {
+    height: 200px;
+  }
 }

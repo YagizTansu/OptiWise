@@ -24,6 +24,27 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
   const statsRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Add a state to track screen size for responsive rendering
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Check screen size on mount and window resize
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+    
+    // Initial check
+    checkScreenSize();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
+
   useEffect(() => {
     const getKeyStatistics = async () => {
       if (!symbol) return;
@@ -47,7 +68,7 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
   // Handle fullscreen toggle
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      // Enter fullscreen
+      // Enter fullscreen - check for mobile compatibility
       if (containerRef.current?.requestFullscreen) {
         containerRef.current.requestFullscreen()
           .then(() => {
@@ -55,6 +76,21 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
           })
           .catch(err => {
             console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            // Fallback for devices not supporting fullscreen API
+            if (isMobile) {
+              // Apply a class that mimics fullscreen on mobile
+              document.body.style.overflow = 'hidden';
+              if (containerRef.current) {
+                containerRef.current.style.position = 'fixed';
+                containerRef.current.style.top = '0';
+                containerRef.current.style.left = '0';
+                containerRef.current.style.width = '100%';
+                containerRef.current.style.height = '100%';
+                containerRef.current.style.zIndex = '9999';
+                containerRef.current.style.background = 'white';
+              }
+              setIsFullscreen(true);
+            }
           });
       }
     } else {
@@ -66,6 +102,18 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
           })
           .catch(err => {
             console.error(`Error attempting to exit fullscreen: ${err.message}`);
+            // Restore fallback fullscreen styling
+            document.body.style.overflow = '';
+            if (containerRef.current) {
+              containerRef.current.style.position = '';
+              containerRef.current.style.top = '';
+              containerRef.current.style.left = '';
+              containerRef.current.style.width = '';
+              containerRef.current.style.height = '';
+              containerRef.current.style.zIndex = '';
+              containerRef.current.style.background = '';
+            }
+            setIsFullscreen(false);
           });
       }
     }
@@ -93,13 +141,16 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
       
       const canvas = await html2canvas(statsRef.current, {
         backgroundColor: '#ffffff',
-        scale: 2, // Higher scale for better quality
+        scale: isMobile ? 1.5 : 2, // Optimize scale for device
       });
       
       // Create download link
       const link = document.createElement('a');
       link.download = `${symbol}-key-statistics-${new Date().toISOString().split('T')[0]}.png`;
-      link.href = canvas.toDataURL('image/png');
+      
+      // Optimize image quality for mobile devices
+      const quality = isMobile ? 0.8 : 0.95;
+      link.href = canvas.toDataURL('image/png', quality);
       link.click();
     } catch (error) {
       console.error('Failed to download statistics:', error);
@@ -139,6 +190,7 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
               className={styles.modernActionButton} 
               title="Download Statistics"
               onClick={downloadStats}
+              aria-label="Download Statistics"
             >
               <FaDownload className={styles.buttonIcon} /> 
               <span>Download</span>
@@ -147,11 +199,12 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
               className={styles.modernActionButton} 
               title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
               onClick={toggleFullscreen}
+              aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
             >
               {isFullscreen ? (
                 <>
                   <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
+                  <span>Exit</span>
                 </>
               ) : (
                 <>
@@ -164,6 +217,7 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
               className={styles.modernIconButton} 
               title="Learn More"
               onClick={() => setShowInfoModal(true)}
+              aria-label="Learn More About Statistics"
             >
               <FaQuestion />
             </button>
@@ -206,13 +260,20 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
         
         {/* Info Modal */}
         {showInfoModal && (
-          <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
+          <div 
+            className={styles.modalOverlay} 
+            onClick={() => setShowInfoModal(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+          >
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
               <div className={styles.modalHeader}>
-                <h3>About Key Statistics</h3>
+                <h3 id="modal-title">About Key Statistics</h3>
                 <button 
                   className={styles.closeButton}
                   onClick={() => setShowInfoModal(false)}
+                  aria-label="Close dialog"
                 >
                   &times;
                 </button>

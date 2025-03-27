@@ -208,7 +208,6 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
             >
               <div className={styles.metricHeader}>
                 <span className={styles.periodLabel}>{period.label}</span>
-                {selectedPeriod === period.label && <span className={styles.activeBadge}>Active</span>}
               </div>
               <div className={styles.returnValue}>
                 {period.value >= 0 ? <FaArrowUp className={styles.upIcon} /> : <FaArrowDown className={styles.downIcon} />}

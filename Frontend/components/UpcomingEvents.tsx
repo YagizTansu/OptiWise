@@ -27,6 +27,7 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ symbol }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hoveredEvent, setHoveredEvent] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (!symbol) return;
@@ -137,6 +138,18 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ symbol }) => {
     
     fetchEvents();
   }, [symbol]);
+
+  useEffect(() => {
+    // Check if we're on a mobile device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Format currency value in a more readable way
   const formatCurrency = (value: number | undefined): string => {
@@ -169,8 +182,9 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ symbol }) => {
         <div 
           key={index} 
           className={styles.eventItem}
-          onMouseEnter={() => setHoveredEvent(index)}
-          onMouseLeave={() => setHoveredEvent(null)}
+          onMouseEnter={() => !isMobile && setHoveredEvent(index)}
+          onMouseLeave={() => !isMobile && setHoveredEvent(null)}
+          onClick={() => isMobile && setHoveredEvent(hoveredEvent === index ? null : index)}
         >
           <FaExclamationCircle className={styles.exclamationIcon} />
           <div className={styles.eventContent}>
@@ -189,11 +203,12 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ symbol }) => {
               )}
             </div>
 
-            {/* Event details based on type - show only on hover */}
+            {/* Show details on hover for desktop, on click for mobile */}
             {hoveredEvent === index && event.type === 'Earnings' && event.details && (
               <div className={styles.eventDetailsPopup}>
                 <p>Est. EPS: {event.details.earningsAverage?.toFixed(2) || 'N/A'} ({event.details.earningsLow?.toFixed(2) || 'N/A'} - {event.details.earningsHigh?.toFixed(2) || 'N/A'})</p>
                 <p>Est. Revenue: {formatCurrency(event.details.revenueAverage)}</p>
+                {isMobile && <p style={{textAlign: 'center', marginTop: '10px', color: '#666', fontSize: '0.8rem'}}>Tap to close</p>}
               </div>
             )}
           </div>

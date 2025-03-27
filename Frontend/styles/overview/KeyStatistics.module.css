@@ -39,11 +39,12 @@
 
 .seasonalityDescription {
   display: flex;
-  align-items: center;
+  align-items: flex-start;  /* Changed from center to flex-start for better wrapping */
   gap: 8px;
   color: #666;
   font-size: 14px;
   margin: 0;
+  flex-wrap: wrap; /* Allow text to wrap on small screens */
 }
 
 .infoIcon {
@@ -270,10 +271,105 @@
     align-items: flex-start;
     gap: 16px;
   }
+  
+  .seasonalityHeader h2 {
+    font-size: 1.25rem;
+  }
+  
+  .chartControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .modernActionButton {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .analysisCard {
+    padding: 18px;
+  }
+  
+  .statCard {
+    padding: 12px;
+  }
+  
+  .statValue {
+    font-size: 1rem;
+  }
+  
+  .statIcon {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
 }
 
 @media (max-width: 480px) {
   .statsGrid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .chartControls {
+    gap: 8px;
+  }
+  
+  .modernActionButton span {
+    display: none; /* Hide button text on very small screens */
+  }
+  
+  .modernActionButton {
+    width: auto;
+    justify-content: center;
+    padding: 8px;
+  }
+  
+  .seasonalityDescription {
+    font-size: 13px;
+  }
+  
+  /* Make the modal more mobile-friendly */
+  .modalContent {
+    width: 95%;
+    max-height: 80vh;
+  }
+  
+  .modalHeader h3 {
+    font-size: 18px;
+  }
+  
+  .modalBody {
+    padding: 15px;
+    font-size: 14px;
+  }
+  
+  /* Ensure proper spacing for touch targets */
+  .closeButton {
+    padding: 8px;
+  }
+  
+  .applyButton {
+    width: 100%;
+    padding: 12px;
+  }
+}
+
+/* Add touch-friendly interactions */
+@media (hover: none) {
+  .modernActionButton:active,
+  .modernIconButton:active,
+  .statCard:active {
+    transform: scale(0.98);
+  }
+  
+  .statCard:hover {
+    transform: none;
+  }
+  
+  /* Increase touch targets */
+  .modernIconButton {
+    width: 40px;
+    height: 40px;
   }
 }
