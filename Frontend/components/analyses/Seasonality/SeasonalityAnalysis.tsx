@@ -576,16 +576,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
 
   return (
     <div className={styles.cardContainer}>
-      <div className={styles.analysisCard} ref={containerRef}>
-        {/* Header Section */}
-        <div className={styles.seasonalityHeader}>
-          <h2>Seasonality Analysis for {symbol}</h2>
-          <p className={styles.seasonalityDescription}>
-            <FaInfoCircle className={styles.infoIcon} /> 
-            Analyze how the asset performs during different time periods to identify recurring patterns and seasonal trends.
-          </p>
-        </div>
-        
+      <div className={styles.analysisCard} ref={containerRef}>        
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
           <h3>{getChartTitle()}</h3>
