@@ -253,7 +253,7 @@ export class FinanceController {
     @Query('symbol', new DefaultValuePipe('AAPL')) symbol: string,
     @Query('modules', new ParseArrayPipe(), new QuoteSummaryModulesValidationPipe()) modules: string[]
   ): Promise<any> {
-    return this.financeService.getQuoteSummary(symbol, { modules });
+    return this.financeService.getQuoteSummary({ symbol, options: { modules } });
   }
 
   /**
