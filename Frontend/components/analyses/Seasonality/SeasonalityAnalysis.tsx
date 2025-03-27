@@ -64,6 +64,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
   const [activeTimeframe] = useState('monthly'); 
   const [showDataPoints, setShowDataPoints] = useState(true);
   const [viewMode, setViewMode] = useState('line');
+  const [showPriceChart, setShowPriceChart] = useState(false); // New state to toggle between percent and price charts
 
   // State for data loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -184,7 +185,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     },
     animation: {
       duration: 1000,
-      easing: 'easeOutQuart'
+      easing: 'easeOutQuart' as const
     },
     interaction: {
       mode: 'index' as const,
@@ -193,6 +194,31 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     hover: {
       mode: 'index' as const,
       intersect: false
+    }
+  };
+
+  // Enhanced chart options for price chart
+  const priceChartOptions = {
+    ...seasonalityChartOptions,
+    scales: {
+      ...seasonalityChartOptions.scales,
+      y: {
+        ...seasonalityChartOptions.scales.y,
+        ticks: {
+          callback: (value: number) => `$${value.toFixed(2)}`, // Format as price
+          font: {
+            size: 11
+          }
+        },
+        title: {
+          display: true,
+          text: 'Price ($)',
+          font: {
+            size: 14,
+            weight: 'bold' as const
+          }
+        }
+      }
     }
   };
 
@@ -379,6 +405,69 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     };
   };
 
+  // Function to get the current seasonality data for price chart
+  const getCurrentPriceData = () => {
+    const timeframeData = seasonalityData[activeTimeframe as keyof typeof seasonalityData];
+    const activePeriods = selectedPeriods.filter(p => p.selected);
+  
+    if (Object.keys(timeframeData).length === 0) {
+      return {
+        labels: [],
+        datasets: []
+      };
+    }
+  
+    let labels: string[] = [];
+    let allDatasets: any[] = [];
+    const colorPalette = [
+      { border: 'rgb(76, 175, 80)', background: 'rgba(76, 175, 80, 0.7)' },
+      { border: 'rgb(53, 162, 235)', background: 'rgba(53, 162, 235, 0.7)' },
+      { border: 'rgb(255, 99, 132)', background: 'rgba(255, 99, 132, 0.7)' },
+      { border: 'rgb(75, 192, 192)', background: 'rgba(75, 192, 192, 0.7)' },
+      { border: 'rgb(255, 159, 64)', background: 'rgba(255, 159, 64, 0.7)' },
+      { border: 'rgb(153, 102, 255)', background: 'rgba(153, 102, 255, 0.7)' },
+      { border: 'rgb(255, 205, 86)', background: 'rgba(255, 205, 86, 0.7)' },
+    ];
+  
+    activePeriods.forEach((period, index) => {
+      const periodKey = period.isCurrentYear ? 'current_year' : `${period.years}_years`;
+      const periodData = timeframeData[periodKey];
+  
+      if (periodData && periodData.labels && periodData.datasets && periodData.datasets.length > 0) {
+        if (labels.length === 0) {
+          labels = periodData.labels;
+        }
+  
+        const colorIndex = index % colorPalette.length;
+        const color = colorPalette[colorIndex];
+  
+        periodData.datasets.forEach(dataset => {
+          allDatasets.push({
+            ...dataset,
+            label: period.label,
+            borderColor: color.border,
+            backgroundColor: viewMode === 'line' ? 'rgba(0, 0, 0, 0.1)' : color.background,
+            fill: viewMode === 'line' ? false : undefined,
+            pointBackgroundColor: color.border,
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1.5,
+            pointHoverBackgroundColor: color.border,
+            pointHoverBorderColor: '#fff',
+            pointHoverBorderWidth: 2,
+            pointHoverRadius: 6,
+            barPercentage: 0.8,
+            categoryPercentage: 0.7
+          });
+        });
+      }
+    });
+  
+    return {
+      labels: labels,
+      datasets: allDatasets
+    };
+  };
+
   // Handle fullscreen toggle
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -502,33 +591,6 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
           <h3>{getChartTitle()}</h3>
           <div className={styles.chartControls}>
             <button 
-              className={styles.modernActionButton} 
-              title="Download Chart"
-              onClick={downloadChart}
-              disabled={isLoading || !hasValidData()}
-            >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
-            </button>
-            <button 
-              className={styles.modernActionButton} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-              disabled={isLoading || !hasValidData()}
-            >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
-            </button>
-            <button 
               className={styles.modernIconButton} 
               title="Learn More"
               onClick={() => setShowInfoModal(true)}
@@ -568,6 +630,15 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               <FaCircle className={styles.buttonIcon} /> 
               <span>Points</span>
             </button>
+            <button 
+              className={`${styles.modernButton} ${showPriceChart ? styles.activeMod : ''}`}
+              title="Toggle Price Chart"
+              onClick={() => setShowPriceChart(!showPriceChart)}
+              disabled={isLoading}
+            >
+              <FaChartLine className={styles.buttonIcon} /> 
+              <span>{showPriceChart ? 'Percent' : 'Price'}</span>
+            </button>
           </div>
           
           {/* Multi-period selection */}
@@ -605,14 +676,14 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
             <div className={styles.chartContainer}>
               {viewMode === 'line' ? (
                 <Line 
-                  data={getCurrentSeasonalityData()}
-                  options={seasonalityChartOptions}
+                  data={showPriceChart ? getCurrentPriceData() : getCurrentSeasonalityData()}
+                  options={showPriceChart ? priceChartOptions : seasonalityChartOptions}
                   height={isFullscreen ? 600 : 300}
                 />
               ) : (
                 <Bar
-                  data={getCurrentSeasonalityData()}
-                  options={seasonalityChartOptions}
+                  data={showPriceChart ? getCurrentPriceData() : getCurrentSeasonalityData()}
+                  options={showPriceChart ? priceChartOptions : seasonalityChartOptions}
                   height={isFullscreen ? 600 : 300}
                 />
               )}

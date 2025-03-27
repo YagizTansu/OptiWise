@@ -207,25 +207,14 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
               title="Download Chart"
               onClick={downloadChart}
             >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
+              <FaDownload className={styles.buttonIcon} />
             </button>
             <button 
               className={styles.modernActionButton} 
               title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
               onClick={toggleFullscreen}
             >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
+              {isFullscreen ? <FaCompress className={styles.buttonIcon} /> : <FaExpand className={styles.buttonIcon} />}
             </button>
             <button 
               className={styles.modernIconButton} 
@@ -283,7 +272,7 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
                       }
                     },
                     title: {
-                      display: true,
+                      display: window.innerWidth > 768, // Hide title on small screens
                       text: `Dividend Amount (${getCurrencySymbol(currency)})`
                     }
                   },

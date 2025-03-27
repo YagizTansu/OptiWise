@@ -429,3 +429,87 @@
     min-width: auto;
   }
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .cardContainer {
+    padding: 10px;
+  }
+
+  .analysisCard {
+    padding: 16px;
+  }
+
+  .seasonalityHeader h2 {
+    font-size: 1.25rem;
+  }
+
+  .seasonalityDescription {
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .chartHeader h3 {
+    font-size: 1rem;
+  }
+
+  .chartControls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modernButton, .modernActionButton {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .modernIconButton {
+    width: 28px;
+    height: 28px;
+  }
+
+  .seasonalityControls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .periodsSelectionContainer {
+    gap: 6px;
+    padding: 10px;
+  }
+
+  .periodToggleButton {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .comparisonChart {
+    height: 250px;
+  }
+
+  .loadingSpinner {
+    height: 250px;
+  }
+
+  .noDataPlaceholder {
+    height: 250px;
+  }
+
+  .modalContent {
+    max-width: 90%;
+    padding: 10px;
+  }
+
+  .modalHeader h3 {
+    font-size: 18px;
+  }
+
+  .modalBody {
+    font-size: 14px;
+  }
+
+  .applyButton {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}

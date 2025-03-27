@@ -275,31 +275,6 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
           <h3>Trading Patterns</h3>
           <div className={styles.chartControls}>
             <button 
-              className={styles.modernActionButton} 
-              title="Download Insights"
-              onClick={downloadInsights}
-            >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
-            </button>
-            <button 
-              className={styles.modernActionButton} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
-            </button>
-            <button 
               className={styles.modernIconButton} 
               title="Learn More"
               onClick={() => setShowInfoModal(true)}

@@ -164,31 +164,7 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
         <div className={styles.chartHeader}>
           <h3>Average Returns Analysis</h3>
           <div className={styles.chartControls}>
-            <button 
-              className={styles.modernActionButton} 
-              title="Download Chart"
-              onClick={handleDownload}
-            >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
-            </button>
-            <button 
-              className={styles.modernActionButton} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
-            </button>
+            {/* Removed Download and Fullscreen buttons */}
             <button 
               className={styles.modernIconButton} 
               title="Learn More"
@@ -231,28 +207,23 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
           </div>
         </div>
         
-        <div 
-          className={`${styles.chartContainer} ${isFullscreen ? styles.fullscreenChart : ''}`}
-          ref={chartRef}
-        >
-          {loading && (
-            <div className={styles.loadingContainer}>
-              <div className={styles.loadingSpinner}></div>
-              <p>Loading chart data...</p>
-            </div>
-          )}
-          
-          {error && (
-            <div className={styles.errorContainer}>
-              <FaInfoCircle className={styles.errorIcon} />
-              <p>{error}</p>
-            </div>
-          )}
-          
-          {!loading && !error && chartData && (
-            <Bar data={chartData} options={chartOptions} className={styles.trendChart} />
-          )}
-        </div>
+        {loading && (
+          <div className={styles.loadingContainer}>
+            <div className={styles.loadingSpinner}></div>
+            <p>Loading chart data...</p>
+          </div>
+        )}
+        
+        {error && (
+          <div className={styles.errorContainer}>
+            <FaInfoCircle className={styles.errorIcon} />
+            <p>{error}</p>
+          </div>
+        )}
+        
+        {!loading && !error && chartData && (
+          <Bar data={chartData} options={chartOptions} className={styles.trendChart} />
+        )}
         
         {!loading && !error && statsData.length > 0 && (
           <div className={styles.statsTableContainer}>

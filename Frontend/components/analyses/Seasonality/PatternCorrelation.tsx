@@ -91,7 +91,7 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
   return (
     <div className={`${styles.patternCorrelationSection} ${styles.analysisCard}`}>
       <div className={styles.cardHeader}>
-        <h2> Pattern Correlation</h2>
+        <h2>Pattern Correlation</h2>
         <div className={styles.infoIconContainer}>
           <button 
             className={styles.modernIconButton} 

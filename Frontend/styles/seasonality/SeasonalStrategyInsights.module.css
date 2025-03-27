@@ -518,4 +518,89 @@
     width: 100%;
     justify-content: space-between;
   }
+
+  .strategyCard {
+    padding: 16px;
+  }
+
+  .strategyCard h3 {
+    font-size: 1rem;
+  }
+
+  .cardContent p {
+    font-size: 0.9rem;
+  }
+
+  .dataHighlight {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+
+  .modernPrimaryButton {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+
+  .modalHeader h3 {
+    font-size: 1.2rem;
+  }
+
+  .modalBody {
+    font-size: 0.9rem;
+  }
+
+  .applyButton {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .strategyCards {
+    gap: 16px;
+  }
+
+  .strategyCard {
+    padding: 12px;
+  }
+
+  .cardIconContainer {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cardIcon {
+    font-size: 1.2rem;
+  }
+
+  .strategyCard h3 {
+    font-size: 0.9rem;
+  }
+
+  .cardContent p {
+    font-size: 0.8rem;
+  }
+
+  .dataHighlight {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+  }
+
+  .modernPrimaryButton {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+
+  .modalHeader h3 {
+    font-size: 1rem;
+  }
+
+  .modalBody {
+    font-size: 0.8rem;
+  }
+
+  .applyButton {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
 }
