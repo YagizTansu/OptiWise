@@ -151,14 +151,6 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
   return (
     <div className={styles.cardContainer}>
       <div className={styles.analysisCard} ref={chartContainerRef}>
-        {/* Header Section */}
-        <div className={styles.seasonalityHeader}>
-          <h2>Time Average Returns</h2>
-          <p className={styles.seasonalityDescription}>
-            <FaInfoCircle className={styles.infoIcon} /> 
-            Analyze average returns across different time periods to identify consistent patterns and performance trends.
-          </p>
-        </div>
       
         {/* Chart Controls */}
         <div className={styles.chartHeader}>

@@ -260,16 +260,7 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
   
   return (
     <div className={styles.cardContainer}>
-      <div className={styles.analysisCard} ref={containerRef}>
-        {/* Header Section */}
-        <div className={styles.seasonalityHeader}>
-          <h2>Strategic Insights</h2>
-          <p className={styles.seasonalityDescription}>
-            <FaInfoCircle className={styles.infoIcon} /> 
-            Actionable trading opportunities based on historical seasonal patterns for {symbol}.
-          </p>
-        </div>
-        
+      <div className={styles.analysisCard} ref={containerRef}>        
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
           <h3>Trading Patterns</h3>
