@@ -35,9 +35,7 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ symbol }) => {
       try {
         setLoading(true);
         const data = await fetchAnalysisData(symbol, ['calendarEvents']);
-        
-        console.log('Calendar events data:', data);
-        
+                
         // Check if calendarEvents data exists
         if (data && data.calendarEvents) {
           const upcomingEvents: EventData[] = [];
@@ -126,10 +124,8 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ symbol }) => {
           // Sort events by date (closest first)
           upcomingEvents.sort((a, b) => a.date.getTime() - b.date.getTime());
           
-          console.log('Processed upcoming events:', upcomingEvents);
           setEvents(upcomingEvents);
         } else {
-          console.log('No calendar events data found in response:', data);
         }
       } catch (err) {
         console.error('Error fetching calendar events:', err);
@@ -164,7 +160,6 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ symbol }) => {
   
   // Don't render anything if there are no events
   if (events.length === 0) {
-    console.log('No upcoming events to display');
     return null;
   }
   

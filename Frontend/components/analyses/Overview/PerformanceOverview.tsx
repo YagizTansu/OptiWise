@@ -375,7 +375,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
           padding: 12,
           titleFont: {
             size: 14,
-            weight: 'bold'
+            weight: '700' // Change 'bold' to '700' to match Chart.js expected format
           },
           bodyFont: {
             size: 13
