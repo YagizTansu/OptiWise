@@ -35,7 +35,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!session?.user) return;
     
     try {
-      console.log('Checking for Google data to update profile...');
       
       // Check if we have Google auth data with name information
       const googleData = session.user.identities?.find(
@@ -46,14 +45,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const hasExistingName = session.user.user_metadata?.first_name && 
                             session.user.user_metadata?.last_name;
       
-      console.log('Google identity found:', !!googleData);
-      console.log('Has existing name:', hasExistingName);
       
       // If we have Google data with name info and no existing name in metadata, update it
       if (googleData?.identity_data && !hasExistingName) {
         const { name, full_name, email } = googleData.identity_data;
         
-        console.log('Updating user data from Google:', { name, full_name, email });
         
         // Extract first and last name
         let firstName = '';
@@ -70,7 +66,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         
         if (firstName || lastName) {
-          console.log('Updating user metadata with:', { firstName, lastName });
           
           const { data, error } = await supabase.auth.updateUser({
             data: {
@@ -82,7 +77,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (error) {
             console.error('Error updating user metadata:', error);
           } else {
-            console.log('User metadata updated successfully');
             
             // Refresh the session to get updated user metadata
             const { data: { session: refreshedSession } } = await supabase.auth.getSession();
@@ -104,7 +98,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Check if this is a redirect from OAuth (Google)
       if (window.location.hash && window.location.hash.includes('access_token')) {
         setIsLoading(true);
-        console.log('Detected OAuth redirect, processing...');
         
         // Let Supabase handle the OAuth redirect
         const { data, error } = await supabase.auth.getSession();
@@ -112,7 +105,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (error) {
           console.error('Error getting session after OAuth redirect:', error);
         } else if (data?.session) {
-          console.log('Got session after OAuth redirect');
           await updateUserWithGoogleData(data.session);
         }
         
@@ -130,7 +122,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        console.log('Initial session found, checking Google data...');
         await updateUserWithGoogleData(session);
       }
       
@@ -143,14 +134,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event);
       
       setSession(session);
       setUser(session?.user || null);
       
       // If this is a sign-in event with a session, update user data from Google if needed
       if (event === 'SIGNED_IN' && session) {
-        console.log('User signed in, checking for Google data');
         // Add slight delay to ensure Google data is available
         setTimeout(async () => {
           await updateUserWithGoogleData(session);

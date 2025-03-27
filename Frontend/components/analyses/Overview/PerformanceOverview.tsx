@@ -158,7 +158,6 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
   // Create chart data from API response
   const realTrendData = useMemo(() => {
     if (!chartData || chartData.length === 0) {
-      console.log('No chart data available to render');
       return null;
     }
     
