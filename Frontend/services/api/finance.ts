@@ -2313,7 +2313,7 @@ function timeframeToDateRange(timeframe: string): { from: string; to: string; in
  * @returns Processed Wyckoff indicator data
  */
 function calculateWyckoffIndicator(timestamps: any[], quotes: any): WyckoffIndicatorData {
-  if (!timestamps.length || !quotes.close || !quotes.volume) {
+  if (!timestamps.length || !quotes.close || !quotes.volume || quotes.close.length < 14) {
     return { labels: [], indicators: [] };
   }
   
@@ -2325,62 +2325,51 @@ function calculateWyckoffIndicator(timestamps: any[], quotes: any): WyckoffIndic
   const labels: string[] = [];
   const indicators: number[] = [];
   
-  // We need at least 14 data points to calculate meaningful indicators
-  const lookback = Math.min(14, closes.length - 1);
+  const lookback = 14; // Minimum 14 periyot
   
-  // Process the data
   for (let i = lookback; i < closes.length; i++) {
-    // Format date from timestamp
-    // Handle both timestamp number and date string formats
     const date = typeof timestamps[i] === 'number' 
       ? new Date(timestamps[i] * 1000) 
       : new Date(timestamps[i]);
     labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
     
-    // Calculate price momentum (rate of change over lookback period)
-    const priceChange = closes[i] / closes[i - lookback] - 1;
-    
-    // Calculate volume trend (is volume increasing or decreasing?)
-    let volumeSum = 0;
-    let prevVolumeSum = 0;
-    
+    // **1. Momentum Hesaplama (Log Ölçekleme ile)**
+    const priceChange = Math.log(closes[i] / closes[i - lookback]);
+
+    // **2. Hacim Trendini Hesapla**
+    let volumeSum = 0, prevVolumeSum = 0;
     for (let j = 0; j < lookback; j++) {
-      if (volumes[i - j]) volumeSum += volumes[i - j];
-      if (volumes[i - j - lookback]) prevVolumeSum += volumes[i - j - lookback];
+      volumeSum += volumes[i - j] || 0;
+      prevVolumeSum += volumes[i - j - lookback] || 0;
     }
-    
-    const volumeTrend = prevVolumeSum > 0 ? volumeSum / prevVolumeSum - 1 : 0;
-    
-    // Calculate price range volatility
+    const volumeTrend = prevVolumeSum > 0 ? Math.log(volumeSum / prevVolumeSum) : 0;
+
+    // **3. Volatilite (True Range) Hesaplama**
     let trueRange = 0;
     for (let j = 0; j < lookback; j++) {
-      if (highs[i - j] && lows[i - j]) {
-        const prevClose = i - j - 1 >= 0 ? closes[i - j - 1] : closes[i - j];
-        const currentTR = Math.max(
-          highs[i - j] - lows[i - j],
-          Math.abs(highs[i - j] - prevClose),
-          Math.abs(lows[i - j] - prevClose)
-        );
-        trueRange += currentTR;
-      }
+      const prevClose = closes[i - j - 1] || closes[i - j];
+      const currentTR = Math.max(
+        (highs[i - j] || prevClose) - (lows[i - j] || prevClose),
+        Math.abs((highs[i - j] || prevClose) - prevClose),
+        Math.abs((lows[i - j] || prevClose) - prevClose)
+      );
+      trueRange += currentTR;
     }
     trueRange /= lookback;
-    
-    // Normalize the true range
     const normalizedTrueRange = trueRange / closes[i] * 100;
-    
-    // Calculate Wyckoff Indicator combining price momentum, volume trend, and volatility
-    // This is a simplified interpretation of Wyckoff principles
-    const wyckoffIndicator = (priceChange * 10) * (1 + volumeTrend * 0.5) * (1 - normalizedTrueRange * 0.05);
-    
-    // Scale the indicator to fit within our chart range (-15 to 15)
+
+    // **4. Wyckoff Göstergesi Hesaplama (Daha Dengeli Ağırlıklandırma)**
+    const wyckoffIndicator = (priceChange * 12) * (1 + volumeTrend * 0.4) * (1 - normalizedTrueRange * 0.03);
+
+    // **5. Normalize ve Sınırlandır**
     const scaledIndicator = Math.max(Math.min(wyckoffIndicator * 100, 15), -15);
-    
+
     indicators.push(scaledIndicator);
   }
   
   return { labels, indicators };
 }
+
 
 /**
  * Fetches chart data and calculates Wyckoff indicator values

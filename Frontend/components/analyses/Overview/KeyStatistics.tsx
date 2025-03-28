@@ -185,43 +185,6 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
           <h3>Price Metrics ({statisticsData.currency})</h3>
-          <div className={styles.chartControls}>
-            <button 
-              className={styles.modernActionButton} 
-              title="Download Statistics"
-              onClick={downloadStats}
-              aria-label="Download Statistics"
-            >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
-            </button>
-            <button 
-              className={styles.modernActionButton} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-              aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-            >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
-            </button>
-            <button 
-              className={styles.modernIconButton} 
-              title="Learn More"
-              onClick={() => setShowInfoModal(true)}
-              aria-label="Learn More About Statistics"
-            >
-              <FaQuestion />
-            </button>
-          </div>
         </div>
         
         <div 
@@ -247,13 +210,6 @@ const KeyStatistics: React.FC<KeyStatisticsProps> = ({ symbol }) => {
             <div className={styles.statContent}>
               <div className={styles.statValue}>{statisticsData.profitDays}</div>
               <div className={styles.statLabel}>Profit Days</div>
-            </div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statIcon}><FaCalendarAlt /></div>
-            <div className={styles.statContent}>
-              <div className={styles.statValue}>{statisticsData.avgHoldPeriod}</div>
-              <div className={styles.statLabel}>Avg Hold Period</div>
             </div>
           </div>
         </div>
