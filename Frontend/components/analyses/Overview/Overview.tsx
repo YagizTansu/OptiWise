@@ -28,7 +28,7 @@ const Overview: React.FC<OverviewProps> = ({ symbol }) => {
       <AnnualPerformance symbol={symbol} />
       
       {/* Key Statistics Component */}
-      <KeyStatistics symbol={symbol} />
+      {/* <KeyStatistics symbol={symbol} /> */}
       
       {/* Dividends Component */}
       <Dividends symbol={symbol} />

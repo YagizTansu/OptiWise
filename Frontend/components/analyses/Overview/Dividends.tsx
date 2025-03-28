@@ -203,20 +203,6 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
           <h3>Payment History (10 Years)</h3>
           <div className={styles.chartControls}>
             <button 
-              className={styles.modernActionButton} 
-              title="Download Chart"
-              onClick={downloadChart}
-            >
-              <FaDownload className={styles.buttonIcon} />
-            </button>
-            <button 
-              className={styles.modernActionButton} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? <FaCompress className={styles.buttonIcon} /> : <FaExpand className={styles.buttonIcon} />}
-            </button>
-            <button 
               className={styles.modernIconButton} 
               title="Learn More"
               onClick={() => setShowInfoModal(true)}

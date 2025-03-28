@@ -6,7 +6,6 @@ import html2canvas from 'html2canvas';
 import { 
   fetchSeasonalityData, 
   SeasonalityChartData,
-  fetchAllSeasonalityData
 } from '../../../services/api/finance';
 // Import required Chart.js components
 import {
@@ -50,9 +49,10 @@ interface PeriodOption {
 const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => {
   // Available period options - updated with Current Year option
   const periodOptions: PeriodOption[] = [
-    { label: 'Past Year', years: 1, selected: true },
-    { label: '3 Years', years: 3, selected: false },
-    { label: '5 Years', years: 5, selected: false },
+    { label: 'Current Year', years: 0, selected: false, isCurrentYear: true },
+    { label: 'Past Year', years: 1, selected: false },
+    { label: '3 Years', years: 3, selected: true },
+    { label: '5 Years', years: 5, selected: true },
     { label: '10 Years', years: 10, selected: false },
     { label: '15 Years', years: 15, selected: false },
     { label: '20 Years', years: 20, selected: false },
@@ -284,6 +284,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                     years: period.years 
                   };
               
+                debugger
               const allData = await fetchSeasonalityData(
                 symbol,
                 activeTimeframe,
@@ -620,15 +621,6 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
             >
               <FaCircle className={styles.buttonIcon} /> 
               <span>Points</span>
-            </button>
-            <button 
-              className={`${styles.modernButton} ${showPriceChart ? styles.activeMod : ''}`}
-              title="Toggle Price Chart"
-              onClick={() => setShowPriceChart(!showPriceChart)}
-              disabled={isLoading}
-            >
-              <FaChartLine className={styles.buttonIcon} /> 
-              <span>{showPriceChart ? 'Percent' : 'Price'}</span>
             </button>
           </div>
           

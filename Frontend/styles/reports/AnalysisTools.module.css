@@ -95,8 +95,99 @@
 
 /* Reports Table */
 .reportsTable {
+  width: 100%;
   overflow-x: auto;
-  margin-bottom: 16px;
+  margin: 16px 0 24px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.reportsTable table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+}
+
+.reportsTable th {
+  background-color: #f8fafc;
+  text-align: left;
+  padding: 16px;
+  color: #475569;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.reportsTable td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  transition: background-color 0.2s ease;
+}
+
+.reportsTable tr:last-child td {
+  border-bottom: none;
+}
+
+.reportsTable tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Modern zebra striping for better readability */
+.reportsTable tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Current Period Row */
+.currentPeriodRow {
+  background-color: rgba(59, 130, 246, 0.04);
+}
+
+.currentPeriodRow td:first-child {
+  border-left: 3px solid #3b82f6;
+  font-weight: 500;
+}
+
+.currentPeriodRow:hover td {
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+/* Apply card-like appearance to the entire table */
+.reportsTable table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Responsive Table Adjustments */
+@media (max-width: 992px) {
+  .reportsTable {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .reportsTable th, 
+  .reportsTable td {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .reportsTable th, 
+  .reportsTable td {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+  
+  .currentPeriodRow td:first-child {
+    border-left-width: 2px;
+  }
 }
 
 /* Color Classes */
@@ -293,16 +384,6 @@
   line-height: 1.5;
   color: #475569;
   font-size: 15px;
-}
-
-/* Current Period Row */
-.currentPeriodRow {
-  background-color: rgba(59, 130, 246, 0.05);
-  font-weight: 500;
-}
-
-.currentPeriodRow td {
-  border-left: 3px solid #3b82f6;
 }
 
 /* Earnings Summary */

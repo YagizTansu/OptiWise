@@ -282,9 +282,11 @@ const IndicatorChart: React.FC<IndicatorChartProps> = ({ symbol }) => {
           </button>
         </div>
       ) : (
-        <div className={styles.chartContainer} style={{ height: '400px', position: 'relative' }}>
-          <canvas ref={indicatorChartRef}></canvas>
-        </div>
+        <canvas 
+          ref={indicatorChartRef} 
+          className={styles.chartCanvas}
+          style={{ height: '400px', width: '100%', boxSizing: 'border-box' }}
+        ></canvas>
       )}
     </div>
   );

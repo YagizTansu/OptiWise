@@ -1452,22 +1452,36 @@ export async function fetchSeasonalityData(
       const { years } = period;
       
       // Calculate date range based on years
-      const to = new Date();
-      const from = new Date();
-      from.setFullYear(from.getFullYear() - years);
+      let to = new Date();
+      let from = new Date();
+
+      if (years === 0) {
+        to = new Date(); // Bugünün tarihi (örneğin: 28 Mart 2025)
+        from = new Date(to.getFullYear(), 0, 1); // 1 Ocak 2025
+        from.setFullYear(from.getFullYear() - years);
+      }
+      else if (years === 1) {
+        const year = new Date().getFullYear() - 1; // Geçen yılın yıl bilgisini al
+        from = new Date(year, 0, 1, 0, 0, 0, 0); // 1 Ocak geçen yıl, 00:00:00
+        to = new Date(year, 11, 31, 23, 59, 59, 999); // 31 Aralık geçen yıl, 23:59:59
+      }else{
+        to = new Date();
+        from = new Date();
+        from.setFullYear(from.getFullYear() - years);
+      }
       
       // Determine appropriate interval based on timeframe
       let interval = '1d';
-      if (timeframe === 'yearly') {
-        interval = '1mo'; // Monthly data for yearly analysis is sufficient
-      } else if (timeframe === 'monthly' || timeframe === 'weekly') {
-        interval = '1d'; // Need daily data to calculate weekly/monthly performance
-      }
+      // if (timeframe === 'yearly') {
+      //   interval = '1mo'; // Monthly data for yearly analysis is sufficient
+      // } else if (timeframe === 'monthly' || timeframe === 'weekly') {
+      //   interval = '1d'; // Need daily data to calculate weekly/monthly performance
+      // }
       
       // Format dates for chart API
       const period1 = from.toISOString();
       const period2 = to.toISOString();
-      
+      debugger
       const params = {
         symbol,
         period1,

@@ -118,9 +118,10 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 28px;
   transition: transform 0.3s ease;
+  flex-wrap: wrap;
 }
 
 .recommendationCard:hover {
@@ -131,6 +132,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-right: 20px;
+  min-width: 120px;
 }
 
 .recommendationBadge {
@@ -183,7 +186,7 @@
 
 .bullBearSection {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 28px;
 }
 
@@ -193,6 +196,8 @@
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .bullBearCard h4 {
@@ -208,12 +213,18 @@
 .bullBearList {
   padding-left: 22px;
   margin: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .bullBearList li {
-  margin-bottom: 14px;
+  margin-bottom: 8px;
   line-height: 1.6;
   font-size: 1rem;
+  position: relative;
+  padding-left: 5px;
 }
 
 .bullPoint {
@@ -261,6 +272,70 @@
   margin-bottom: 16px;
 }
 
+/* Table Styles */
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  margin: 16px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background-color: white;
+}
+
+.tableContainer table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  overflow: hidden;
+}
+
+.tableContainer th {
+  background-color: #f8fafc;
+  text-align: left;
+  padding: 16px;
+  color: #475569;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tableContainer td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  transition: background-color 0.2s ease;
+}
+
+.tableContainer tr:last-child td {
+  border-bottom: none;
+}
+
+.tableContainer tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Modern zebra striping for better readability */
+.tableContainer tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* Responsive Tables */
+@media (max-width: 768px) {
+  .tableContainer {
+    border-radius: 6px;
+    margin: 12px 0;
+  }
+  
+  .tableContainer th,
+  .tableContainer td {
+    padding: 12px;
+    font-size: 0.85rem;
+  }
+}
+
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
@@ -291,20 +366,26 @@
   .recommendationPrice {
     text-align: left;
     width: 100%;
+    margin-top: 10px;
+  }
+
+  .recommendationHeader {
+    margin-right: 0;
   }
 }
 
 @media (max-width: 768px) {
+  .analysisCard {
+    min-width: 100%;
+    padding: 12px;
+  }
+
   .bullBearCard {
     padding: 16px;
   }
   
   .bullBearList {
     padding-left: 16px;
-  }
-  
-  .analysisCard {
-    min-width: 100%;
   }
 }
 
@@ -320,5 +401,19 @@
   /* Ensure tooltips don't overflow screen on mobile */
   .infoTooltip {
     max-width: calc(100vw - 40px);
+  }
+  
+  .recommendationCard {
+    padding: 16px;
+  }
+
+  .targetPrice {
+    font-size: 1.5rem;
+  }
+
+  /* Ensure all elements align properly */
+  .metricHeader {
+    flex-wrap: wrap;
+    gap: 4px;
   }
 }

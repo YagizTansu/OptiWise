@@ -190,21 +190,9 @@ const CompanySnapshot: React.FC<CompanySnapshotProps> = ({ symbol }) => {
                     style={{ width: `${percentValue}%` }}
                   />
                   {/* Add sector marker on the progress bar */}
-                  <div 
-                    className={styles.sectorMarker} 
-                    style={{ left: `${sectorPercentValue}%` }} 
-                    title={`Sector average: ${sectorPercentValue}%`}
-                  ></div>
+
                 </div>
               </div>
-              <p className={styles.sectorCompare}>
-                <span className={styles.comparisonLabel}>
-                  {isHigherThanSector ? 'Outperforms sector by:' : 'Behind sector by:'}
-                </span>
-                <span className={isHigherThanSector ? styles.positive : styles.negative}>
-                  {Math.abs(percentValue - sectorPercentValue)}%
-                </span>
-              </p>
             </div>
           );
         })}

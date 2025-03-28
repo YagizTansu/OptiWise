@@ -149,7 +149,7 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
       <div className={styles.analysisCard} ref={containerRef}>
         {/* Header Section */}
         <div className={styles.seasonalityHeader}>
-          <h2>Performance Metrics</h2>
+          <h3>Performance Metrics</h3>
           <p className={styles.seasonalityDescription}>
             <FaInfoCircle className={styles.infoIcon} /> 
             Compare returns across different time periods to track investment performance.
@@ -158,33 +158,8 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ symbol }) => {
         
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
-          <h3>Time Period Returns</h3>
+          <h4>Time Period Returns</h4>
           <div className={styles.chartControls}>
-            <button 
-              className={styles.modernActionButton} 
-              title="Download Metrics"
-              onClick={downloadMetrics}
-            >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
-            </button>
-            <button 
-              className={styles.modernActionButton} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
-            </button>
             <button 
               className={styles.modernIconButton} 
               title="Learn More"

@@ -166,7 +166,7 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
       <div className={styles.analysisCard} ref={chartContainerRef}>
         {/* Header Section */}
         <div className={styles.seasonalityHeader}>
-          <h2>Annual Performance</h2>
+          <h3>Annual Performance</h3>
           <p className={styles.seasonalityDescription}>
             <FaInfoCircle className={styles.infoIcon} /> 
             Analyze yearly returns to understand historical performance patterns over time.
@@ -175,33 +175,8 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
         
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
-          <h3>Yearly Returns</h3>
+          <h4>Yearly Returns</h4>
           <div className={styles.chartControls}>
-            <button 
-              className={styles.modernActionButton} 
-              title="Download Chart"
-              onClick={downloadChart}
-            >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
-            </button>
-            <button 
-              className={styles.modernActionButton} 
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
-            </button>
             <button 
               className={styles.modernIconButton} 
               title="Learn More"

@@ -1,5 +1,6 @@
 import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl, FaSearchDollar, FaBalanceScale, FaChartArea, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Navbar.module.css';
 import { useAuth } from '../contexts/AuthContext';
@@ -59,6 +60,13 @@ export default function Navbar() {
       <div className={styles.navContainer}>
         <div className={styles.navLogo}>
           <Link href="/">
+            <Image 
+              src="/images/logo.jpeg" 
+              alt="OptiWise Logo" 
+              width={60} 
+              height={60} 
+              className={`${styles.logoImage} ${styles.roundLogo}`} 
+            />
             <span className={styles.logoPrefix}>Opti</span>
             <span className={styles.logoSuffix}>Wise</span>
           </Link>

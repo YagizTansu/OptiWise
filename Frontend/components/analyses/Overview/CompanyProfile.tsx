@@ -70,7 +70,7 @@ const CompanyProfile: React.FC<CompanyProfileProps> = ({ symbol }) => {
         className={styles.companyProfileHeader} 
         onClick={toggleExpand}
       >
-        <h2>Company Profile</h2>
+        <h3>Company Profile</h3>
         <div className={styles.expandIcon}>
           {isExpanded ? '▼' : '►'}
         </div>

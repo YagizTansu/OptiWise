@@ -42,6 +42,21 @@
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
 }
 
+.chartCanvas {
+  background: rgb(248, 246, 246);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 15px;
+  margin-bottom: 0;
+  transition: all 0.3s ease;
+  display: block;
+  max-height: 400px;
+}
+
+.chartCanvas:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+
 .indicatorControls {
   display: flex;
   gap: 8px;

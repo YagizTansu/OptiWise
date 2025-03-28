@@ -528,7 +528,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
       <div className={styles.analysisCard}>
         {/* Overview Header Section */}
         <div className={styles.seasonalityHeader}>
-          <h2>Performance Overview for {assetInfo.name}</h2>
+          <h3>Performance Overview for {assetInfo.name}</h3>
           <p className={styles.seasonalityDescription}>
             <FaInfoCircle className={styles.infoIcon} /> 
             Track historical performance trends and compare returns across different timeframes to make 
@@ -723,40 +723,15 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
 
         {/* Chart Header */}
         <div className={styles.chartHeader}>
-          <h2>
+          <h3>
             {isMobile && selectedPeriod !== 'custom' 
               ? `${selectedPeriod} Trend - ${assetInfo.symbol}`
               : selectedPeriod === 'custom' 
                 ? `Custom Period (${formatDateForDisplay(dateRange.startDate)} - ${formatDateForDisplay(dateRange.endDate)}) ` 
                 : selectedPeriod} 
-            {!isMobile && `Price Trend for ${assetInfo.symbol} (${assetInfo.currency})`}
-          </h2>
+            {!isMobile && ` Price Trend for ${assetInfo.symbol} (${assetInfo.currency})`}
+          </h3>
           <div className={`${styles.chartControls} ${isMobile ? styles.mobileChartControls : ''}`}>
-            <button 
-              className={`${styles.modernActionButton} ${isMobile ? styles.mobileActionButton : ''}`}
-              title="Download Chart"
-              onClick={downloadChart}
-            >
-              <FaDownload className={styles.buttonIcon} /> 
-              <span>Download</span>
-            </button>
-            <button 
-              className={`${styles.modernActionButton} ${isMobile ? styles.mobileActionButton : ''}`}
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
-              onClick={toggleFullscreen}
-            >
-              {isFullscreen ? (
-                <>
-                  <FaCompress className={styles.buttonIcon} /> 
-                  <span>Exit Fullscreen</span>
-                </>
-              ) : (
-                <>
-                  <FaExpand className={styles.buttonIcon} /> 
-                  <span>Fullscreen</span>
-                </>
-              )}
-            </button>
             <button 
               className={`${styles.modernIconButton} ${isMobile ? styles.mobileIconButton : ''}`}
               title="Learn More"

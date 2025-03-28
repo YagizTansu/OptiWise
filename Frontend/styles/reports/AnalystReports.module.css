@@ -123,36 +123,49 @@
   overflow-x: auto;
   margin-top: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background-color: white;
 }
 
 .reportsTable table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.95rem;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .reportsTable th {
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
   text-align: left;
   padding: 16px 20px;
-  color: #334155;
+  color: #475569;
   font-weight: 600;
   border-bottom: 2px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .reportsTable td {
-  padding: 14px 20px;
-  border-bottom: 1px solid #e2e8f0;
-  color: #475569;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  transition: background-color 0.2s ease;
+}
+
+.reportsTable tr:last-child td {
+  border-bottom: none;
 }
 
 .reportsTable tr:hover td {
   background-color: #f8fafc;
 }
 
-.reportsTable tr:last-child td {
-  border-bottom: none;
+/* Add zebra striping for better readability */
+.reportsTable tr:nth-child(even) {
+  background-color: #fafafa;
 }
 
 .reportTitle {
@@ -227,6 +240,16 @@
   .infoTooltip::before {
     right: 14px;
   }
+
+  .reportsTable th, 
+  .reportsTable td {
+    padding: 14px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .reportTitle {
+    max-width: 200px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -243,5 +266,9 @@
   .infoTooltip {
     width: 220px;
     max-width: calc(100vw - 40px);
+  }
+
+  .reportTitle {
+    max-width: 150px;
   }
 }
