@@ -1,6 +1,5 @@
 import PriceVolumeChart from './PriceVolumeChart';
 import IndicatorChart from './IndicatorChart';
-import AdvancedDPO from './AdvancedDPO';
 
 interface OverboughtOversoldProps {
   symbol: string;
