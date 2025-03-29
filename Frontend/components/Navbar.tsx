@@ -166,7 +166,7 @@ export default function Navbar() {
                     </div>
                   </div>
                   
-                  <div className={styles.categorySection}>
+                  {/* <div className={styles.categorySection}>
                     <div className={styles.categoryTitle}>AI-Powered Analysis</div>
                     <div className={styles.dropdownGrid}>
                       <Link href="/ai-assistant" className={styles.dropdownGridItem}>
@@ -209,7 +209,7 @@ export default function Navbar() {
                         </div>
                       </Link>
                       
-                      {/* <Link href="/market-insights" className={styles.dropdownGridItem}>
+                      <Link href="/market-insights" className={styles.dropdownGridItem}>
                         <div className={styles.dropdownItemIconWrap}>
                           <FaLightbulb className={styles.dropdownItemIcon} />
                         </div>
@@ -217,9 +217,10 @@ export default function Navbar() {
                           <span className={styles.dropdownItemTitle}>Insights</span>
                           <p className={styles.dropdownItemDesc}>Market opportunities</p>
                         </div>
-                      </Link> */}
+                      </Link>
                     </div>
-                  </div>
+                  </div> */}
+
                 </div>
               </>
             )}
