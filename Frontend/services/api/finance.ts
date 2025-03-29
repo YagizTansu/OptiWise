@@ -1088,7 +1088,7 @@ export async function fetchTimeAverageReturns(
     // Format dates for API
     const period1 = startDate.toISOString();
     const period2 = endDate.toISOString();
-    
+    debugger
     const params = {
       symbol,
       period1,

@@ -326,7 +326,7 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
             </div>
           </div>
 
-          <div className={styles.strategyCard}>
+          {/* <div className={styles.strategyCard}>
             <div className={styles.cardIconContainer}>
               <FaRobot className={styles.cardIcon} />
             </div>
@@ -341,7 +341,7 @@ const SeasonalStrategyInsights: React.FC<SeasonalStrategyInsightsProps> = ({ sym
                 AI Analysis <FaArrowRight className={styles.buttonIcon} />
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
         
         {/* Strategy Exploration Modal */}
