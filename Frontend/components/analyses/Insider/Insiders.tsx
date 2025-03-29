@@ -438,7 +438,7 @@ const Insiders: React.FC<InsidersProps> = ({ symbol }) => {
         <div className={styles.modernCardHeader}>
           <div className={styles.chartTitleAndControls}>
             <h3>
-              <span className={styles.cardTitleIcon}><FaChartLine /></span>
+              
               Insider Holdings
               <span className={styles.infoButtonContainer}>
                 <button 
@@ -525,7 +525,7 @@ const Insiders: React.FC<InsidersProps> = ({ symbol }) => {
         <div className={styles.modernCardHeader}>
           <div className={styles.chartTitleAndControls}>
             <h3>
-              <span className={styles.cardTitleIcon}><FaChartLine /></span>
+              
               Institutional Ownership
               <span className={styles.infoButtonContainer}>
                 <button 
@@ -620,7 +620,7 @@ const Insiders: React.FC<InsidersProps> = ({ symbol }) => {
         <div className={styles.modernCardHeader}>
           <div className={styles.chartTitleAndControls}>
             <h3>
-              <span className={styles.cardTitleIcon}><FaChartLine /></span>
+              
               Recent Insider Transactions
               <span className={styles.infoButtonContainer}>
                 <button 
