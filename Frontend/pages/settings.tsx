@@ -146,27 +146,7 @@ export default function Settings() {
                   <FaUser className={styles.sidebarIcon} />
                   <span>Profile</span>
                 </li>
-                <li 
-                  className={`${styles.sidebarItem} ${activeTab === 'appearance' ? styles.active : ''}`}
-                  onClick={() => setActiveTab('appearance')}
-                >
-                  <FaPalette className={styles.sidebarIcon} />
-                  <span>Appearance</span>
-                </li>
-                <li 
-                  className={`${styles.sidebarItem} ${activeTab === 'notifications' ? styles.active : ''}`}
-                  onClick={() => setActiveTab('notifications')}
-                >
-                  <FaBell className={styles.sidebarIcon} />
-                  <span>Notifications</span>
-                </li>
-                <li 
-                  className={`${styles.sidebarItem} ${activeTab === 'privacy' ? styles.active : ''}`}
-                  onClick={() => setActiveTab('privacy')}
-                >
-                  <FaShieldAlt className={styles.sidebarIcon} />
-                  <span>Privacy & Security</span>
-                </li>
+
                 <li 
                   className={`${styles.sidebarItem} ${activeTab === 'account' ? styles.active : ''}`}
                   onClick={() => setActiveTab('account')}

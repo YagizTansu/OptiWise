@@ -407,11 +407,7 @@ const Insiders: React.FC<InsidersProps> = ({ symbol }) => {
       {/* Enhanced Header Section with visual impact */}
       <div className={styles.enhancedSectionHeader}>
         <div className={styles.headerContent}>
-          <h2>Ownership Structure for {symbol}</h2>
-          <p className={styles.sectionDescription}>
-            <FaEye className={styles.headerIcon} />
-            Tracking insider and institutional ownership, including holdings and recent transactions
-          </p>
+          <h3>Ownership Structure for {symbol}</h3>
         </div>
         <div className={styles.overviewStats}>
           <div className={styles.statBadge}>

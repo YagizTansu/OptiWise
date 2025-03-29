@@ -113,16 +113,7 @@ export default function Navbar() {
                 <div className={styles.featuresDropdown} role="menu">
                   {/* Mobile handle and header */}
                   <div className={styles.mobileMenuHandle}></div>
-                  <div className={styles.mobileMenuHeader}>
-                    <div className={styles.mobileMenuTitle}>Tools & Features</div>
-                    <button 
-                      className={styles.mobileCloseButton}
-                      onClick={() => setFeaturesDropdownOpen(false)}
-                      aria-label="Close menu"
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
+
                   
                   <div className={styles.dropdownHeader}>
                     <span className={styles.dropdownHeaderTitle}>Tools & Features</span>
