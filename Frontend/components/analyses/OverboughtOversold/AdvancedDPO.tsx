@@ -3,7 +3,7 @@ import { fetchChartData, ChartDataPoint } from '../../../services/api/finance';
 import Chart from 'chart.js/auto';
 import styles from './AdvancedDPO.module.css';
 import { CircularProgress } from '@mui/material';
-import { FaInfoCircle, FaExpand, FaDownload, FaQuestion } from 'react-icons/fa';
+import { FaQuestion } from 'react-icons/fa';
 
 interface AdvancedDPOProps {
   symbol: string;
