@@ -1,5 +1,6 @@
 import PriceVolumeChart from './PriceVolumeChart';
 import IndicatorChart from './IndicatorChart';
+import AdvancedDPO from './AdvancedDPO';
 
 interface OverboughtOversoldProps {
   symbol: string;
@@ -8,7 +9,7 @@ interface OverboughtOversoldProps {
 const OverboughtOversold: React.FC<OverboughtOversoldProps> = ({ symbol }) => {
   return (
     <div>
-      <PriceVolumeChart symbol={symbol} />
+      <AdvancedDPO symbol={symbol} />
       <IndicatorChart symbol={symbol} />
     </div>
   );
