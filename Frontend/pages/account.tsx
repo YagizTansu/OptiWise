@@ -3,7 +3,8 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { 
   FiUser, FiSettings, FiLogOut, FiShield, 
-  FiMail, FiLock, FiEdit, FiSave, FiRefreshCw
+  FiMail, FiLock, FiEdit, FiSave, FiRefreshCw,
+  FiAlertTriangle
 } from 'react-icons/fi';
 import styles from '../styles/Account.module.css';
 import { useAuth } from '../contexts/AuthContext';
@@ -18,6 +19,8 @@ const Account = () => {
   const [updating, setUpdating] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
   const [activeTab, setActiveTab] = useState('profile');
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   // Form state
   const [fullName, setFullName] = useState('');
@@ -94,214 +97,269 @@ const Account = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    setMessage({ text: '', type: '' });
+    
+    try {
+      const { error } = await supabase.rpc('delete_user_account');
+      
+      if (error) throw error;
+      
+      // Sign out the user and redirect to login page
+      await signOut();
+      // The router.push is handled in signOut function
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      setMessage({ 
+        text: error.message || 'Error deleting your account. Please contact support.', 
+        type: 'error' 
+      });
+      setIsDeleting(false);
+      setShowDeleteConfirmation(false);
+    }
+  };
+
   return (
     <ProtectedRoute>
-          <Layout>
+      <Layout>
+        <Head>
+          <title>My Account | OptiWise</title>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        </Head>
 
-      <Head>
-        <title>My Account | OptiWise</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
-
-      {loading ? (
-        <div className={styles.loadingContainer}>
-          <div className={styles.spinner}></div>
-          <p>Loading your account...</p>
-        </div>
-      ) : (
-        <div className={styles.page}>
-          <div className={styles.container}>
-            <div className={styles.sidePanel}>
-              <div className={styles.userInfo}>
-                <div className={styles.userAvatar}>
-                  <FiUser size={30} />
-                </div>
-                <div className={styles.userDetails}>
-                  <h3 className={styles.userName}>{fullName || 'User'}</h3>
-                  <p className={styles.userEmail}>{email}</p>
-                </div>
+        {/* Delete Account Confirmation Modal */}
+        {showDeleteConfirmation && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <div className={styles.modalHeader}>
+                <FiAlertTriangle size={24} color="#e53e3e" />
+                <h3>Delete Account</h3>
               </div>
-              
-              <div className={styles.menuItems}>
+              <div className={styles.modalBody}>
+                <p>Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.</p>
+              </div>
+              <div className={styles.modalFooter}>
                 <button 
-                  className={`${styles.menuItem} ${activeTab === 'profile' ? styles.active : ''}`} 
-                  onClick={() => setActiveTab('profile')}
+                  className={styles.cancelButton}
+                  onClick={() => setShowDeleteConfirmation(false)}
+                  disabled={isDeleting}
                 >
-                  <FiUser className={styles.menuIcon} />
-                  <span>Profile</span>
+                  Cancel
                 </button>
-                
                 <button 
-                  className={`${styles.menuItem} ${activeTab === 'security' ? styles.active : ''}`} 
-                  onClick={() => setActiveTab('security')}
+                  className={styles.dangerButton}
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
                 >
-                  <FiShield className={styles.menuIcon} />
-                  <span>Security</span>
-                </button>
-                
-                <button 
-                  className={`${styles.menuItem} ${activeTab === 'settings' ? styles.active : ''}`} 
-                  onClick={() => setActiveTab('settings')}
-                >
-                  <FiSettings className={styles.menuIcon} />
-                  <span>Settings</span>
-                </button>
-                
-                <button 
-                  className={`${styles.menuItem} ${styles.logoutItem}`} 
-                  onClick={handleSignOut}
-                >
-                  <FiLogOut className={styles.menuIcon} />
-                  <span>Sign Out</span>
+                  {isDeleting ? 'Deleting...' : 'Yes, Delete My Account'}
                 </button>
               </div>
-            </div>
-            
-            <div className={styles.mainContent}>
-              <div className={styles.contentHeader}>
-                <h2 className={styles.contentTitle}>
-                  {activeTab === 'profile' && 'My Profile'}
-                  {activeTab === 'security' && 'Security Settings'}
-                  {activeTab === 'settings' && 'Account Settings'}
-                </h2>
-              </div>
-              
-              {message.text && (
-                <div className={`${styles.message} ${styles[message.type]}`}>
-                  {message.text}
-                </div>
-              )}
-              
-              {activeTab === 'profile' && (
-                <div className={styles.formSection}>
-                  <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Full Name</label>
-                    <div className={styles.inputWrapper}>
-                      <FiUser className={styles.inputIcon} />
-                      <input
-                        type="text"
-                        className={styles.input}
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        placeholder="Your full name"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className={styles.inputGroup}>
-                    <label className={styles.inputLabel}>Email Address</label>
-                    <div className={styles.inputWrapper}>
-                      <FiMail className={styles.inputIcon} />
-                      <input
-                        type="email"
-                        className={styles.input}
-                        value={email}
-                        disabled
-                        placeholder="Your email"
-                      />
-                    </div>
-                    <p className={styles.inputHelp}>Contact support to change your email address</p>
-                  </div>
-                  
-                  <button 
-                    className={styles.button}
-                    onClick={updateProfile}
-                    disabled={updating}
-                  >
-                    {updating ? (
-                      <span className={styles.buttonText}>
-                        <div className={styles.spinner}></div>
-                        Updating...
-                      </span>
-                    ) : (
-                      <span className={styles.buttonText}>
-                        <FiSave className={styles.buttonIcon} />
-                        Save Changes
-                      </span>
-                    )}
-                  </button>
-                </div>
-              )}
-              
-              {activeTab === 'security' && (
-                <div className={styles.formSection}>
-                  <div className={styles.securityCard}>
-                    <div className={styles.securityCardHeader}>
-                      <FiLock className={styles.securityIcon} />
-                      <h3>Password</h3>
-                    </div>
-                    <p className={styles.securityText}>
-                      Change your password to keep your account secure.
-                    </p>
-                    <button 
-                      className={styles.secondaryButton}
-                      onClick={changePassword}
-                    >
-                      <FiRefreshCw className={styles.buttonIcon} />
-                      Reset Password
-                    </button>
-                  </div>
-                  
-                  <div className={styles.securityCard}>
-                    <div className={styles.securityCardHeader}>
-                      <FiShield className={styles.securityIcon} />
-                      <h3>Two-Factor Authentication</h3>
-                    </div>
-                    <p className={styles.securityText}>
-                      Add an extra layer of security to your account.
-                    </p>
-                    <button className={styles.secondaryButton}>
-                      <FiEdit className={styles.buttonIcon} />
-                      Setup 2FA
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              {activeTab === 'settings' && (
-                <div className={styles.formSection}>
-                  <div className={styles.settingsCard}>
-                    <h3 className={styles.settingsTitle}>Notification Preferences</h3>
-                    <div className={styles.checkboxGroup}>
-                      <label className={styles.checkboxLabel}>
-                        <input type="checkbox" className={styles.checkbox} defaultChecked />
-                        <span className={styles.checkboxText}>Email notifications</span>
-                      </label>
-                    </div>
-                    
-                    <div className={styles.checkboxGroup}>
-                      <label className={styles.checkboxLabel}>
-                        <input type="checkbox" className={styles.checkbox} defaultChecked />
-                        <span className={styles.checkboxText}>Market alerts</span>
-                      </label>
-                    </div>
-                    
-                    <div className={styles.checkboxGroup}>
-                      <label className={styles.checkboxLabel}>
-                        <input type="checkbox" className={styles.checkbox} />
-                        <span className={styles.checkboxText}>Newsletter</span>
-                      </label>
-                    </div>
-                  </div>
-                  
-                  <div className={styles.dangerZone}>
-                    <h3 className={styles.dangerTitle}>Danger Zone</h3>
-                    <p className={styles.dangerText}>
-                      Once you delete your account, there is no going back. Please be certain.
-                    </p>
-                    <button className={styles.dangerButton}>
-                      Delete Account
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
-        </div>
-      )}
-          </Layout>
+        )}
 
+        {loading ? (
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
+            <p>Loading your account...</p>
+          </div>
+        ) : (
+          <div className={styles.page}>
+            <div className={styles.container}>
+              <div className={styles.sidePanel}>
+                <div className={styles.userInfo}>
+                  <div className={styles.userAvatar}>
+                    <FiUser size={30} />
+                  </div>
+                  <div className={styles.userDetails}>
+                    <h3 className={styles.userName}>{fullName || 'User'}</h3>
+                    <p className={styles.userEmail}>{email}</p>
+                  </div>
+                </div>
+                
+                <div className={styles.menuItems}>
+                  <button 
+                    className={`${styles.menuItem} ${activeTab === 'profile' ? styles.active : ''}`} 
+                    onClick={() => setActiveTab('profile')}
+                  >
+                    <FiUser className={styles.menuIcon} />
+                    <span>Profile</span>
+                  </button>
+                  
+                  <button 
+                    className={`${styles.menuItem} ${activeTab === 'security' ? styles.active : ''}`} 
+                    onClick={() => setActiveTab('security')}
+                  >
+                    <FiShield className={styles.menuIcon} />
+                    <span>Security</span>
+                  </button>
+                  
+                  <button 
+                    className={`${styles.menuItem} ${activeTab === 'settings' ? styles.active : ''}`} 
+                    onClick={() => setActiveTab('settings')}
+                  >
+                    <FiSettings className={styles.menuIcon} />
+                    <span>Settings</span>
+                  </button>
+                  
+                  <button 
+                    className={`${styles.menuItem} ${styles.logoutItem}`} 
+                    onClick={handleSignOut}
+                  >
+                    <FiLogOut className={styles.menuIcon} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div className={styles.mainContent}>
+                <div className={styles.contentHeader}>
+                  <h2 className={styles.contentTitle}>
+                    {activeTab === 'profile' && 'My Profile'}
+                    {activeTab === 'security' && 'Security Settings'}
+                    {activeTab === 'settings' && 'Account Settings'}
+                  </h2>
+                </div>
+                
+                {message.text && (
+                  <div className={`${styles.message} ${styles[message.type]}`}>
+                    {message.text}
+                  </div>
+                )}
+                
+                {activeTab === 'profile' && (
+                  <div className={styles.formSection}>
+                    <div className={styles.inputGroup}>
+                      <label className={styles.inputLabel}>Full Name</label>
+                      <div className={styles.inputWrapper}>
+                        <FiUser className={styles.inputIcon} />
+                        <input
+                          type="text"
+                          className={styles.input}
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="Your full name"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className={styles.inputGroup}>
+                      <label className={styles.inputLabel}>Email Address</label>
+                      <div className={styles.inputWrapper}>
+                        <FiMail className={styles.inputIcon} />
+                        <input
+                          type="email"
+                          className={styles.input}
+                          value={email}
+                          disabled
+                          placeholder="Your email"
+                        />
+                      </div>
+                      <p className={styles.inputHelp}>Contact support to change your email address</p>
+                    </div>
+                    
+                    <button 
+                      className={styles.button}
+                      onClick={updateProfile}
+                      disabled={updating}
+                    >
+                      {updating ? (
+                        <span className={styles.buttonText}>
+                          <div className={styles.spinner}></div>
+                          Updating...
+                        </span>
+                      ) : (
+                        <span className={styles.buttonText}>
+                          <FiSave className={styles.buttonIcon} />
+                          Save Changes
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                )}
+                
+                {activeTab === 'security' && (
+                  <div className={styles.formSection}>
+                    <div className={styles.securityCard}>
+                      <div className={styles.securityCardHeader}>
+                        <FiLock className={styles.securityIcon} />
+                        <h3>Password</h3>
+                      </div>
+                      <p className={styles.securityText}>
+                        Change your password to keep your account secure.
+                      </p>
+                      <button 
+                        className={styles.secondaryButton}
+                        onClick={changePassword}
+                      >
+                        <FiRefreshCw className={styles.buttonIcon} />
+                        Reset Password
+                      </button>
+                    </div>
+                    
+                    <div className={styles.securityCard}>
+                      <div className={styles.securityCardHeader}>
+                        <FiShield className={styles.securityIcon} />
+                        <h3>Two-Factor Authentication</h3>
+                      </div>
+                      <p className={styles.securityText}>
+                        Add an extra layer of security to your account.
+                      </p>
+                      <button className={styles.secondaryButton}>
+                        <FiEdit className={styles.buttonIcon} />
+                        Setup 2FA
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {activeTab === 'settings' && (
+                  <div className={styles.formSection}>
+                    <div className={styles.settingsCard}>
+                      <h3 className={styles.settingsTitle}>Notification Preferences</h3>
+                      <div className={styles.checkboxGroup}>
+                        <label className={styles.checkboxLabel}>
+                          <input type="checkbox" className={styles.checkbox} defaultChecked />
+                          <span className={styles.checkboxText}>Email notifications</span>
+                        </label>
+                      </div>
+                      
+                      <div className={styles.checkboxGroup}>
+                        <label className={styles.checkboxLabel}>
+                          <input type="checkbox" className={styles.checkbox} defaultChecked />
+                          <span className={styles.checkboxText}>Market alerts</span>
+                        </label>
+                      </div>
+                      
+                      <div className={styles.checkboxGroup}>
+                        <label className={styles.checkboxLabel}>
+                          <input type="checkbox" className={styles.checkbox} />
+                          <span className={styles.checkboxText}>Newsletter</span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <div className={styles.dangerZone}>
+                      <h3 className={styles.dangerTitle}>Danger Zone</h3>
+                      <p className={styles.dangerText}>
+                        Once you delete your account, there is no going back. Please be certain.
+                      </p>
+                      <button 
+                        className={styles.dangerButton}
+                        onClick={() => setShowDeleteConfirmation(true)}
+                      >
+                        Delete Account
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </Layout>
     </ProtectedRoute>
   );
 };
