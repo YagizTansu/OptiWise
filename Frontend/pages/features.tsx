@@ -9,12 +9,14 @@ import {
 } from 'react-icons/fa'
 import { AwaitedReactNode, JSXElementConstructor, ReactElement, ReactNode, ReactPortal, useState } from 'react'
 
+type CategoryId = 'overview' | 'seasonality' | 'overbought' | 'fundamental' | 'insiders' | 'report' | 'aiagent';
+
 export default function Features() {
-  const [activeCategory, setActiveCategory] = useState('overview');
+  const [activeCategory, setActiveCategory] = useState<CategoryId>('overview');
   const [activeFeature, setActiveFeature] = useState(0);
   const [activeToolFeature, setActiveToolFeature] = useState(0);
   
-  const categories = [
+  const categories: { id: CategoryId; name: string }[] = [
     { id: 'overview', name: 'Overview' },
     { id: 'seasonality', name: 'Seasonality' },
     { id: 'overbought', name: 'Overbought/Oversold' },
@@ -254,7 +256,7 @@ export default function Features() {
 
         <div className={styles.mainFeature}>
           <div className={styles.featureNav}>
-            {currentFeatures.map((feature: { icon: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; title: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }, index: string | number | bigint | ((prevState: number) => number) | null | undefined) => (
+            {currentFeatures.map((feature, index) => (
               <div 
                 key={index} 
                 className={`${styles.featureTab} ${activeFeature === index ? styles.active : ''}`}
