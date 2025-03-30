@@ -61,7 +61,7 @@ export default function Navbar() {
         <div className={styles.navLogo}>
           <Link href="/">
             <Image 
-              src="/images/logo.jpeg" 
+              src="/images/logo.png" 
               alt="OptiWise Logo" 
               width={60} 
               height={60} 

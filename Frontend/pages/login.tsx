@@ -2,7 +2,8 @@ import React, { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
-import { FiMail, FiLock, FiArrowRight, FiCheck, FiShield, FiBarChart } from 'react-icons/fi';
+import Image from 'next/image';
+import { FiMail, FiLock, FiArrowRight, FiCheck, FiShield, FiBarChart, FiPieChart, FiTrendingUp, FiAward, FiAlertCircle, FiTarget } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import styles from '../styles/Login.module.css';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,14 +17,12 @@ const Login = () => {
   const router = useRouter();
   const { signIn, signInWithGoogle } = useAuth();
 
-  // Check for registration success in query params
   useEffect(() => {
     if (router.query.registered === 'true') {
       setRegistrationSuccess(true);
     }
   }, [router.query]);
 
-  // If returnUrl is provided, use it for redirection after login
   const returnUrl = router.query.returnUrl as string || '/';
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -40,7 +39,6 @@ const Login = () => {
         return;
       }
 
-      // Successful login
       router.push(returnUrl);
     } catch (err) {
       setError('An unexpected error occurred');
@@ -59,7 +57,6 @@ const Login = () => {
         setError(error.message || 'Failed to sign in with Google');
         setIsLoading(false);
       }
-      // If successful, the user will be redirected to the OAuth provider
     } catch (err) {
       setError('An unexpected error occurred');
       setIsLoading(false);
@@ -78,8 +75,99 @@ const Login = () => {
         <div className={styles.split}>
           <div className={styles.leftPanel}>
             <div className={styles.brandWrapper}>
-              <h1 className={styles.brandName}>OptiWise</h1>
+              <div className={styles.brandHeader}>
+                <div className={styles.logoContainer}>
+                  <div className={styles.logoCircle}>
+                    <Image 
+                      src="/images/logo.png" 
+                      alt="OptiWise Logo" 
+                      width={70} 
+                      height={70}
+                      className={styles.logoImage}
+                    />
+                  </div>
+                </div>
+                <h1 className={styles.brandName}>OptiWise</h1>
+              </div>
               <p className={styles.brandTagline}>AI-Powered Market Intelligence</p>
+              <p className={styles.brandDescription}>
+                Take control of your investment strategy with our cutting-edge AI platform that analyzes market trends, predicts movements, and provides actionable insights.
+              </p>
+            </div>
+            
+            <div className={styles.statsContainer}>
+              <div className={styles.statItem}>
+                <span className={styles.statValue}>94%</span>
+                <span className={styles.statLabel}>Prediction Accuracy</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statValue}>5M+</span>
+                <span className={styles.statLabel}>Data Points Analyzed</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statValue}>-40%</span>
+                <span className={styles.statLabel}>Risk Reduction</span>
+              </div>
+            </div>
+
+            <div className={styles.featureList}>
+              <h3 className={styles.featuresTitle}>Key Features</h3>
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <FiTrendingUp size={16} />
+                </div>
+                <div className={styles.featureContent}>
+                  <span className={styles.featureTitle}>Price Prediction Dashboard</span>
+                  <span className={styles.featureText}>
+                    Access AI-powered price forecasts with confidence levels for different timeframes, with precise support and resistance levels.
+                  </span>
+                </div>
+              </div>
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <FiBarChart size={16} />
+                </div>
+                <div className={styles.featureContent}>
+                  <span className={styles.featureTitle}>Performance Overview</span>
+                  <span className={styles.featureText}>
+                    Visualize stock performance with interactive charts that compare against benchmarks and identify relative strength patterns.
+                  </span>
+                </div>
+              </div>
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <FiPieChart size={16} />
+                </div>
+                <div className={styles.featureContent}>
+                  <span className={styles.featureTitle}>Seasonality Analysis</span>
+                  <span className={styles.featureText}>
+                    Discover recurring annual patterns that give you an edge in timing trades with statistical confidence indicators.
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.testimonialsContainer}>
+              <div className={styles.testimonialControls}>
+                <span className={styles.testimonialDot + ' ' + styles.active}></span>
+                <span className={styles.testimonialDot}></span>
+                <span className={styles.testimonialDot}></span>
+              </div>
+              <div className={styles.testimonial}>
+                <div className={styles.testimonialHeader}>
+                  <div className={styles.testimonialAvatar}>
+                    <span>MT</span>
+                  </div>
+                  <div className={styles.testimonialRating}>
+                    <span>★★★★★</span>
+                  </div>
+                </div>
+                <p className={styles.quote}>"OptiWise completely transformed my investment approach. Their predictive algorithms helped me avoid a major market correction and their risk analysis tools have given me confidence in volatile conditions."</p>
+                <div className={styles.author}>
+                  <span className={styles.authorName}>— Michael Thompson</span>
+                  <span className={styles.authorTitle}>Investment Director, Pinnacle Partners</span>
+                </div>
+              </div>
             </div>
           </div>
 

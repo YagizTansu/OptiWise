@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Head from 'next/head';
-import { FiUser, FiMail, FiLock, FiArrowRight, FiCheck, FiClock, FiUsers } from 'react-icons/fi';
+import Image from 'next/image';
+import { FiUser, FiMail, FiLock, FiArrowRight, FiCheck, FiActivity, FiPieChart, FiTrendingUp, FiAlertCircle, FiTarget, FiBarChart2, FiGlobe } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import styles from '../styles/Register.module.css';
 import { useAuth } from '../contexts/AuthContext';
@@ -99,51 +100,108 @@ const Register = () => {
         <div className={styles.split}>
           <div className={styles.leftPanel}>
             <div className={styles.brandWrapper}>
-              <div className={styles.logoBox}>
-                <div className={styles.logoIcon}>OW</div>
+              <div className={styles.brandHeader}>
+                <div className={styles.logoContainer}>
+                  <div className={styles.logoCircle}>
+                    <Image 
+                      src="/images/logo.png" 
+                      alt="OptiWise Logo" 
+                      width={70} 
+                      height={70}
+                      className={styles.logoImage}
+                    />
+                  </div>
+                </div>
+                <h1 className={styles.brandName}>OptiWise</h1>
               </div>
-              <h1 className={styles.brandName}>OptiWise</h1>
-              <p className={styles.brandTagline}>Forecaster AI Agent</p>
+              <p className={styles.brandTagline}>Next-Gen AI Investment Platform</p>
               <p className={styles.brandDescription}>
-                Join investors using our AI-powered platform to identify opportunities and reduce risk through intelligent market analysis.
+                Join thousands of sophisticated investors leveraging our AI technology to maximize returns while minimizing risk in today's complex markets.
               </p>
-              
-              <div className={styles.featureList}>
-                <div className={styles.featureItem}>
-                  <div className={styles.featureIcon}>
-                    <FiClock size={14} />
-                  </div>
-                  <span className={styles.featureText}>
-                    Insider Transactions Tracking and Regulatory Alerts
+            </div>
+            
+            <div className={styles.whyJoinSection}>
+              <h3 className={styles.sectionTitle}>Why Join OptiWise?</h3>
+              <div className={styles.whyJoinGrid}>
+                <div className={styles.whyJoinItem}>
+                  <span className={styles.whyJoinText}>
+                    <FiBarChart2 size={16} className={styles.whyJoinInlineIcon} />
+                    Outperform the market with AI-driven insights
                   </span>
                 </div>
-                <div className={styles.featureItem}>
-                  <div className={styles.featureIcon}>
-                    <FiUsers size={14} />
-                  </div>
-                  <span className={styles.featureText}>
-                    Financial Health Assessment with Altman Z-Score
+                <div className={styles.whyJoinItem}>
+                  <span className={styles.whyJoinText}>
+                    <FiGlobe size={16} className={styles.whyJoinInlineIcon} />
+                    Access global markets with real-time data
                   </span>
                 </div>
-                <div className={styles.featureItem}>
-                  <div className={styles.featureIcon}>
-                    <FiCheck size={14} />
-                  </div>
-                  <span className={styles.featureText}>
-                    Personalized AI Investment Recommendations
+                <div className={styles.whyJoinItem}>
+                  <span className={styles.whyJoinText}>
+                    <FiCheck size={16} className={styles.whyJoinInlineIcon} />
+                    Make decisions with institutional-grade analysis
                   </span>
                 </div>
               </div>
             </div>
-            
-            <div className={styles.graphic + ' ' + styles.circle1}></div>
-            <div className={styles.graphic + ' ' + styles.circle2}></div>
-            
-            <div className={styles.testimonial}>
-              <p className={styles.quote}>"The AI alerts saved me from a major loss by flagging insider selling before earnings. OptiWise's MOAT scoring system has transformed how I evaluate company fundamentals."</p>
-              <div className={styles.author}>
-                <span className={styles.authorName}>— Rebecca Chen</span>
-                <span className={styles.authorTitle}>Private Investor, Former Goldman Sachs</span>
+
+            <div className={styles.featuresShowcase}>
+              <div className={styles.featureItem + ' ' + styles.featureHighlight}>
+                <div className={styles.featureIcon}>
+                  <FiTrendingUp size={18} />
+                </div>
+                <div className={styles.featureContent}>
+                  <h4 className={styles.featureTitle}>Predictive Market Analysis</h4>
+                  <p className={styles.featureDescription}>
+                    Our AI analyzes patterns across 50+ factors to identify emerging opportunities and potential risks before they become obvious to the market.
+                  </p>
+                </div>
+              </div>
+              
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <FiAlertCircle size={18} />
+                </div>
+                <div className={styles.featureContent}>
+                  <h4 className={styles.featureTitle}>Smart Risk Management</h4>
+                  <p className={styles.featureDescription}>
+                    Receive customized alerts on portfolio vulnerabilities and get actionable recommendations to optimize your risk-reward ratio.
+                  </p>
+                </div>
+              </div>
+              
+              <div className={styles.featureItem}>
+                <div className={styles.featureIcon}>
+                  <FiTarget size={18} />
+                </div>
+                <div className={styles.featureContent}>
+                  <h4 className={styles.featureTitle}>Tailored Investment Strategies</h4>
+                  <p className={styles.featureDescription}>
+                    Get personalized investment plans that adapt to your unique financial goals, risk tolerance, and market conditions.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.userReviews}>
+              <div className={styles.reviewHeader}>
+                <h3 className={styles.reviewsTitle}>What Our Users Say</h3>
+                <div className={styles.reviewRating}>
+                  <span className={styles.reviewStars}>★★★★★</span>
+                  <span className={styles.reviewCount}>4.9/5 from 2,800+ reviews</span>
+                </div>
+              </div>
+              
+              <div className={styles.testimonial}>
+                <p className={styles.quote}>"OptiWise identified a key market shift that my traditional advisors missed completely. The AI alerts enabled me to reallocate assets just in time, avoiding a 22% portfolio loss."</p>
+                <div className={styles.author}>
+                  <div className={styles.authorInfo}>
+                    <div className={styles.authorAvatar}>EJ</div>
+                    <div className={styles.authorDetails}>
+                      <span className={styles.authorName}>Elena Jovanovic</span>
+                      <span className={styles.authorTitle}>Former Hedge Fund Manager</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
