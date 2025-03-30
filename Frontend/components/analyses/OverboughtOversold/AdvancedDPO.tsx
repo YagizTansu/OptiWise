@@ -24,19 +24,16 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
   const dpoChartRef = useRef<HTMLCanvasElement>(null);
   const priceChartInstance = useRef<Chart | null>(null);
   const dpoChartInstance = useRef<Chart | null>(null);
-  
-  // Fetch chart data based on the selected period
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Calculate date range based on period
         const endDate = new Date();
         let startDate = new Date();
         let displayStartDate = new Date();
-        
-        // Set display start date based on active period
-        switch(activePeriod) {
+
+        switch (activePeriod) {
           case '6m':
             displayStartDate.setMonth(endDate.getMonth() - 6);
             break;
@@ -55,17 +52,13 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
           default:
             displayStartDate.setFullYear(endDate.getFullYear() - 1);
         }
-        
-        // Always fetch enough data for Bollinger Bands calculation (at least 200 days)
-        // We need to fetch more data than we actually display to have proper calculations
+
         startDate = new Date(displayStartDate);
-        startDate.setDate(startDate.getDate() - BOLLINGER_PERIOD); // Add buffer for calculation
-        
-        // For 10-year reference data (needed for normalization)
+        startDate.setDate(startDate.getDate() - BOLLINGER_PERIOD);
+
         const tenYearsAgo = new Date();
         tenYearsAgo.setFullYear(endDate.getFullYear() - 10);
-        
-        // Fetch recent data for display and calculation
+
         const data = await fetchChartData(
           symbol,
           startDate.toISOString(),
@@ -73,14 +66,13 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
           '1d'
         );
 
-        // Fetch 10 years of data for normalization if needed
         let tenYearData = data;
         if (activePeriod !== '10y') {
           tenYearData = await fetchChartData(
             symbol,
             tenYearsAgo.toISOString(),
             endDate.toISOString(),
-            '1wk'  // Weekly data for 10 years to avoid too many data points
+            '1wk'
           );
         }
 
@@ -97,7 +89,6 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
 
     fetchData();
 
-    // Clean up charts when component unmounts or period changes
     return () => {
       if (priceChartInstance.current) {
         priceChartInstance.current.destroy();
@@ -111,27 +102,23 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
   const createCharts = (data: ChartDataPoint[], referenceData: ChartDataPoint[], displayStartDate: Date) => {
     if (!data.length || !priceChartRef.current || !dpoChartRef.current) return;
 
-    // Process the data to calculate the Advanced DPO
-    const { 
-      dates, 
-      prices, 
-      volumes, 
-      dpoValues, 
-      upperBand1, 
-      lowerBand1, 
-      upperBand2, 
-      lowerBand2 
+    const {
+      dates,
+      prices,
+      volumes,
+      dpoValues,
+      upperBand1,
+      lowerBand1,
+      upperBand2,
+      lowerBand2
     } = processAdvancedDPO(data, referenceData);
 
-    // If we're fetching more data than we want to display, we need to filter here
-    // Find display start index based on the displayStartDate
     const displayStartDateStr = displayStartDate.toISOString().split('T')[0];
     const displayStartIndex = data.findIndex(item => {
       const itemDate = new Date(item.date);
       return itemDate >= displayStartDate;
     });
-    
-    // Only display data after the display start date
+
     const displayDateIndex = displayStartIndex > 0 ? displayStartIndex : 0;
     const displayDates = dates.slice(displayDateIndex);
     const displayPrices = prices.slice(displayDateIndex);
@@ -142,7 +129,6 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
     const displayUpperBand2 = upperBand2.slice(displayDateIndex);
     const displayLowerBand2 = lowerBand2.slice(displayDateIndex);
 
-    // Create price and volume chart with filtered data
     if (priceChartRef.current) {
       if (priceChartInstance.current) {
         priceChartInstance.current.destroy();
@@ -150,11 +136,10 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
 
       const ctx = priceChartRef.current.getContext('2d');
       if (ctx) {
-        // Create gradients and chart setup as before
         const priceGradient = ctx.createLinearGradient(0, 0, 0, 400);
         priceGradient.addColorStop(0, 'rgba(33, 150, 243, 0.4)');
         priceGradient.addColorStop(1, 'rgba(33, 150, 243, 0.05)');
-        
+
         const volumeGradient = ctx.createLinearGradient(0, 0, 0, 400);
         volumeGradient.addColorStop(0, 'rgba(76, 175, 80, 0.7)');
         volumeGradient.addColorStop(1, 'rgba(76, 175, 80, 0.2)');
@@ -321,7 +306,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                   label: function(context) {
                     let label = context.dataset.label || '';
                     let value = Number(context.raw);
-                    
+
                     if (label === 'Price') {
                       return `${label}: ${value.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
@@ -349,7 +334,6 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
       }
     }
 
-    // Create DPO indicator chart with filtered data
     if (dpoChartRef.current) {
       if (dpoChartInstance.current) {
         dpoChartInstance.current.destroy();
@@ -503,7 +487,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                     const value = context.raw as number;
                     let signal = '';
                     let signalColor = '';
-                    
+
                     if (value > displayUpperBand2[context.dataIndex as number]) {
                       signal = '📉 Strong Sell';
                       signalColor = '#f44336';
@@ -520,7 +504,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                       signal = '🔄 Hold';
                       signalColor = '#9e9e9e';
                     }
-                    
+
                     const dataset = context.dataset.label || '';
                     if (dataset === 'Advanced DPO') {
                       return [
@@ -539,94 +523,85 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
     }
   };
 
-  // Calculate the Advanced DPO indicator
   const processAdvancedDPO = (data: ChartDataPoint[], referenceData: ChartDataPoint[]) => {
     const dates: string[] = [];
     const prices: number[] = [];
     const volumes: number[] = [];
     const closePrices = data.map(item => item.close);
-    
-    // Extract data for charts
+
     data.forEach(item => {
       dates.push(item.date);
       prices.push(item.close);
       volumes.push(item.volume || 0);
     });
 
-    // Find 10-year price range for normalization
     const allPrices = referenceData.map(item => item.close);
     const minPrice = Math.min(...allPrices);
     const maxPrice = Math.max(...allPrices);
     const priceRange = maxPrice - minPrice;
-    
-    // Calculate DPO
+
     const dpoValues: number[] = [];
     const sma: number[] = calculateSMA(closePrices, DPO_PERIOD);
-    
-    // DPO = Close Price - SMA shifted (period/2 + 1) bars into the past
+
     for (let i = 0; i < closePrices.length; i++) {
       const lookbackIndex = i - Math.floor(DPO_PERIOD / 2 + 1);
       if (lookbackIndex >= 0 && lookbackIndex < sma.length) {
-        // Calculate DPO and normalize it by price range
         const dpo = closePrices[i] - sma[lookbackIndex];
-        const normalizedDpo = (dpo / priceRange) * 100; // Normalize as percentage of the 10-year range
+        const normalizedDpo = (dpo / priceRange) * 100;
         dpoValues.push(normalizedDpo);
       } else {
-        dpoValues.push(0); // Not enough data for DPO calculation
+        dpoValues.push(0);
       }
     }
-    
-    // Calculate Bollinger Bands for the DPO (200-period)
-    const { 
-      sma: dpoSMA, 
-      upperBand1, 
-      lowerBand1, 
-      upperBand2, 
-      lowerBand2 
+
+    const {
+      sma: dpoSMA,
+      upperBand1,
+      lowerBand1,
+      upperBand2,
+      lowerBand2
     } = calculateBollingerBands(dpoValues, BOLLINGER_PERIOD, STD_DEV_1, STD_DEV_2);
-    
-    return { 
-      dates, 
-      prices, 
-      volumes, 
-      dpoValues, 
-      dpoSMA, 
-      upperBand1, 
-      lowerBand1, 
-      upperBand2, 
-      lowerBand2 
+
+    return {
+      dates,
+      prices,
+      volumes,
+      dpoValues,
+      dpoSMA,
+      upperBand1,
+      lowerBand1,
+      upperBand2,
+      lowerBand2
     };
   };
 
-  // Calculate Simple Moving Average
   const calculateSMA = (data: number[], period: number): number[] => {
     const result: number[] = [];
-    
+
     for (let i = 0; i < data.length; i++) {
       if (i < period - 1) {
-        result.push(0); // Not enough data for full period
+        result.push(0);
         continue;
       }
-      
+
       let sum = 0;
       for (let j = 0; j < period; j++) {
         sum += data[i - j];
       }
-      
+
       result.push(sum / period);
     }
-    
+
     return result;
   };
 
-  // Calculate Bollinger Bands
   const calculateBollingerBands = (data: number[], period: number, stdDev1: number, stdDev2: number) => {
     const sma = calculateSMA(data, period);
     const upperBand1: number[] = [];
     const lowerBand1: number[] = [];
     const upperBand2: number[] = [];
     const lowerBand2: number[] = [];
-    
+
     for (let i = 0; i < data.length; i++) {
       if (i < period - 1) {
         upperBand1.push(0);
@@ -635,28 +610,25 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
         lowerBand2.push(0);
         continue;
       }
-      
-      // Calculate standard deviation
+
       let sumSquaredDiff = 0;
       for (let j = 0; j < period; j++) {
         const diff = data[i - j] - sma[i];
         sumSquaredDiff += diff * diff;
       }
       const stdDevValue = Math.sqrt(sumSquaredDiff / period);
-      
-      // Calculate bands
+
       upperBand1.push(sma[i] + stdDevValue * stdDev1);
       lowerBand1.push(sma[i] - stdDevValue * stdDev1);
       upperBand2.push(sma[i] + stdDevValue * stdDev2);
       lowerBand2.push(sma[i] - stdDevValue * stdDev2);
     }
-    
+
     return { sma, upperBand1, lowerBand1, upperBand2, lowerBand2 };
   };
 
   const handleDownload = () => {
     if (priceChartRef.current && dpoChartRef.current) {
-      // Create a composite image from both canvases
       const link = document.createElement('a');
       link.download = `advanced-dpo-${symbol}-${activePeriod}.png`;
       link.href = priceChartRef.current.toDataURL('image/png');
@@ -677,79 +649,87 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
   };
 
   return (
-    <div className={styles.chartCard}>
-      <div className={styles.chartHeader}>
-        <h2>Advanced DPO - {symbol}</h2>
-        <div className={styles.chartControls}>
-          <div className={styles.periodSelector}>
-            {['6m', '1y', '2y', '5y', '10y'].map(period => (
-              <button 
-                key={period}
-                className={`${styles.periodButton} ${activePeriod === period ? styles.periodButtonActive : ''}`}
-                onClick={() => setActivePeriod(period)}
-              >
-                {period.toUpperCase()}
-              </button>
-            ))}
+    <>
+      <div className={styles.chartCard}>
+        <div className={styles.chartHeader}>
+          <h2>Advanced DPO - {symbol}</h2>
+          <div className={styles.chartControls}>
+            <div className={styles.periodSelector}>
+              {['6m', '1y', '2y', '5y', '10y'].map(period => (
+                <button
+                  key={period}
+                  className={`${styles.periodButton} ${activePeriod === period ? styles.periodButtonActive : ''}`}
+                  onClick={() => setActivePeriod(period)}
+                >
+                  {period.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <button
+              className={styles.modernIconButton}
+              onClick={toggleInfoDisplay}
+              title="Show indicator information"
+            >
+              <FaQuestion />
+            </button>
           </div>
-          <button 
-            className={styles.modernIconButton} 
-            onClick={toggleInfoDisplay}
-            title="Show indicator information"
-          >
-            <FaQuestion />
-          </button>
         </div>
-      </div>
-      
-      {showInfo && (
-        <div className={styles.helpContent}>
-          <h3>About Advanced DPO Indicator</h3>
-          <p>
-            The proprietary indicator 'Forecaster Advanced DPO' allows you to tell, at a glance, whether a financial instrument is over or undervalued compared to its historical series. It combines the DPO indicator (Detrended Price Oscillator) with an algorithm that normalizes the DPO figure based on the 10-year price range.
-          </p>
-          
-          <p><strong>How To Use This Indicator:</strong></p>
-          <p>
-            The Advanced DPO with Bollinger Bands creates four different zones that correspond to various market phases:
-          </p>
-          <ul>
-            <li><strong>GREEN (Below Lower 2σ Band):</strong> Strong Buy - The asset is significantly undervalued.</li>
-            <li><strong>BLUE (Between Lower 1σ and 2σ):</strong> Buy - The asset is moderately undervalued.</li>
-            <li><strong>BLUE (Between Upper and Lower 1σ):</strong> Hold - The asset is fairly valued.</li>
-            <li><strong>ORANGE (Between Upper 1σ and 2σ):</strong> Sell - The asset is moderately overvalued.</li>
-            <li><strong>RED (Above Upper 2σ Band):</strong> Strong Sell - The asset is significantly overvalued.</li>
-          </ul>
-          
-          <p><strong>Investing Strategy:</strong></p>
-          <p>
-            Although this indicator provides timely information, particularly regarding possible purchase points, it is always better to use it in synergy with seasonality analysis. If a financial instrument is in the Strong Buy or Buy zone and the seasonality signals a favorable period for purchase, the chances that the trading/investment operation will be profitable rise significantly.
-          </p>
-        </div>
-      )}
 
-      <p className={styles.description}>
-        The proprietary indicator 'Forecaster Advanced DPO' allows you to tell, at a glance, whether a financial instrument is over or undervalued compared to its historical series.
-      </p>
+        {showInfo && (
+          <div className={styles.helpContent}>
+            <h3>About Advanced DPO Indicator</h3>
+            <p>
+              The proprietary indicator 'Forecaster Advanced DPO' allows you to tell, at a glance, whether a financial instrument is over or undervalued compared to its historical series. It combines the DPO indicator (Detrended Price Oscillator) with an algorithm that normalizes the DPO figure based on the 10-year price range.
+            </p>
 
-      <div className={styles.chartContainer}>
-        <canvas ref={priceChartRef} />
-        {loading && (
-          <div className={styles.loadingOverlay}>
-            <CircularProgress />
+            <p><strong>How To Use This Indicator:</strong></p>
+            <p>
+              The Advanced DPO with Bollinger Bands creates four different zones that correspond to various market phases:
+            </p>
+            <ul>
+              <li><strong>GREEN (Below Lower 2σ Band):</strong> Strong Buy - The asset is significantly undervalued.</li>
+              <li><strong>BLUE (Between Lower 1σ and 2σ):</strong> Buy - The asset is moderately undervalued.</li>
+              <li><strong>BLUE (Between Upper and Lower 1σ):</strong> Hold - The asset is fairly valued.</li>
+              <li><strong>ORANGE (Between Upper 1σ and 2σ):</strong> Sell - The asset is moderately overvalued.</li>
+              <li><strong>RED (Above Upper 2σ Band):</strong> Strong Sell - The asset is significantly overvalued.</li>
+            </ul>
+
+            <p><strong>Investing Strategy:</strong></p>
+            <p>
+              Although this indicator provides timely information, particularly regarding possible purchase points, it is always better to use it in synergy with seasonality analysis. If a financial instrument is in the Strong Buy or Buy zone and the seasonality signals a favorable period for purchase, the chances that the trading/investment operation will be profitable rise significantly.
+            </p>
           </div>
         )}
+
+        <p className={styles.description}>
+          The proprietary indicator 'Forecaster Advanced DPO' allows you to tell, at a glance, whether a financial instrument is over or undervalued compared to its historical series.
+        </p>
+
+        <div className={styles.chartContainer}>
+          <canvas ref={priceChartRef} />
+          {loading && (
+            <div className={styles.loadingOverlay}>
+              <CircularProgress />
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className={styles.indicatorContainer}>
-        <canvas ref={dpoChartRef} />
-        {loading && (
-          <div className={styles.loadingOverlay}>
-            <CircularProgress />
-          </div>
-        )}
+      <div className={styles.chartCard}>
+        <div className={styles.chartHeader}>
+          <h2>Forecaster Advanced DPO Indicator - {symbol}</h2>
+        </div>
+
+        <div className={styles.indicatorContainer}>
+          <canvas ref={dpoChartRef} />
+          {loading && (
+            <div className={styles.loadingOverlay}>
+              <CircularProgress />
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
