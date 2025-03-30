@@ -280,15 +280,6 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                   boxHeight: 8,
                 }
               },
-              title: {
-                display: true,
-                text: `${symbol} Price & Volume`,
-                font: {
-                  size: 16,
-                  weight: 'bold',
-                },
-                padding: { top: 10, bottom: 20 }
-              },
               tooltip: {
                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                 titleColor: '#333',
@@ -463,15 +454,6 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                   boxHeight: 8,
                 }
               },
-              title: {
-                display: true,
-                text: 'Forecaster Advanced DPO',
-                font: {
-                  size: 16,
-                  weight: 'bold',
-                },
-                padding: { top: 10, bottom: 20 }
-              },
               tooltip: {
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
                 titleColor: '#333',
@@ -627,23 +609,6 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
     return { sma, upperBand1, lowerBand1, upperBand2, lowerBand2 };
   };
 
-  const handleDownload = () => {
-    if (priceChartRef.current && dpoChartRef.current) {
-      const link = document.createElement('a');
-      link.download = `advanced-dpo-${symbol}-${activePeriod}.png`;
-      link.href = priceChartRef.current.toDataURL('image/png');
-      link.click();
-    }
-  };
-
-  const handleFullscreen = () => {
-    if (priceChartRef.current) {
-      if (priceChartRef.current.requestFullscreen) {
-        priceChartRef.current.requestFullscreen();
-      }
-    }
-  };
-
   const toggleInfoDisplay = () => {
     setShowInfo(!showInfo);
   };
@@ -701,9 +666,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
           </div>
         )}
 
-        <p className={styles.description}>
-          The proprietary indicator 'Forecaster Advanced DPO' allows you to tell, at a glance, whether a financial instrument is over or undervalued compared to its historical series.
-        </p>
+
 
         <div className={styles.chartContainer}>
           <canvas ref={priceChartRef} />
