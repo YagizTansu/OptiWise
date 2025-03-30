@@ -1088,7 +1088,7 @@ export async function fetchTimeAverageReturns(
     // Format dates for API
     const period1 = startDate.toISOString();
     const period2 = endDate.toISOString();
-    debugger
+    
     const params = {
       symbol,
       period1,
@@ -1481,7 +1481,7 @@ export async function fetchSeasonalityData(
       // Format dates for chart API
       const period1 = from.toISOString();
       const period2 = to.toISOString();
-      debugger
+      
       const params = {
         symbol,
         period1,

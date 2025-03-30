@@ -309,7 +309,6 @@ export default function Features() {
           <p>Access the power of AI-driven market intelligence with OptiWise</p>
           <div className={styles.ctaButtons}>
             <button className={styles.primaryBtn}>Start Free Trial</button>
-            <button className={styles.secondaryBtn}>Schedule a Demo</button>
           </div>
         </section>
       </div>

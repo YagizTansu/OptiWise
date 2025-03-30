@@ -284,7 +284,6 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                     years: period.years 
                   };
               
-                debugger
               const allData = await fetchSeasonalityData(
                 symbol,
                 activeTimeframe,
