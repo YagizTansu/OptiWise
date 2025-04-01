@@ -216,7 +216,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                   dash: [4, 4],
                 },
                 title: {
-                  display: true,
+                  display: false,
                   text: 'Price',
                   font: {
                     size: 12,
@@ -244,7 +244,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                   dash: [4, 4],
                 },
                 title: {
-                  display: true,
+                  display: false,
                   text: 'Volume',
                   font: {
                     size: 12,
@@ -617,7 +617,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
     <>
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2>Advanced DPO - {symbol}</h2>
+          <h2>Price/Volume chart - {symbol}</h2>
           <div className={styles.chartControls}>
             <div className={styles.periodSelector}>
               {['6m', '1y', '2y', '5y', '10y'].map(period => (
@@ -680,7 +680,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
 
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2>Forecaster Advanced DPO Indicator - {symbol}</h2>
+          <h2>Advanced DPO Indicator - {symbol}</h2>
         </div>
 
         <div className={styles.indicatorContainer}>
