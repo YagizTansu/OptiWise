@@ -23,15 +23,6 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-.modernCardHeader h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #1e293b;
-  display: flex;
-  align-items: center;
-}
 
 .cardTitleIcon {
   background-color: #dbeafe;

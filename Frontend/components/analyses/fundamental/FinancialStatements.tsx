@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from '../../../styles/fundamental/FinancialStatements.module.css';
-import { FaQuestionCircle, FaChartLine, FaBalanceScale, FaMoneyBillWave, FaRegCalendarAlt, FaRegCalendar, FaInfoCircle } from 'react-icons/fa';
+import { FaChartLine, FaBalanceScale, FaMoneyBillWave, FaRegCalendarAlt, FaRegCalendar, FaInfoCircle } from 'react-icons/fa';
 import { fetchFundamentalsTimeSeries } from '../../../services/api/finance';
 
 // Financial statement data types
@@ -209,16 +209,6 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
     return processedData;
   };
   
-  // Helper function to determine class name for values (positive or negative)
-  const getValueClassName = (value: number | string, isChangeColumn: boolean = false): string => {
-    if (value === '-' || typeof value !== 'number') return '';
-    // Only apply color styling if this is the change column
-    if (isChangeColumn) {
-      return value < 0 ? styles.negative : styles.positive;
-    }
-    return ''; // Return empty string for non-change columns
-  };
-  
   // Get the current dataset based on the active tab
   const getCurrentData = () => {
     switch (activeTab) {
@@ -303,16 +293,12 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
     <div className={styles.financialStatementCard}>
       <div className={styles.modernCardHeader}>
         <h3>
-          {icon}
-          {title} - {symbol}
+          {title}
           <span 
             className={styles.infoButtonContainer}
             onMouseEnter={(e) => handleInfoIconHover(e, statementDescriptions[activeTab])}
             onMouseLeave={handleInfoIconLeave}
           >
-            <button className={styles.infoButton}>
-              <FaInfoCircle className={styles.infoIcon} />
-            </button>
           </span>
         </h3>
         

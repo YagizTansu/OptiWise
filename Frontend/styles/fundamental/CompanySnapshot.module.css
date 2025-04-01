@@ -1,6 +1,4 @@
 .analysisCard {
-  flex: 1;
-  min-width: 600px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -8,33 +6,25 @@
   margin-top: 1%;
 }
 
-.seasonalityHeader {
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  width: 100%;
-  margin-bottom: 24px;
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.seasonalityHeader h3 {
-  font-size: 1.25rem;
+.cardHeader h3 {
+  font-size: 1.1rem;
   margin: 0;
   color: #333;
-}
-
-.chartControls {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
 }
 
 .modernIconButton {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background-color: #f5f5f5;
   color: #666;
@@ -46,95 +36,52 @@
 .modernIconButton:hover {
   background-color: #eeeeee;
   color: #333;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .sectionDescription {
   color: #64748b;
-  margin-top: -8px;
-  margin-bottom: 20px;
-  font-size: 1rem;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
 }
 
-.companySnapshotGrid {
+.metricsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
 }
 
-.snapshotMetricCard {
-  background-color: #f8fafc;
-  border-radius: 10px;
-  padding: 22px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
-}
-
-.snapshotMetricCard:hover {
-  transform: translateY(-4px);
-}
-
-.snapshotMetricCard h4 {
-  margin-top: 0;
-  margin-bottom: 18px;
-  font-size: 1.1rem;
-  color: #334155;
-  font-weight: 600;
+.metricCard {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .metricHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  position: relative;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
 }
 
-.progressBarContainer {
-  margin-bottom: 12px;
-}
-
-.progressBarLabel {
-  margin-bottom: 8px;
+.metricValue {
   font-weight: 600;
-  color: #334155;
-  display: block;
-  font-size: 1.15rem;
+  font-size: 1rem;
 }
 
 .progressBar {
-  height: 10px;
+  height: 8px;
   background-color: #e2e8f0;
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
-  margin-top: 8px;
 }
 
 .progressBarFill {
   height: 100%;
   background-color: #3b82f6;
-  border-radius: 5px;
+  border-radius: 4px;
   transition: width 0.5s ease;
-}
-
-.sectorMarker {
-  position: absolute;
-  width: 2px;
-  height: 20px;
-  background-color: #334155;
-  transform: translateY(-5px);
-}
-
-.sectorCompare {
-  margin-top: 12px;
-  font-size: 0.95rem;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.comparisonLabel {
-  margin-right: 5px;
 }
 
 .positive {
@@ -145,7 +92,7 @@
   color: #ef4444;
 }
 
-/* Modal styles for info popup */
+/* Modal styles */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -163,15 +110,13 @@
 .modalContent {
   background-color: white;
   border-radius: 8px;
-  max-width: 600px;
+  max-width: 500px;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 .modalHeader {
-  padding: 15px 20px;
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -180,199 +125,37 @@
 
 .modalHeader h3 {
   margin: 0;
-  font-size: 20px;
-  color: #333;
+  font-size: 1rem;
 }
 
-.closeButton {
+.modalHeader button {
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
   color: #666;
 }
 
 .modalBody {
-  padding: 20px;
-}
-
-.modalFooter {
-  padding: 15px 20px;
-  border-top: 1px solid #eaeaea;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.applyButton {
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.applyButton:hover {
-  background-color: #0069d9;
-}
-
-/* Info Button Styling */
-.infoButtonContainer {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.infoButton {
-  background: rgba(59, 130, 246, 0.08);
-  border: none;
-  color: #3b82f6;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  border-radius: 50%;
-  transition: all 0.2s ease;
-  padding: 0;
-  margin-left: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.infoButton:hover {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: #2563eb;
-  transform: translateY(1px);
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-}
-
-.infoIcon {
-  font-size: 12px;
-  line-height: 1;
-  font-weight: bold;
-}
-
-.infoTooltip {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: -8px;
-  width: 280px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  padding: 14px;
-  z-index: 100;
-  font-size: 0.9rem;
-  color: #334155;
-  text-align: left;
-  transform-origin: top right;
-  animation: tooltipFadeIn 0.2s ease;
-}
-
-.infoTooltip::before {
-  content: '';
-  position: absolute;
-  top: -6px;
-  right: 12px;
-  width: 12px;
-  height: 12px;
-  background-color: #ffffff;
-  border-left: 1px solid #e2e8f0;
-  border-top: 1px solid #e2e8f0;
-  transform: rotate(45deg);
-}
-
-.tooltipTitle {
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 8px;
-  font-size: 1rem;
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 6px;
-}
-
-.tooltipContent {
-  line-height: 1.6;
-  color: #475569;
+  padding: 16px;
   font-size: 0.9rem;
 }
 
-/* Loading and error states */
-.loadingContainer {
+.loadingContainer, .errorContainer {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 300px;
+  align-items: center;
+  height: 150px;
   color: #666;
 }
 
-.loadingSpinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top-color: #0066cc;
-  animation: spin 1s ease-in-out infinite;
-  margin-bottom: 10px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes tooltipFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .errorContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
   color: #d32f2f;
 }
 
-.errorIcon {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-/* Responsive adjustments */
+/* Responsive adjustment */
 @media (max-width: 768px) {
-  .companySnapshotGrid {
+  .metricsGrid {
     grid-template-columns: 1fr;
-  }
-  
-  .infoTooltip {
-    width: 240px;
-    right: -10px;
-  }
-  
-  .infoTooltip::before {
-    right: 14px;
-  }
-}
-
-@media (max-width: 576px) {
-  .infoTooltip {
-    width: 220px;
-  }
-  
-  .infoTooltip {
-    max-width: calc(100vw - 40px);
   }
 }
