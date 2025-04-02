@@ -83,7 +83,7 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
     try {
       // Get historical free cash flows (most recent 5 years if available)
       const freeCashFlows = financialData
-        .filter(data => data.freeCashFlow)
+        .filter(data => data.freeCashFlow !== undefined && data.freeCashFlow !== null)
         .slice(0, 5)
         .map(data => data.freeCashFlow);
 
@@ -93,21 +93,33 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
         return;
       }
 
-      // Calculate average growth rate from historical FCF
+      // Calculate average growth rate from historical FCF (corrected calculation)
       let growthRates: number[] = [];
+      let validGrowthRateCount = 0;
+
       for (let i = 0; i < freeCashFlows.length - 1; i++) {
-        const growth = (freeCashFlows[i] - freeCashFlows[i + 1]) / freeCashFlows[i + 1];
+        const current = freeCashFlows[i];
+        const previous = freeCashFlows[i + 1];
+
+        // Skip negative or zero previous cash flows to avoid misleading growth rates
+        if (previous <= 0) continue;
+
+        const growth = (current - previous) / previous;
         growthRates.push(growth);
+        validGrowthRateCount++;
       }
 
       // Average historical growth rate (cap at reasonable values)
-      const avgGrowthRate = Math.min(
-        Math.max(
-          growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length,
-          0.03 // Minimum 3% growth
-        ),
-        0.15 // Maximum 15% growth
-      );
+      // Use valid growth rates only, default to minimum if no valid rates
+      const avgGrowthRate = validGrowthRateCount > 0
+        ? Math.min(
+            Math.max(
+              growthRates.reduce((sum, rate) => sum + rate, 0) / validGrowthRateCount,
+              0.03 // Minimum 3% growth
+            ),
+            0.15 // Maximum 15% growth
+          )
+        : 0.03; // Default to minimum if no valid growth rates
 
       // DCF assumptions
       const discountRate = 0.10; // 10% discount rate (WACC estimate)
@@ -117,22 +129,24 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
         dashboardData.defaultKeyStatistics?.sharesOutstanding ||
         dashboardData.price?.marketCap / currentPrice;
 
-      // Most recent free cash flow
-      const baseFCF = freeCashFlows[0];
+      // Most recent free cash flow (use absolute value if negative for projection base)
+      const mostRecentFCF = freeCashFlows[0];
+      const baseFCF = mostRecentFCF < 0 ? Math.abs(mostRecentFCF) * 0.5 : mostRecentFCF;
 
-      // Project future free cash flows
+      // Project future free cash flows with improved method
       let projectedFCF = [];
       for (let year = 1; year <= projectionYears; year++) {
         projectedFCF.push(baseFCF * Math.pow(1 + avgGrowthRate, year));
       }
 
-      // Calculate present value of projected FCFs
+      // Calculate present value of projected FCFs (DCF formula)
       let presentValueFCF = 0;
       projectedFCF.forEach((fcf, index) => {
         presentValueFCF += fcf / Math.pow(1 + discountRate, index + 1);
       });
 
-      // Calculate terminal value (Gordon Growth Model)
+      // Calculate terminal value using Gordon Growth Model
+      // TV = FCF in final year × (1 + g) / (r - g)
       const terminalValue =
         (projectedFCF[projectionYears - 1] * (1 + terminalGrowthRate)) /
         (discountRate - terminalGrowthRate);
@@ -144,7 +158,7 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
       // Enterprise value = PV of FCF + PV of terminal value
       const enterpriseValue = presentValueFCF + presentValueTerminal;
 
-      // Adjust for cash and debt
+      // Adjust for cash and debt to get equity value
       const cash = financialData[0]?.cashAndCashEquivalents || 0;
       const debt = financialData[0]?.totalDebt || 0;
       const equityValue = enterpriseValue + cash - debt;
@@ -163,7 +177,8 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
           growthRate: avgGrowthRate,
           discountRate,
           terminalGrowthRate,
-          projectionYears
+          projectionYears,
+          baseFreeCashFlow: baseFCF
         }
       }));
     } catch (error) {
@@ -203,23 +218,12 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
         0.25 // Maximum 25% growth
       );
 
-      // Get most recent EPS
+      // Get most recent EPS (TTM EPS)
       const currentEPS = epsData[0];
 
-      // Calculate Peter Lynch "fair" P/E ratio (Growth × 2)
-      // For slow growers (< 10%), use different formula
-      let fairPE;
-      if (avgGrowthRate < 0.1) {
-        // Slow grower: dividend yield + growth rate
-        const dividendYield = dashboardData.summaryDetail?.dividendYield || 0.01;
-        fairPE = (dividendYield + avgGrowthRate) * 8; // Multiple of 8 for stability
-      } else {
-        // Fast grower: Growth rate × 2
-        fairPE = avgGrowthRate * 100 * 2; // Convert decimal growth to percentage
-      }
-
-      // Lynch Fair Value = EPS × Fair P/E
-      const fairValue = currentEPS * fairPE;
+      // Use Peter Lynch's simple formula: Fair Value = Growth Rate (as %) x TTM EPS
+      const growthRatePercent = avgGrowthRate * 100; // Convert to percentage
+      const fairValue = growthRatePercent * currentEPS;
 
       // Store results
       setLynchValue(fairValue);
@@ -230,8 +234,9 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
         ...prev,
         lynch: {
           growthRate: avgGrowthRate,
-          fairPE,
-          currentEPS
+          growthRatePercent: growthRatePercent,
+          currentEPS,
+          formula: "Growth Rate (%) × TTM EPS"
         }
       }));
     } catch (error) {
@@ -255,19 +260,36 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
 
       // Calculate NOPAT (Net Operating Profit After Taxes)
       const operatingIncome = recentData.operatingIncome;
-      const taxRate = recentData.taxRateForCalcs || 0.21; // Default to 21% if not available
+      if (operatingIncome === undefined || operatingIncome === null) {
+        setEvaValue(null);
+        setEvaUpside(null);
+        return;
+      }
+      
+      // Get effective tax rate or use default
+      const taxRate = recentData.taxRateForCalcs || 
+                      (recentData.incomeTaxExpense && recentData.incomeBeforeTax ? 
+                       recentData.incomeTaxExpense / recentData.incomeBeforeTax : 0.21);
+      
       const nopat = operatingIncome * (1 - taxRate);
 
-      // Get invested capital
-      const investedCapital = recentData.investedCapital;
-      if (!investedCapital) {
+      // Calculate Invested Capital properly: Equity + Debt - Cash
+      const equityCapital = recentData.stockholdersEquity || 0;
+      const totalDebt = recentData.totalDebt || 0;
+      const cashAndEquivalents = recentData.cashAndCashEquivalents || 0;
+      
+      const investedCapital = equityCapital + totalDebt - cashAndEquivalents;
+      
+      if (investedCapital <= 0) {
         setEvaValue(null);
         setEvaUpside(null);
         return;
       }
 
+      // Calculate ROIC (Return on Invested Capital)
+      const roic = nopat / investedCapital;
+
       // Determine WACC (Weighted Average Cost of Capital)
-      // We'll use a simplified approach based on beta
       const beta = dashboardData.defaultKeyStatistics?.beta || 1;
       const riskFreeRate = 0.04; // 4% assumption for risk-free rate
       const marketRiskPremium = 0.05; // 5% assumption for market risk premium
@@ -275,40 +297,60 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
       // Capital Asset Pricing Model (CAPM) for cost of equity
       const costOfEquity = riskFreeRate + beta * marketRiskPremium;
 
-      // Cost of debt (simplified)
-      const costOfDebt = 0.05; // 5% assumption
+      // Cost of debt (using actual interest expense if available, otherwise estimate)
+      const interestExpense = recentData.interestExpense || 0;
+      const costOfDebt = totalDebt > 0 ? 
+                         (interestExpense / totalDebt) || 0.05 : 
+                         0.05; // 5% default assumption
 
-      // Debt and equity in capital structure
-      const totalDebt = recentData.totalDebt || 0;
-      const marketCap = dashboardData.price?.marketCap;
+      // Market values for capital structure
+      const marketCap = dashboardData.price?.marketCap || equityCapital;
       const totalCapital = totalDebt + marketCap;
+      
+      // Avoid division by zero
+      if (totalCapital <= 0) {
+        setEvaValue(null);
+        setEvaUpside(null);
+        return;
+      }
+      
       const debtWeighting = totalDebt / totalCapital;
       const equityWeighting = marketCap / totalCapital;
 
-      // Calculate WACC
-      const wacc =
-        costOfDebt * (1 - taxRate) * debtWeighting + costOfEquity * equityWeighting;
+      // Calculate WACC using the formula: (E/V × Re) + (D/V × Rd × (1 - Tc))
+      const wacc = (equityWeighting * costOfEquity) + 
+                   (debtWeighting * costOfDebt * (1 - taxRate));
 
-      // Calculate EVA
-      const eva = nopat - investedCapital * wacc;
+      // Calculate EVA = NOPAT - (Invested Capital × WACC)
+      const eva = nopat - (investedCapital * wacc);
 
       // Calculate EVA per share
       const sharesOutstanding =
         dashboardData.defaultKeyStatistics?.sharesOutstanding ||
-        dashboardData.price?.marketCap / currentPrice;
+        (dashboardData.price?.marketCap && currentPrice ? 
+         dashboardData.price.marketCap / currentPrice : 0);
+        
+      if (sharesOutstanding <= 0) {
+        setEvaValue(null);
+        setEvaUpside(null);
+        return;
+      }
+      
       const evaPerShare = eva / sharesOutstanding;
 
-      // Estimate fair value by adding EVA/share to book value/share
+      // Estimate fair value by adding EVA contribution to book value
       const bookValuePerShare =
         dashboardData.defaultKeyStatistics?.bookValue ||
-        recentData.stockholdersEquity / sharesOutstanding;
+        (recentData.stockholdersEquity ? recentData.stockholdersEquity / sharesOutstanding : 0);
 
       // Fair value approximation - base on book value plus EVA contribution
-      const evaFairValue = bookValuePerShare + evaPerShare * 10; // 10x multiplier on EVA
+      // Use higher multiple for positive EVA, lower for negative
+      const evaMultiplier = evaPerShare > 0 ? 10 : 5;
+      const evaFairValue = bookValuePerShare + (evaPerShare * evaMultiplier);
 
       // Store results
-      setEvaValue(evaFairValue);
-      setEvaUpside(((evaFairValue - currentPrice) / currentPrice) * 100);
+      setEvaValue(evaFairValue > 0 ? evaFairValue : null);
+      setEvaUpside(evaFairValue > 0 ? ((evaFairValue - currentPrice) / currentPrice) * 100 : null);
 
       // Store assumptions
       setAssumptions((prev: any) => ({
@@ -316,8 +358,11 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
         eva: {
           nopat,
           wacc,
+          roic,
           investedCapital,
-          bookValuePerShare
+          bookValuePerShare,
+          evaPerShare,
+          spreadROICWACC: roic - wacc
         }
       }));
     } catch (error) {
@@ -454,7 +499,7 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
                 <h5 className={styles.cardTitle}>Peter Lynch Valuation</h5>
                 <Tooltip
                   title="Lynch Valuation"
-                  content="Based on earnings growth rate × PE ratio"
+                  content="Based on earnings growth rate × TTM EPS"
                 />
               </div>
               <div className={styles.valuationValue}>{formatCurrency(lynchValue)}</div>
@@ -632,8 +677,7 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
         <div className={styles.detailsContainer}>
           <h4 className={styles.sectionTitle}>Peter Lynch Valuation</h4>
           <p>
-            The Peter Lynch approach compares P/E ratio to growth rate, suggesting fair
-            value when they are roughly equal.
+            The Peter Lynch approach values a company based on its earnings growth rate multiplied by its current earnings per share.
           </p>
 
           <div className={styles.divider}></div>
@@ -656,9 +700,9 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
                 </span>
               </div>
               <div className={styles.cardRow}>
-                <span className={styles.cardLabel}>Fair P/E Ratio:</span>
+                <span className={styles.cardLabel}>Formula Used:</span>
                 <span className={styles.cardValue}>
-                  {formatValue(assumptions?.lynch?.fairPE)}
+                  {assumptions?.lynch?.formula || 'Growth Rate (%) × TTM EPS'}
                 </span>
               </div>
               <div className={styles.cardRow}>
@@ -752,11 +796,35 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
                 </span>
               </div>
               <div className={styles.cardRow}>
+                <span className={styles.cardLabel}>Return on Invested Capital (ROIC):</span>
+                <span className={styles.cardValue}>
+                  {assumptions?.eva?.roic
+                    ? formatPercentage(assumptions.eva.roic * 100)
+                    : 'N/A'}
+                </span>
+              </div>
+              <div className={styles.cardRow}>
                 <span className={styles.cardLabel}>Cost of Capital (WACC):</span>
                 <span className={styles.cardValue}>
                   {assumptions?.eva?.wacc
                     ? formatPercentage(assumptions.eva.wacc * 100)
                     : 'N/A'}
+                </span>
+              </div>
+              <div className={styles.cardRow}>
+                <span className={styles.cardLabel}>ROIC - WACC Spread:</span>
+                <span className={`${styles.cardValue} ${
+                  assumptions?.eva?.spreadROICWACC > 0 ? styles.positive : styles.negative
+                }`}>
+                  {assumptions?.eva?.spreadROICWACC
+                    ? formatPercentage(assumptions.eva.spreadROICWACC * 100)
+                    : 'N/A'}
+                </span>
+              </div>
+              <div className={styles.cardRow}>
+                <span className={styles.cardLabel}>EVA Per Share:</span>
+                <span className={styles.cardValue}>
+                  {formatCurrency(assumptions?.eva?.evaPerShare)}
                 </span>
               </div>
               <div className={styles.cardRow}>
@@ -766,7 +834,7 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
                 </span>
               </div>
             </div>
-
+            
             <div className={styles.resultCard}>
               <h5 className={styles.cardTitle}>EVA Valuation Result</h5>
               <div className={styles.resultValue}>{formatCurrency(evaValue)}</div>
