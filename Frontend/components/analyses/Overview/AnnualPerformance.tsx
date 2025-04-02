@@ -212,7 +212,7 @@ const AnnualPerformance: React.FC<AnnualPerformanceProps> = ({ symbol }) => {
                       color: 'rgba(200, 200, 200, 0.1)'
                     },
                     title: {
-                      display: !isMobile,
+                      display: false,
                       text: 'Annual Return (%)',
                       font: {
                         size: isMobile ? 12 : 14,

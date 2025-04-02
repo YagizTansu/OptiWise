@@ -258,7 +258,7 @@ const Dividends: React.FC<DividendsProps> = ({ symbol }) => {
                       }
                     },
                     title: {
-                      display: window.innerWidth > 768, // Hide title on small screens
+                      display: false, // Hide title on small screens
                       text: `Dividend Amount (${getCurrencySymbol(currency)})`
                     }
                   },

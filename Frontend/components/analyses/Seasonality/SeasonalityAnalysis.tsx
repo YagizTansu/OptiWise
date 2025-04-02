@@ -126,7 +126,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
           }
         },
         title: {
-          display: true,
+          display: false,
           text: 'Percent Change (%)',
           font: {
             size: 14,

@@ -63,7 +63,7 @@ const TimeAverageReturns: React.FC<TimeAverageReturnsProps> = ({ symbol }) => {
     scales: {
       y: {
         title: {
-          display: true,
+          display: false,
           text: 'Return %'
         }
       }
