@@ -96,6 +96,44 @@ export class FinanceService implements OnModuleInit {
   }
 
   /**
+   * Helper method to retry API calls with exponential backoff
+   * @param operation - Function that returns a promise
+   * @param retries - Number of retries
+   * @param delay - Initial delay in ms
+   */
+  private async retryOperation<T>(
+    operation: () => Promise<T>, 
+    retries = 3, 
+    delay = 1000,
+    operationName = 'Yahoo Finance operation'
+  ): Promise<T> {
+    try {
+      return await operation();
+    } catch (error) {
+      if (
+        retries > 0 && 
+        error.message && 
+        (error.message.includes('collectConsentSubmitResponse') || 
+         error.message.includes('Location header') ||
+         error.message.includes('429')) // Rate limit error
+      ) {
+        this.logger.warn(
+          `Yahoo Finance API consent error. Retrying ${operationName} in ${delay}ms. Retries left: ${retries}`
+        );
+        
+        // Wait before retrying with exponential backoff
+        await new Promise(resolve => setTimeout(resolve, delay));
+        
+        // Retry with increased delay (exponential backoff)
+        return this.retryOperation(operation, retries - 1, delay * 2, operationName);
+      }
+      
+      // If we're out of retries or it's not a consent error, rethrow
+      throw error;
+    }
+  }
+
+  /**
    * Search for symbols with advanced options
    */
   async searchSymbols(query: string, options: SearchOptions = {}) {
@@ -105,11 +143,16 @@ export class FinanceService implements OnModuleInit {
         options.quotesCount = 10;
       }
       
-      const result = await yahooFinance.search(query, options);
-      return result.quotes;
+      return await this.retryOperation(
+        () => yahooFinance.search(query, options).then(result => result.quotes),
+        3,
+        1000,
+        `searchSymbols for "${query}"`
+      );
     } catch (error) {
       this.logger.error(`Failed to search for ${query}`, error);
-      throw error;
+      // Return empty array instead of throwing
+      return [];
     }
   }
 
@@ -125,12 +168,24 @@ export class FinanceService implements OnModuleInit {
    */
   async getQuote(symbol: string | string[], options: QuoteOptions = {}) {
     try {
-      // Type assertion to handle the type mismatch
-      return await yahooFinance.quote(symbol, options as any);
+      const symbolStr = Array.isArray(symbol) ? symbol.join(',') : symbol;
+      
+      return await this.retryOperation(
+        () => yahooFinance.quote(symbol, options as any),
+        3,
+        1000,
+        `getQuote for ${symbolStr}`
+      );
     } catch (error) {
       const symbolStr = Array.isArray(symbol) ? symbol.join(',') : symbol;
       this.logger.error(`Failed to fetch quote for ${symbolStr}`, error);
-      throw error;
+      
+      // Return empty data instead of throwing
+      if (Array.isArray(symbol)) {
+        return [];
+      } else {
+        return {};
+      }
     }
   }
 
@@ -210,15 +265,21 @@ export class FinanceService implements OnModuleInit {
         options.modules = ['price', 'summaryDetail'];
       }
       
-      // More aggressive type casting to bypass TypeScript checks
-      // This is necessary because the Yahoo Finance library's type definitions 
-      // may not perfectly match our string[] input
-      return await yahooFinance.quoteSummary(symbol, {
-        modules: options.modules
-      } as any);
+      return await this.retryOperation(
+        () => yahooFinance.quoteSummary(symbol, { modules: options.modules } as any),
+        3,
+        1000,
+        `getQuoteSummary for ${symbol}`
+      );
     } catch (error) {
       this.logger.error(`Failed to fetch quote summary for ${symbol}`, error);
-      throw error;
+      
+      // Return empty object with structure that won't break consumers
+      return { 
+        price: { regularMarketPrice: null },
+        summaryDetail: {},
+        defaultKeyStatistics: {}
+      };
     }
   }
 
@@ -242,17 +303,24 @@ export class FinanceService implements OnModuleInit {
         period1: options.period1,
         period2: options.period2 || new Date(),
         type: options.type || 'quarterly',
-        module: options.module, // This is now required in the interface
+        module: options.module,
         lang: options.lang || 'en-US',
         region: options.region || 'US',
         merge: options.merge !== undefined ? options.merge : false,
         padTimeSeries: options.padTimeSeries !== undefined ? options.padTimeSeries : false
       };
 
-      return await yahooFinance.fundamentalsTimeSeries(symbol, queryOptions);
+      return await this.retryOperation(
+        () => yahooFinance.fundamentalsTimeSeries(symbol, queryOptions),
+        3,
+        1000,
+        `getFundamentalsTimeSeries for ${symbol}`
+      );
     } catch (error) {
       this.logger.error(`Failed to fetch fundamentals time series for ${symbol}`, error);
-      throw error;
+      
+      // Return empty array instead of throwing
+      return [];
     }
   }
 

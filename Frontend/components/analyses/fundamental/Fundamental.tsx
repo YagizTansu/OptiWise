@@ -1,6 +1,5 @@
 import StockDashboard from './StockDashboard';
 import FinancialStatements from './FinancialStatements';
-import TechnicalAnalysis from './TechnicalAnalysis';
 import CompanySnapshot from './CompanySnapshot';
 import ValuationModels from './ValuationModels';
 
@@ -17,13 +16,12 @@ const Fundamental = ({ symbol }: FundamentalProps) => {
         <ValuationModels symbol={symbol} />
         
         {/* Technical Analysis Component */}
-        <TechnicalAnalysis symbol={symbol} />
-
-        {/* Company Snapshot Component */}
-        <CompanySnapshot symbol={symbol} />
 
         {/* Analysis Tools Component */}
         <FinancialStatements symbol={symbol} />
+
+        {/* Company Snapshot Component */}
+        <CompanySnapshot symbol={symbol} />
     </div>
   );
 };

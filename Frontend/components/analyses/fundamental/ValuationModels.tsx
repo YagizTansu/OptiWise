@@ -45,6 +45,19 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
         // Fetch stock dashboard data
         const dashboardResult = await fetchStockDashboardData(symbol);
 
+        // Handle potential API failures
+        if (!financialDataResult || financialDataResult.length === 0) {
+          setError('Failed to fetch financial data. This might be due to temporary issues with Yahoo Finance API.');
+          setLoading(false);
+          return;
+        }
+
+        if (!dashboardResult || Object.keys(dashboardResult).length === 0) {
+          setError('Failed to fetch stock data. This might be due to temporary issues with Yahoo Finance API.');
+          setLoading(false);
+          return;
+        }
+
         setFinancialData(financialDataResult);
         setDashboardData(dashboardResult);
 
@@ -53,7 +66,11 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
 
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch data. Please try again later.');
+        const errorMessage = err.message?.includes('collectConsentSubmitResponse') 
+          ? 'Yahoo Finance API is experiencing issues. Please try again later.'
+          : 'Failed to fetch data. Please try again later.';
+          
+        setError(errorMessage);
         setLoading(false);
         console.error('Error fetching valuation data:', err);
       }
@@ -190,9 +207,16 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
 
   const calculatePeterLynch = (financialData: any[], dashboardData: any, currentPrice: number) => {
     try {
+      // If no financial data or dashboard data, early return
+      if (!financialData?.length || !dashboardData) {
+        setLynchValue(null);
+        setLynchUpside(null);
+        return;
+      }
+      
       // Get EPS data (most recent 5 years if available)
       const epsData = financialData
-        .filter(data => data.dilutedEPS)
+        .filter(data => data.dilutedEPS !== undefined && data.dilutedEPS !== null)
         .slice(0, 5)
         .map(data => data.dilutedEPS);
 
@@ -417,6 +441,44 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
       <div className={styles.errorWrapper}>
         <div className={styles.errorIcon}>⚠️</div>
         <p>{error}</p>
+        <button 
+          className={styles.retryButton}
+          onClick={() => {
+            setLoading(true);
+            setError(null);
+            // Retry data fetching
+            setTimeout(() => {
+              const fetchData = async () => {
+                try {
+                  // Fetch fundamental time series data
+                  const financialDataResult = await fetchFundamentalsTimeSeries(
+                    symbol,
+                    '2000-01-01',
+                    'all',
+                    periodType
+                  );
+
+                  // Fetch stock dashboard data
+                  const dashboardResult = await fetchStockDashboardData(symbol);
+
+                  setFinancialData(financialDataResult);
+                  setDashboardData(dashboardResult);
+
+                  // Calculate valuations
+                  calculateValuations(financialDataResult, dashboardResult);
+
+                  setLoading(false);
+                } catch (err) {
+                  setError('Failed to fetch data. Please try again later.');
+                  setLoading(false);
+                }
+              };
+              fetchData();
+            }, 1000);
+          }}
+        >
+          Retry
+        </button>
       </div>
     );
   }

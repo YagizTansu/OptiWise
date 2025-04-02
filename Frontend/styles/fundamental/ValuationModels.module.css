@@ -241,18 +241,36 @@
 
 /* Error State */
 .errorWrapper {
-  padding: 24px;
-  border-radius: 8px;
-  background-color: #fff5f5;
-  color: #d32f2f;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
   text-align: center;
-  margin: 24px;
-  border: 1px solid #ffe5e5;
 }
 
 .errorIcon {
-  font-size: 36px;
-  margin-bottom: 12px;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.retryButton {
+  margin-top: 15px;
+  padding: 8px 16px;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.retryButton:hover {
+  background-color: #303f9f;
+}
+
+.retryButton:active {
+  background-color: #1a237e;
 }
 
 /* Metrics / Details */

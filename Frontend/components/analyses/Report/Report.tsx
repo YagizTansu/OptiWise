@@ -4,6 +4,7 @@ import AnalystReports from './AnalystReports';
 import EventsAndDevelopments from './EventsAndDevelopments';
 import SECFilings from './SECFilings';
 import AnalysisTools from './AnalysisTools';
+import TechnicalAnalysis from './TechnicalAnalysis';
 
 
 interface ReportProps {
@@ -15,6 +16,9 @@ const Report: React.FC<ReportProps> = ({ symbol }) => {
     <div>
       {/* Analysis Tools Component */}
       <AnalysisTools symbol={symbol} />
+
+      <TechnicalAnalysis symbol={symbol} />
+      {/* Technical Analysis Component */}
 
       {/* Analyst Recommendation Component */}
       <AnalystRecommendation symbol={symbol} />
