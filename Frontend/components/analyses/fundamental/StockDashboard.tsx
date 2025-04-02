@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styles from '../../../styles/fundamental/StockDashboard.module.css';
 import { fetchStockDashboardData, QuoteSummaryData } from '../../../services/api/finance';
 import { FaQuestion } from 'react-icons/fa';
+import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
 
 interface StockDashboardProps {
   symbol: string;
@@ -12,12 +13,14 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+  const [showDetailedParams, setShowDetailedParams] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await fetchStockDashboardData(symbol);
+        debugger
         setData(response);
         setLoading(false);
       } catch (err) {
@@ -41,10 +44,71 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
     return `$${num.toFixed(2)}`;
   };
 
+  const formatValue = (value: any) => {
+    if (value === null || value === undefined) return 'N/A';
+    if (typeof value === 'number') {
+      if (value >= 1.0e9) return `$${(value / 1.0e9).toFixed(2)}B`;
+      if (value >= 1.0e6) return `$${(value / 1.0e6).toFixed(2)}M`;
+      return Number.isInteger(value) ? value : value.toFixed(2);
+    }
+    if (value instanceof Date) return new Date(value).toLocaleDateString();
+    return String(value);
+  };
+
   const price = data.price;
   const summaryDetail = data.summaryDetail || {};
   const keyStats = data.defaultKeyStatistics || {};
   const isPositiveChange = price.regularMarketChange > 0;
+
+  // Component for rendering detailed parameters table
+  const DetailedParamsTable = () => {
+    // Create categories for organizing data
+    const categories = {
+      'Price Information': {
+        ...Object.entries(price || {})
+          .filter(([key]) => key !== 'maxAge')
+          .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {})
+      },
+      'Summary Details': {
+        ...Object.entries(summaryDetail || {})
+          .filter(([key]) => key !== 'maxAge')
+          .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {})
+      },
+      'Key Statistics': {
+        ...Object.entries(keyStats || {})
+          .filter(([key]) => key !== 'maxAge')
+          .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {})
+      }
+    };
+
+    return (
+      <div className={styles.detailedParams}>
+        {Object.entries(categories).map(([category, items]) => (
+          <div key={category} className={styles.paramCategory}>
+            <h4>{category}</h4>
+            <div className={styles.paramTable}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(items).map(([key, value]) => (
+                    <tr key={key}>
+                      <td>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</td>
+                      <td>{formatValue(value)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className={styles.dashboard}>
@@ -126,6 +190,26 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
           <span>{formatPercent(summaryDetail.dividendYield)}</span>
         </div>
       </div>
+
+      {/* Detailed Parameters Toggle Button */}
+      <div className={styles.detailToggleContainer}>
+        <button
+          className={styles.detailToggle}
+          onClick={() => setShowDetailedParams(!showDetailedParams)}
+          aria-expanded={showDetailedParams}
+          aria-controls="detailed-params"
+        >
+          {showDetailedParams ? 'Hide All Parameters' : 'Show All Parameters'}
+          {showDetailedParams ? <FaAngleUp /> : <FaAngleDown />}
+        </button>
+      </div>
+
+      {/* Detailed Parameters Section */}
+      {showDetailedParams && (
+        <div id="detailed-params" className={styles.detailedParamsContainer}>
+          <DetailedParamsTable />
+        </div>
+      )}
     </div>
   );
 };

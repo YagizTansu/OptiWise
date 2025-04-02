@@ -245,8 +245,6 @@ const TechnicalAnalysis: React.FC<TechnicalAnalysisProps> = ({ symbol }) => {
         alignItems: 'center', 
         width: '100%',
         padding: '16px 20px',
-        borderBottom: '1px solid #eaeaea',
-        backgroundColor: '#f9fafb'
       }}>
         <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>Technical Analysis</h3>
         <div className={styles.chartControls} style={{ marginLeft: 'auto' }}>
