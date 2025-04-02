@@ -94,6 +94,7 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
           'all',
           periodType
         );
+        debugger
         
         if (!financialData || financialData.length === 0) {
           setHasError(true);
