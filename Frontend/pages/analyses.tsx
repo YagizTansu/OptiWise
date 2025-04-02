@@ -24,6 +24,9 @@ export default function Analyses() {
   const { symbol = '' } = router.query; // Default to AAPL if no symbol provided
   
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Check if symbol is a futures contract
+  const isFutures = typeof symbol === 'string' && symbol.includes('=F');
 
   const handleAIButtonClick = () => {
     setActiveTab('ai-forecast');
@@ -63,24 +66,31 @@ export default function Analyses() {
           >
             <FaBalanceScale /> Overbought/Oversold
           </button>
-          <button 
-            className={`${styles.tabButton} ${activeTab === 'fundamental' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('fundamental')}
-          >
-            <FaChartPie /> Fundamental
-          </button>
-          <button 
-            className={`${styles.tabButton} ${activeTab === 'insiders' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('insiders')}
-          >
-            <FaUserTie /> Insiders
-          </button>
-          <button 
-            className={`${styles.tabButton} ${activeTab === 'report' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('report')}
-          >
-            <FaFileAlt /> Report
-          </button>
+          
+          {/* Only show these tabs if not a futures contract */}
+          {!isFutures && (
+            <>
+              <button 
+                className={`${styles.tabButton} ${activeTab === 'fundamental' ? styles.activeTab : ''}`}
+                onClick={() => setActiveTab('fundamental')}
+              >
+                <FaChartPie /> Fundamental
+              </button>
+              <button 
+                className={`${styles.tabButton} ${activeTab === 'insiders' ? styles.activeTab : ''}`}
+                onClick={() => setActiveTab('insiders')}
+              >
+                <FaUserTie /> Insiders
+              </button>
+              <button 
+                className={`${styles.tabButton} ${activeTab === 'report' ? styles.activeTab : ''}`}
+                onClick={() => setActiveTab('report')}
+              >
+                <FaFileAlt /> Report
+              </button>
+            </>
+          )}
+          
           <button 
             className={`${styles.tabButton} ${activeTab === 'ai-forecast' ? styles.activeTab : ''}`}
             onClick={() => setActiveTab('ai-forecast')}
@@ -109,21 +119,21 @@ export default function Analyses() {
           )}
           
           {/* Fundamental Analysis Tab */}
-          {activeTab === 'fundamental' && (
+          {!isFutures && activeTab === 'fundamental' && (
             <Fundamental 
               symbol={symbol as string}
             />
           )}
 
           {/* Insiders Tab */}
-          {activeTab === 'insiders' && (
+          {!isFutures && activeTab === 'insiders' && (
             <Insiders 
               symbol={symbol as string}
             />
           )}
 
           {/* Report Tab */}
-          {activeTab === 'report' && (
+          {!isFutures && activeTab === 'report' && (
             <Report 
               symbol={symbol as string}
             />

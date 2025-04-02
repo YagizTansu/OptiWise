@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import styles from '../styles/Rankings.module.css';
-import { FaSortAmountDown, FaSortAmountUp, FaInfoCircle, FaChartPie, FaTable, FaFilter, FaChevronDown, FaGlobeAmericas } from 'react-icons/fa';
+import { FaSortAmountDown, FaSortAmountUp, FaInfoCircle, FaGlobeAmericas, FaChevronDown } from 'react-icons/fa';
 import { searchSymbols, fetchQuoteData, fetchStockDashboardData, SearchResult, QuoteData } from '../services/api/finance';
 import Layout from '../components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -121,7 +121,6 @@ export default function Rankings() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [sortField, setSortField] = useState('potential');
   const [sortDirection, setSortDirection] = useState('desc');
-  const [viewMode, setViewMode] = useState('table');
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [showRegionDropdown, setShowRegionDropdown] = useState(false);
 
@@ -181,8 +180,7 @@ export default function Rankings() {
                 currentValue: quote.regularMarketPrice,
                 potential: potential,
                 // Mark certain indexes as coming soon
-                comingSoon: symbol === "^TASI" || symbol === "^KLSE"
-              };
+                };
               
               indexData.push(index);
               
@@ -267,24 +265,11 @@ export default function Rankings() {
 
           <main className={styles.container}>
 
-            <div className={styles.filtersBar}>
-              <div className={styles.viewToggle}>
-                <button 
-                  className={`${styles.viewButton} ${viewMode === 'table' ? styles.active : ''}`}
-                  onClick={() => setViewMode('table')}
-                >
-                  <FaTable /> Table
-                </button>
-                <button 
-                  className={`${styles.viewButton} ${viewMode === 'cards' ? styles.active : ''}`}
-                  onClick={() => setViewMode('cards')}
-                >
-                  <FaChartPie /> Cards
-                </button>
-              </div>
-              
-              <div className={styles.filters}>
-                <div className={styles.regionFilterDropdown}>
+            <div className={styles.content}>
+              <div className={styles.indexesContainer}>
+                <div className={styles.sectionTitle}>
+                  <h2>{selectedRegion || 'World'} Indexes</h2>
+                  <div className={styles.regionFilterDropdown}>
                   <button 
                     className={styles.filterChip}
                     onClick={() => setShowRegionDropdown(!showRegionDropdown)}
@@ -320,13 +305,6 @@ export default function Rankings() {
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-
-            <div className={styles.content}>
-              <div className={styles.indexesContainer}>
-                <div className={styles.sectionTitle}>
-                  <h2>{selectedRegion || 'World'} Indexes</h2>
                   <div className={styles.infoTag}>
                     <FaInfoCircle className={styles.infoIcon} />
                     <span>Fair value based on component analysis</span>
@@ -337,7 +315,7 @@ export default function Rankings() {
                   <div className={styles.loadingMessage}>Loading index data...</div>
                 ) : error ? (
                   <div className={styles.errorMessage}>{error}</div>
-                ) : viewMode === 'table' ? (
+                ) : (
                   <div className={styles.tableWrapper}>
                     <table className={styles.indexesTable}>
                       <thead>
@@ -399,56 +377,6 @@ export default function Rankings() {
                         ))}
                       </tbody>
                     </table>
-                  </div>
-                ) : (
-                  <div className={styles.cardsGrid}>
-                    {uniqueRegions.filter(region => 
-                      selectedRegion ? region === selectedRegion : true
-                    ).map(region => (
-                      <div key={region} className={styles.regionGroup}>
-                        <div className={styles.regionHeader}>
-                          <h3>{region}</h3>
-                        </div>
-                        <div className={styles.regionCards}>
-                          {sortedIndexes
-                            .filter(index => index.region === region)
-                            .map((index) => (
-                              <div 
-                                key={index.id} 
-                                className={`${styles.indexCard} ${selectedIndex === index.id ? styles.selectedCard : ''} ${index.comingSoon ? styles.comingSoonCard : ''}`}
-                                onClick={() => !index.comingSoon && setSelectedIndex(index.id)}
-                              >
-                                <div className={styles.cardHeader}>
-                                  <h3>{index.name}</h3>
-                                  {index.comingSoon && <span className={styles.comingSoonBadge}>Coming soon</span>}
-                                </div>
-                                <div className={styles.cardBody}>
-                                  <div className={styles.cardData}>
-                                    <div className={styles.dataItem}>
-                                      <span className={styles.dataLabel}>Current Value</span>
-                                      <span className={styles.dataValue}>{index.currentValue.toLocaleString()}</span>
-                                    </div>
-                                    <div className={styles.dataItem}>
-                                      <span className={styles.dataLabel}>Fair Value</span>
-                                      <span className={styles.dataValue}>
-                                        {(index.currentValue * (1 + index.fairValue / 100)).toLocaleString()}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className={styles.cardPotential}>
-                                    <span className={styles.potentialLabel}>Growth Potential</span>
-                                    <span 
-                                      className={`${styles.potentialBadge} ${index.potential > 0 ? styles.positiveBg : styles.negativeBg}`}
-                                    >
-                                      {index.potential > 0 ? '+' : ''}{index.potential.toFixed(1)}%
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 )}
               </div>

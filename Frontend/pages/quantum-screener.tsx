@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import Head from 'next/head';
 import { FaFilter, FaArrowDown, FaArrowUp, FaCalendarAlt, FaChartLine, FaPercentage, FaTrophy, FaExclamationTriangle } from 'react-icons/fa';
 import styles from '../styles/QuantumScreener.module.css';
 import { fetchSeasonalityData, fetchSeasonalStrategyInsights, SeasonalStrategyResponse } from '../services/api/finance';

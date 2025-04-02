@@ -516,7 +516,6 @@ export async function fetchChartData(
       return: 'array',
       useYfid: true
     };
-
     const data = await makeApiRequest<any>('chart', params);
     
     // Extract currency information
