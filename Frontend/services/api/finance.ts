@@ -2722,7 +2722,7 @@ export interface CompanyProfile {
  * @param symbol - Stock or company symbol
  * @returns Company profile data
  */
-export async function fetchCompanyProfile(symbol: string): Promise<CompanyProfile | null> {
+export async function fetchCompanyProfile(symbol: string): Promise<CompanyProfile> {
   try {
     const params = {
       symbol,
@@ -2731,11 +2731,7 @@ export async function fetchCompanyProfile(symbol: string): Promise<CompanyProfil
     
     const data = await makeApiRequest<any>('quoteSummary', params);
     
-    if (data && data.summaryProfile) {
-      return data.summaryProfile;
-    }
-    
-    return null;
+    return data.summaryProfile;
   } catch (error) {
     console.error('Error fetching company profile:', error);
     throw error;
