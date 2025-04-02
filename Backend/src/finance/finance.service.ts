@@ -203,7 +203,7 @@ export class FinanceService implements OnModuleInit {
    * sectorTrend, summaryDetail, summaryProfile, topHoldings,
    * upgradeDowngradeHistory
    */
-  async getQuoteSummary({ symbol, options = {} }: { symbol: string; options?: { modules?: string[]; }; }): Promise<any> {
+  async getQuoteSummary(symbol: string, options: { modules: string[]; }): Promise<any> {
     try {
       // If no modules specified, use defaults
       if (!options.modules || options.modules.length === 0) {
