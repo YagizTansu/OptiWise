@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 // Base API URL
-const API_BASE_URL = 'http://192.168.1.98:3001/api/finance';
+const API_BASE_URL = 'http://localhost:3001/api/finance';
 
 // =============================================================================
 // TYPE DEFINITIONS

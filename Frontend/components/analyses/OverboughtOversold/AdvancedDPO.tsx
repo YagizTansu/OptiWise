@@ -430,7 +430,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                   dash: [4, 4],
                 },
                 title: {
-                  display: true,
+                  display: false,
                   text: 'DPO Value',
                   font: {
                     size: 12,
