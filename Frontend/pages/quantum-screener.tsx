@@ -42,6 +42,9 @@ const SYMBOLS_TO_ANALYZE = [
   { symbol: 'EUR=X', name: 'EUR/USD' }
 ];
 
+// Periods to check for seasonality correlation
+const SEASONALITY_PERIODS = [1, 3, 5, 7, 10, 15, 20];
+
 // Map duration to months for API calls
 const durationToMonths: Record<string, number> = {
   '1M': 1,
@@ -108,11 +111,14 @@ export default function QuantumScreener() {
                 // Extract monthly stats from the data
                 const monthDetails = getRelevantMonthsData(strategyData, targetMonth, months, direction);
                 
-                // Calculate average win rate and return
+                // Calculate win rate (percentage of profitable periods)
                 const winRate = calculateAverage(monthDetails.map(m => m.consistency));
-                const avgReturn = direction === 'long' 
-                  ? calculateAverage(monthDetails.map(m => m.avgReturn))
-                  : calculateAverage(monthDetails.map(m => -m.avgReturn)); // Inverse for short positions
+                
+                // Calculate average return for profitable periods only
+                const monthlyReturns = monthDetails.map(m => 
+                  direction === 'long' ? m.avgReturn : -m.avgReturn
+                );
+                const avgReturn = calculateAverageOfProfitablePeriods(monthlyReturns);
                 
                 // Calculate overall score
                 const score = (
@@ -162,13 +168,72 @@ export default function QuantumScreener() {
       const data = seasonalityData.datasets[0]?.data;
       if (!data || data.length < 2) return 0.5;
       
-      // Simple correlation calculation: percentage of positive months
-      const positiveMonths = data.filter((val: number) => val > 0).length;
-      return (positiveMonths / data.length) * 0.8 + 0.1; // Scale to 0.1-0.9 range
+      // Find the strongest correlation with current price pattern
+      // This checks multiple seasonality periods against current price action
+      let bestCorrelation = 0;
+      let bestPeriod = 0;
+      
+      // Extract recent price pattern
+      const recentPattern = data.slice(-30); // Last 30 data points
+      
+      // Test different seasonality periods
+      for (const period of SEASONALITY_PERIODS) {
+        if (data.length < period * 2) continue; // Skip if not enough data
+        
+        // Extract historical pattern for this period
+        const historicalPattern = data.slice(-period * 2, -period);
+        
+        // Calculate correlation coefficient between recent pattern and this historical period
+        const corrCoef = calculateCorrelationCoefficient(historicalPattern, recentPattern);
+        
+        // Store if it's the strongest correlation
+        if (Math.abs(corrCoef) > Math.abs(bestCorrelation)) {
+          bestCorrelation = corrCoef;
+          bestPeriod = period;
+        }
+      }
+      
+      // Return the absolute correlation (strength matters more than direction)
+      return Math.abs(bestCorrelation);
     } catch (err) {
       console.error('Error calculating correlation:', err);
       return 0.5; // Default fallback
     }
+  }
+  
+  // Calculate correlation coefficient between two data series
+  function calculateCorrelationCoefficient(series1: number[], series2: number[]): number {
+    // Use smaller length
+    const n = Math.min(series1.length, series2.length);
+    
+    if (n < 5) return 0; // Not enough data points
+    
+    // Trim to same length
+    const x = series1.slice(0, n);
+    const y = series2.slice(0, n);
+    
+    // Calculate means
+    const meanX = x.reduce((sum, val) => sum + val, 0) / n;
+    const meanY = y.reduce((sum, val) => sum + val, 0) / n;
+    
+    // Calculate covariance and standard deviations
+    let covariance = 0;
+    let stdX = 0;
+    let stdY = 0;
+    
+    for (let i = 0; i < n; i++) {
+      const xDiff = x[i] - meanX;
+      const yDiff = y[i] - meanY;
+      covariance += xDiff * yDiff;
+      stdX += xDiff * xDiff;
+      stdY += yDiff * yDiff;
+    }
+    
+    // Prevent division by zero
+    if (stdX === 0 || stdY === 0) return 0;
+    
+    // Return correlation coefficient
+    return covariance / Math.sqrt(stdX * stdY);
   }
   
   // Format date to readable string
@@ -221,6 +286,13 @@ export default function QuantumScreener() {
   function calculateAverage(numbers: number[]): number {
     if (numbers.length === 0) return 0;
     return numbers.reduce((sum, val) => sum + val, 0) / numbers.length;
+  }
+
+  // Calculate average of only positive numbers (for profitable periods)
+  function calculateAverageOfProfitablePeriods(numbers: number[]): number {
+    const profitable = numbers.filter(val => val > 0);
+    if (profitable.length === 0) return 0;
+    return profitable.reduce((sum, val) => sum + val, 0) / profitable.length;
   }
 
   // Sort the results

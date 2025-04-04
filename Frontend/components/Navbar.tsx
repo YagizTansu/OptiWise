@@ -63,9 +63,8 @@ export default function Navbar() {
             <Image 
               src="/images/logo.png" 
               alt="OptiWise Logo" 
-              width={60} 
-              height={60} 
-              className={`${styles.logoImage} ${styles.roundLogo}`} 
+              width={70} 
+              height={40} 
             />
             <span className={styles.logoPrefix}>Opti</span>
             <span className={styles.logoSuffix}>Wise</span>

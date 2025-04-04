@@ -189,6 +189,7 @@ export interface SeasonalityResponse {
 export interface SeasonalPattern {
   period: string;
   return: number;
+  consistency?: number; // Added consistency (Win Rate)
 }
 
 export interface MonthlyPerformance {
@@ -200,6 +201,7 @@ export interface MonthlyPerformance {
 
 export interface MonthlyStatistics {
   avgReturn: number;
+  profitableAvgReturn?: number; // Added for Avg Return % during profitable periods
   consistency: number;
   years: number;
   positiveYears: number;
@@ -1860,7 +1862,7 @@ export async function fetchSeasonalStrategyInsights(
       symbol,
       period1,
       period2,
-      interval: '1mo',
+      interval: '1d', // Changed to daily data for more accurate analysis
       includePrePost: true,
       events: 'div|split',
       lang: 'en-US',
@@ -1932,21 +1934,45 @@ function analyzeSeasonalPatterns(historicalData: HistoricalDataPoint[]): Seasona
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
                     'July', 'August', 'September', 'October', 'November', 'December'];
   
+  // Group historical data by year and month
+  const dataByYearAndMonth: Record<number, Record<string, HistoricalDataPoint[]>> = {};
+  
+  historicalData.forEach(dataPoint => {
+    const date = new Date(dataPoint.date);
+    const year = date.getFullYear();
+    const month = monthNames[date.getMonth()];
+    
+    if (!dataByYearAndMonth[year]) {
+      dataByYearAndMonth[year] = {};
+    }
+    
+    if (!dataByYearAndMonth[year][month]) {
+      dataByYearAndMonth[year][month] = [];
+    }
+    
+    dataByYearAndMonth[year][month].push(dataPoint);
+  });
+  
+  // Calculate monthly returns for each year
   const monthlyReturns: Record<string, number[]> = {};
   monthNames.forEach(month => monthlyReturns[month] = []);
   
-  // Calculate monthly returns
-  for (let i = 1; i < historicalData.length; i++) {
-    const currentData = historicalData[i];
-    const previousData = historicalData[i-1];
+  Object.keys(dataByYearAndMonth).forEach(yearStr => {
+    const year = parseInt(yearStr);
     
-    const date = new Date(currentData.date);
-    const month = monthNames[date.getMonth()];
-    
-    // Calculate monthly return (%)
-    const monthlyReturn = ((currentData.close - previousData.close) / previousData.close) * 100;
-    monthlyReturns[month].push(monthlyReturn);
-  }
+    monthNames.forEach(month => {
+      const monthData = dataByYearAndMonth[year][month];
+      
+      if (monthData && monthData.length > 1) {
+        // Calculate monthly return from first day to last day
+        const firstDay = monthData[0];
+        const lastDay = monthData[monthData.length - 1];
+        
+        const monthlyReturn = ((lastDay.close - firstDay.close) / firstDay.close) * 100;
+        monthlyReturns[month].push(monthlyReturn);
+      }
+    });
+  });
   
   // Calculate detailed monthly statistics for strategy exploration
   const monthlyDetailedData: Record<string, MonthlyStatistics> = {};
@@ -1958,9 +1984,15 @@ function analyzeSeasonalPatterns(historicalData: HistoricalDataPoint[]): Seasona
       const positiveReturns = returns.filter(ret => ret > 0);
       const consistency = (positiveReturns.length / returns.length) * 100;
       
+      // Calculate average return for profitable periods only
+      const profitableAvgReturn = positiveReturns.length > 0 
+        ? positiveReturns.reduce((sum, val) => sum + val, 0) / positiveReturns.length
+        : 0;
+      
       monthlyDetailedData[month] = {
-        avgReturn,
-        consistency,
+        avgReturn: avgReturn,
+        profitableAvgReturn: profitableAvgReturn, // New field: average return during profitable periods
+        consistency, // This is the Win Rate %
         years: returns.length,
         positiveYears: positiveReturns.length,
         maxReturn: Math.max(...returns),
@@ -1971,31 +2003,35 @@ function analyzeSeasonalPatterns(historicalData: HistoricalDataPoint[]): Seasona
   });
   
   // Find best consecutive 3-4 month period
-  const seasonalPatterns: {start: number; end: number; return: number}[] = [];
+  const seasonalPatterns: {start: number; end: number; return: number; consistency: number}[] = [];
   
   for (let start = 0; start < 12; start++) {
     for (let length = 3; length <= 4; length++) {
       let totalReturn = 0;
+      let totalConsistency = 0;
       let isValid = true;
+      let periodCount = 0;
       
       for (let i = 0; i < length; i++) {
         const monthIndex = (start + i) % 12;
         const month = monthNames[monthIndex];
         
-        if (monthlyReturns[month].length === 0) {
+        if (!monthlyDetailedData[month]) {
           isValid = false;
           break;
         }
         
-        const avgReturn = monthlyReturns[month].reduce((sum, val) => sum + val, 0) / monthlyReturns[month].length;
-        totalReturn += avgReturn;
+        totalReturn += monthlyDetailedData[month].avgReturn;
+        totalConsistency += monthlyDetailedData[month].consistency;
+        periodCount++;
       }
       
-      if (isValid) {
+      if (isValid && periodCount > 0) {
         seasonalPatterns.push({
           start,
           end: (start + length - 1) % 12,
-          return: totalReturn
+          return: totalReturn,
+          consistency: totalConsistency / periodCount
         });
       }
     }
@@ -2003,32 +2039,35 @@ function analyzeSeasonalPatterns(historicalData: HistoricalDataPoint[]): Seasona
   
   // Find strongest positive pattern
   let strongestPattern: SeasonalPattern | null = null;
-  const bestPattern = seasonalPatterns.sort((a, b) => b.return - a.return)[0];
-  if (bestPattern) {
+  
+  // Sort by score combining return and consistency
+  const scoredPatterns = seasonalPatterns.map(pattern => ({
+    ...pattern,
+    score: pattern.return * 0.6 + (pattern.consistency / 100) * 0.4
+  })).sort((a, b) => b.score - a.score);
+  
+  if (scoredPatterns.length > 0) {
+    const best = scoredPatterns[0];
     strongestPattern = {
-      period: `${monthNames[bestPattern.start]} to ${monthNames[bestPattern.end]}`,
-      return: bestPattern.return
+      period: `${monthNames[best.start]} to ${monthNames[best.end]}`,
+      return: best.return,
+      consistency: best.consistency
     };
   }
   
   // Find worst month (risk pattern)
   let riskPattern: SeasonalPattern | null = null;
-  const monthlyAvgReturns = monthNames.map(month => {
-    const returns = monthlyReturns[month];
-    const avgReturn = returns.length > 0 
-      ? returns.reduce((sum, val) => sum + val, 0) / returns.length
-      : 0;
-    return { month, avgReturn };
-  });
-  
-  const worstMonth = monthlyAvgReturns
-    .filter(m => m.avgReturn < 0 && monthlyReturns[m.month].length > 0)
-    .sort((a, b) => a.avgReturn - b.avgReturn)[0];
+  const monthRanked = Object.entries(monthlyDetailedData)
+    .map(([month, data]) => ({ month, avgReturn: data.avgReturn, consistency: data.consistency }))
+    .filter(m => monthlyReturns[m.month].length > 0)
+    .sort((a, b) => a.avgReturn - b.avgReturn);
     
-  if (worstMonth) {
+  if (monthRanked.length > 0) {
+    const worst = monthRanked[0];
     riskPattern = {
-      period: worstMonth.month,
-      return: worstMonth.avgReturn
+      period: worst.month,
+      return: worst.avgReturn,
+      consistency: worst.consistency
     };
   }
   
