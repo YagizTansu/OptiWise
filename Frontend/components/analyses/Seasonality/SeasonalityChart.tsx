@@ -1,445 +1,397 @@
-import { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart, registerables } from 'chart.js';
+import React, { useState, useEffect } from 'react';
 import { fetchChartData, ChartDataPoint } from '../../../services/api/finance';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ChartOptions,
+} from 'chart.js';
+import Select from 'react-select';
 
-// Register Chart.js components
-Chart.register(...registerables);
- 
-// Define time range options
-const TIME_RANGE_OPTIONS = [
-  { value: '3y', label: '3 Years Average', years: 3 },
-  { value: '5y', label: '5 Years Average', years: 5 },
-  { value: '7y', label: '7 Years Average', years: 7 },
-  { value: '10y', label: '10 Years Average', years: 10 },
-  { value: 'pastYear', label: 'Past Year' },
-  { value: 'currentYear', label: 'Current Year' }
-];
-
-// Colors for different time ranges
-const CHART_COLORS = [
-  'rgba(75, 192, 192, 1)',   // Teal
-  'rgba(255, 99, 132, 1)',    // Pink
-  'rgba(255, 206, 86, 1)',    // Yellow
-  'rgba(54, 162, 235, 1)',    // Blue
-  'rgba(153, 102, 255, 1)',   // Purple
-  'rgba(255, 159, 64, 1)',    // Orange
-];
-
-// Month names for x-axis labels and organization
-const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const SHORT_MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-// Number of days in each month (non-leap year)
-const DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface SeasonalityChartProps {
   symbol: string;
 }
 
+interface PeriodOption {
+  value: string;
+  label: string;
+  type: 'averaged' | 'raw';
+  years?: number;
+}
+
+interface DayData {
+  sum: number;
+  count: number;
+  values: number[];
+}
+
+interface ProcessedData {
+  label: string;
+  data: (number | null)[];
+  borderColor: string;
+  backgroundColor: string;
+  borderWidth: number;
+  pointRadius: number;
+  tension: number;
+}
+
 const SeasonalityChart: React.FC<SeasonalityChartProps> = ({ symbol }) => {
-  const [selectedRanges, setSelectedRanges] = useState<string[]>(['3y', 'currentYear']);
-  const [chartData, setChartData] = useState<any>(null);
+  const colorPalette = {
+    '3years': '#4CAF50',  // green
+    '5years': '#2196F3',  // blue
+    '7years': '#9C27B0',  // purple
+    '10years': '#FF9800', // orange
+    'pastyear': '#F44336', // red
+    'currentyear': '#009688', // teal
+  };
+
+  const [periodOptions] = useState<PeriodOption[]>([
+    { value: '3years', label: '3 Years Average', type: 'averaged', years: 3 },
+    { value: '5years', label: '5 Years Average', type: 'averaged', years: 5 },
+    { value: '7years', label: '7 Years Average', type: 'averaged', years: 7 },
+    { value: '10years', label: '10 Years Average', type: 'averaged', years: 10 },
+    { value: 'pastyear', label: 'Past Year', type: 'raw' },
+    { value: 'currentyear', label: 'Current Year', type: 'raw' },
+  ]);
+  
+  const [selectedPeriods, setSelectedPeriods] = useState<PeriodOption[]>([
+    { value: '3years', label: '3 Years Average', type: 'averaged', years: 3 },
+    { value: 'currentyear', label: 'Current Year', type: 'raw' },
+  ]);
+  
+  const [chartData, setChartData] = useState<{
+    labels: string[];
+    datasets: ProcessedData[];
+  }>({
+    labels: [],
+    datasets: [],
+  });
+  
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currency, setCurrency] = useState<string>('USD');
 
-  // Main useEffect to fetch and process data when selections change
   useEffect(() => {
-    fetchSeasonalityData();
-  }, [symbol, selectedRanges]);
-
-  // Handle checkbox change for time range selection
-  const handleCheckboxChange = (value: string) => {
-    setSelectedRanges(prev => {
-      if (prev.includes(value)) {
-        return prev.filter(item => item !== value);
-      } else {
-        return [...prev, value];
-      }
-    });
-  };
-
-  // Function to fetch and process seasonality data
-  const fetchSeasonalityData = async () => {
-    if (!symbol) return;
-
+    if (!symbol || selectedPeriods.length === 0) return;
+    
     setIsLoading(true);
     setError(null);
-
-    try {
-      const datasets = [];
-      
-      // Process each selected time range
-      for (const rangeType of selectedRanges) {
-        const rangeData = await fetchRangeData(rangeType);
-        if (rangeData) {
-          datasets.push(rangeData);
+    
+    const fetchAllPeriodData = async () => {
+      try {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const datasets: ProcessedData[] = [];
+        
+        // Process each selected period
+        for (const period of selectedPeriods) {
+          let dateRanges: { startDate: Date, endDate: Date }[] = [];
+          
+          if (period.type === 'averaged' && period.years) {
+            // For averaged periods, we need to fetch data for each year separately
+            for (let i = 0; i < period.years; i++) {
+              const year = currentYear - i - 1; // Previous years (not including current)
+              dateRanges.push({
+                startDate: new Date(`${year}-01-01`),
+                endDate: new Date(`${year}-12-31`)
+              });
+            }
+          } else if (period.value === 'pastyear') {
+            // Past full year
+            const lastYear = currentYear - 1;
+            dateRanges = [{
+              startDate: new Date(`${lastYear}-01-01`),
+              endDate: new Date(`${lastYear}-12-31`)
+            }];
+          } else if (period.value === 'currentyear') {
+            // Current year to date
+            dateRanges = [{
+              startDate: new Date(`${currentYear}-01-01`),
+              endDate: today
+            }];
+          }
+          
+          // Fetch data for all date ranges in this period
+          const allDataForPeriod: ChartDataPoint[][] = [];
+          
+          for (const range of dateRanges) {
+            try {
+              const data = await fetchChartData(
+                symbol,
+                range.startDate.toISOString(),
+                range.endDate.toISOString(),
+                '1d'
+              );
+              
+              // If this is first successful data fetch, store currency
+              if (data.length > 0 && data[0].currency) {
+                setCurrency(data[0].currency);
+              }
+              
+              allDataForPeriod.push(data);
+            } catch (err) {
+              console.error(`Error fetching data for range ${range.startDate} - ${range.endDate}:`, err);
+              // Continue with other ranges even if one fails
+            }
+          }
+          
+          // Process the data according to period type
+          if (period.type === 'averaged' && allDataForPeriod.length > 0) {
+            datasets.push(processAveragedData(allDataForPeriod, period));
+          } else if (allDataForPeriod.length === 1) {
+            datasets.push(processRawData(allDataForPeriod[0], period));
+          }
         }
+        
+        // Generate labels and update chart data
+        const labels = generateDailyLabels();
+        
+        setChartData({
+          labels,
+          datasets,
+        });
+      } catch (err) {
+        setError(`Failed to fetch seasonality data: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        console.error('Error fetching seasonality data:', err);
+      } finally {
+        setIsLoading(false);
       }
+    };
+    
+    fetchAllPeriodData();
+  }, [symbol, selectedPeriods]);
 
-      // Generate day of year labels for x-axis (day number within each month)
-      const labels = generateDayLabels();
-
-      // Prepare final chart data
-      setChartData({
-        labels,
-        datasets
+  // Process averaged data across multiple years
+  const processAveragedData = (dataSets: ChartDataPoint[][], period: PeriodOption): ProcessedData => {
+    // Group data by month and day (ignoring year)
+    const dailyData: Record<string, DayData> = {};
+    
+    // Process all datasets (each representing a year)
+    dataSets.forEach(yearData => {
+      yearData.forEach(point => {
+        const date = point.fullDate;
+        const monthDay = `${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+        
+        if (!dailyData[monthDay]) {
+          dailyData[monthDay] = { sum: 0, count: 0, values: [] };
+        }
+        
+        dailyData[monthDay].sum += point.close;
+        dailyData[monthDay].count += 1;
+        dailyData[monthDay].values.push(point.close);
       });
-    } catch (err) {
-      console.error('Error fetching seasonality data:', err);
-      setError('Failed to load seasonality data. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
+    });
+    
+    // Map to the full year of daily values
+    const values: (number | null)[] = new Array(366).fill(null);
+    
+    // Helper to get day of year from month-day string
+    const getDayOfYear = (monthDayStr: string): number => {
+      const [month, day] = monthDayStr.split('-').map(Number);
+      const date = new Date(2020, month - 1, day); // Using leap year 2020
+      return getDayNumber(date.getMonth(), date.getDate());
+    };
+    
+    // Calculate average for each day and put in correct position
+    Object.entries(dailyData).forEach(([monthDay, data]) => {
+      // Only include if we have data for all requested years
+      if (period.years && data.count === period.years) {
+        const dayOfYear = getDayOfYear(monthDay);
+        values[dayOfYear] = data.sum / data.count;
+      }
+    });
+    
+    // Get color for this period
+    const color = colorPalette[period.value as keyof typeof colorPalette] || '#777777';
+    
+    return {
+      label: period.label,
+      data: values,
+      borderColor: color,
+      backgroundColor: `${color}33`, // 20% opacity
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.2
+    };
+  };
+  
+  // Process raw data for a single year
+  const processRawData = (data: ChartDataPoint[], period: PeriodOption): ProcessedData => {
+    // Create array for all days in a year (0-indexed)
+    const values: (number | null)[] = new Array(366).fill(null);
+    
+    // Process all data points
+    data.forEach(point => {
+      const date = point.fullDate;
+      const dayOfYear = getDayNumber(date.getMonth(), date.getDate());
+      values[dayOfYear] = point.close;
+    });
+    
+    // Get color for this period
+    const color = colorPalette[period.value as keyof typeof colorPalette] || '#777777';
+    
+    return {
+      label: period.label,
+      data: values,
+      borderColor: color,
+      backgroundColor: `${color}33`, // 20% opacity
+      borderWidth: 2,
+      pointRadius: 0,
+      tension: 0.1
+    };
   };
 
-  // Generate labels for each day of year in format "Jan 1", "Jan 2", etc.
-  const generateDayLabels = (): string[] => {
-    const labels: string[] = [];
-    let dayOfYear = 1;
+  // Helper to get day number (0-365) from month and day
+  const getDayNumber = (month: number, day: number): number => {
+    const daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // Using leap year
+    let dayOfYear = day - 1; // 0-indexed
     
-    for (let month = 0; month < 12; month++) {
-      for (let day = 1; day <= DAYS_IN_MONTH[month]; day++) {
-        // Use day number as label for simplicity, Chart.js will handle display
-        labels.push(`${day}`);
-        dayOfYear++;
-      }
+    for (let i = 0; i < month; i++) {
+      dayOfYear += daysInMonth[i];
     }
+    
+    return dayOfYear;
+  };
+  
+  // Function to generate daily labels for a full year
+  const generateDailyLabels = (): string[] => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const daysInMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // Using leap year
+    
+    const labels: string[] = [];
+    
+    monthNames.forEach((month, idx) => {
+      for (let day = 1; day <= daysInMonth[idx]; day++) {
+        labels.push(`${month} ${day.toString().padStart(2, '0')}`);
+      }
+    });
     
     return labels;
   };
-
-  // Fetch data for a specific time range
-  const fetchRangeData = async (rangeType: string): Promise<any> => {
-    // Current date for calculations
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
-    const currentDay = currentDate.getDate();
-
-    let startDate: Date, endDate: Date, label: string;
-    const option = TIME_RANGE_OPTIONS.find(opt => opt.value === rangeType);
-    if (!option) return null;
-    
-    label = option.label;
-    
-    switch (rangeType) {
-      case 'currentYear':
-        // From Jan 1st current year to today
-        startDate = new Date(currentYear, 0, 1);
-        endDate = new Date(currentYear, currentMonth, currentDay);
-        break;
-      case 'pastYear':
-        // Full previous calendar year
-        startDate = new Date(currentYear - 1, 0, 1);
-        endDate = new Date(currentYear - 1, 11, 31);
-        break;
-      case '3y':
-      case '5y':
-      case '7y':
-      case '10y':
-        // Calculate years for the average
-        const years = option.years || 3;
-        // Start 'years' ago from Jan 1
-        startDate = new Date(currentYear - years, 0, 1);
-        // End at Dec 31 of last year
-        endDate = new Date(currentYear - 1, 11, 31);
-        break;
-      default:
-        return null;
-    }
-
-    // Format dates for API
-    const period1 = startDate.toISOString();
-    const period2 = endDate.toISOString();
-    
-    // Fetch chart data
-    try {
-      const rawData = await fetchChartData(symbol, period1, period2, '1d');
-      
-      // Update currency from data if available
-      if (rawData.length > 0 && rawData[0].currency) {
-        setCurrency(rawData[0].currency);
-      }
-      
-      // Process the data based on range type
-      if (rangeType.includes('y') && rangeType !== 'pastYear' && rangeType !== 'currentYear') {
-        return processAveragedData(rawData, rangeType, label);
-      } else {
-        return processRawData(rawData, rangeType, label);
-      }
-    } catch (err) {
-      console.error(`Error fetching data for ${rangeType}:`, err);
-      return null;
-    }
-  };
-
-  // Process data for averaged periods (3y, 5y, 7y, 10y)
-  const processAveragedData = (data: ChartDataPoint[], rangeType: string, label: string): any => {
-    // Create arrays to store sum and count for each day of the year (1-366)
-    const dayOfYearSums: (number | null)[] = Array(366).fill(null);
-    const dayOfYearCounts: number[] = Array(366).fill(0);
-    
-    // Track which years have data for each day
-    const dayYearTracker: { [dayOfYear: number]: Set<number> } = {};
-    for (let i = 0; i < 366; i++) {
-      dayYearTracker[i] = new Set();
-    }
-    
-    // Get the option with years information
-    const option = TIME_RANGE_OPTIONS.find(opt => opt.value === rangeType);
-    const requiredYears = option?.years || 0;
-    
-    // Get set of unique years in the data range
-    const allYearsInData = new Set<number>();
-    
-    // Calculate the sum and count for each day of the year across all years
-    data.forEach(point => {
-      const date = point.fullDate;
-      const year = date.getFullYear();
-      const month = date.getMonth();
-      const day = date.getDate() - 1;  // 0-based day index within month
-      
-      // Keep track of all years in dataset
-      allYearsInData.add(year);
-      
-      // Calculate day of year index (0-based)
-      let dayOfYearIndex = 0;
-      for (let m = 0; m < month; m++) {
-        dayOfYearIndex += DAYS_IN_MONTH[m];
-      }
-      dayOfYearIndex += day;
-      
-      if (point.close) {
-        // Track which year this data point is from
-        dayYearTracker[dayOfYearIndex].add(year);
-        
-        if (dayOfYearSums[dayOfYearIndex] === null) {
-          dayOfYearSums[dayOfYearIndex] = 0;
-        }
-        dayOfYearSums[dayOfYearIndex] = (dayOfYearSums[dayOfYearIndex] as number) + point.close;
-        dayOfYearCounts[dayOfYearIndex]++;
-      }
-    });
-    
-    // Calculate averages for each day of the year
-    const dailyAverages: (number | null)[] = dayOfYearSums.map((sum, index) => {
-      // Skip days with missing data
-      if (sum === null || dayOfYearCounts[index] === 0) {
-        return null;  // No data for this day
-      }
-      
-      // Check if we have data for all required years
-      const yearsWithDataForThisDay = dayYearTracker[index].size;
-      const expectedYearsCount = requiredYears;
-      
-      // Only return a value if we have data from all expected years
-      if (yearsWithDataForThisDay < expectedYearsCount) {
-        return null; // Missing data for some years, create gap in chart
-      }
-      
-      return sum / dayOfYearCounts[index];
-    });
-    
-    // Count days with valid data (after filtering for complete year sets)
-    const validDaysCount = dailyAverages.filter(value => value !== null).length;
-    
-    // Only return datasets with enough data points
-    if (validDaysCount < 30) {  // Require at least 30 days of valid data
-      return null;
-    }
-    
-    // Get color index based on the position in TIME_RANGE_OPTIONS
-    const colorIndex = TIME_RANGE_OPTIONS.findIndex(opt => opt.value === rangeType) % CHART_COLORS.length;
-    
-    return {
-      label,
-      data: dailyAverages,
-      borderColor: CHART_COLORS[colorIndex],
-      backgroundColor: CHART_COLORS[colorIndex].replace('1)', '0.2)'),
-      borderWidth: 2,
-      tension: 0.4,
-      fill: false,
-      spanGaps: true
-    };
-  };
-
-  // Process data for raw periods (Past Year, Current Year)
-  const processRawData = (data: ChartDataPoint[], rangeType: string, label: string): any => {
-    // Create array to store daily values for the year
-    // Index 0 = January 1, Index 1 = January 2, etc.
-    const dailyValues: (number | null)[] = Array(366).fill(null);
-    
-    // Map each data point to its day of year
-    data.forEach(point => {
-      const date = point.fullDate;
-      const month = date.getMonth();
-      const day = date.getDate() - 1;  // 0-based day index within month
-      
-      // Calculate day of year index (0-based)
-      let dayOfYearIndex = 0;
-      for (let m = 0; m < month; m++) {
-        dayOfYearIndex += DAYS_IN_MONTH[m];
-      }
-      dayOfYearIndex += day;
-      
-      if (point.close) {
-        dailyValues[dayOfYearIndex] = point.close;
-      }
-    });
-    
-    // Get color index based on the position in TIME_RANGE_OPTIONS
-    const colorIndex = TIME_RANGE_OPTIONS.findIndex(opt => opt.value === rangeType) % CHART_COLORS.length;
-    
-    return {
-      label,
-      data: dailyValues,
-      borderColor: CHART_COLORS[colorIndex],
-      backgroundColor: CHART_COLORS[colorIndex].replace('1)', '0.2)'),
-      borderWidth: 2,
-      tension: 0.4,
-      fill: false,
-      spanGaps: true
-    };
-  };
-
+  
   // Chart options
-  const chartOptions = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
-        labels: {
-          usePointStyle: true,
-        }
+        position: 'top',
       },
       tooltip: {
-        mode: 'index' as const,
+        mode: 'index',
         intersect: false,
         callbacks: {
-          title: function(context: any[]) {
-            if (context.length > 0) {
-              const dataIndex = context[0].dataIndex;
-              // Calculate month and day from index
-              let dayCount = 0;
-              let month = 0;
-              
-              // Find which month this index belongs to
-              while (month < 12 && dayCount + DAYS_IN_MONTH[month] <= dataIndex) {
-                dayCount += DAYS_IN_MONTH[month];
-                month++;
-              }
-              
-              const day = dataIndex - dayCount + 1;
-              return `${SHORT_MONTH_NAMES[month]} ${day}`;
-            }
-            return '';
-          },
-          label: function(context: any) {
-            const datasetLabel = context.dataset.label || '';
-            const value = context.raw !== null ? context.raw.toFixed(2) : 'N/A';
-            return `${datasetLabel}: ${value} ${currency}`;
+          label: function(context) {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y;
+            return `${label}: ${value !== null ? value.toFixed(2) : 'N/A'} ${currency}`;
           }
         }
-      }
+      },
+      title: {
+        display: true,
+        text: `Seasonality Chart for ${symbol}`,
+        font: {
+          size: 16
+        }
+      },
     },
     scales: {
       x: {
-        title: {
-          display: true,
-          text: 'Day of Year'
-        },
         ticks: {
-          callback: function(value: any, index: number) {
-            // Only show ticks for the 1st of each month for cleaner x-axis
-            let dayCount = 0;
-            let month = 0;
-            
-            // Find which month this index belongs to
-            while (month < 12 && dayCount + DAYS_IN_MONTH[month] <= index) {
-              dayCount += DAYS_IN_MONTH[month];
-              month++;
+          maxRotation: 0,
+          autoSkip: true,
+          maxTicksLimit: 12,
+          callback: function(value, index) {
+            // Only show month names
+            const label = this.getLabelForValue(index as number);
+            if (label.endsWith('01')) {
+              return label.split(' ')[0]; // Return only month name for the 1st of each month
             }
-            
-            const day = index - dayCount + 1;
-            
-            if (day === 1) {
-              return SHORT_MONTH_NAMES[month];
-            }
-            return '';
-          },
-          autoSkip: false,
-          maxRotation: 0
+            return ''; 
+          }
+        },
+        grid: {
+          display: true,
+          drawOnChartArea: true,
+          drawTicks: true,
+          color: (context) => {
+            // Highlight the first day of each month
+            const label = context.tick?.label || '';
+            return label.endsWith('01') ? 'rgba(0,0,0,0.1)' : 'rgba(0,0,0,0.05)';
+          }
         }
       },
       y: {
+        beginAtZero: false,
         title: {
           display: true,
-          text: `Price (${currency})`
-        },
-        ticks: {
-          callback: function(value: any) {
-            return value.toFixed(2);
-          }
+          text: currency
         }
-      }
+      },
     },
     interaction: {
-      mode: 'nearest' as const,
-      axis: 'x' as const,
-      intersect: false
+      intersect: false,
+      mode: 'nearest',
+      axis: 'x'
     }
   };
-
+  
+  // Handle period selection change
+  const handlePeriodChange = (selectedOptions: any) => {
+    setSelectedPeriods(selectedOptions || []);
+  };
+  
   return (
-    <div className="seasonality-chart-container card mb-4">
-      <div className="card-header d-flex justify-content-between align-items-center">
-        <h4 className="mb-0">Price Seasonality Chart</h4>
-        <div className="range-selector" style={{ width: '50%' }}>
-          <div className="mb-0">
-            <div className="d-flex flex-wrap justify-content-end gap-2">
-              {TIME_RANGE_OPTIONS.map(option => (
-                <div key={option.value} className="form-check me-2">
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    id={`range-${option.value}`}
-                    checked={selectedRanges.includes(option.value)}
-                    onChange={() => handleCheckboxChange(option.value)}
-                  />
-                  <label className="form-check-label" htmlFor={`range-${option.value}`}>
-                    {option.label}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+    <div className="p-4 bg-white rounded-lg shadow mb-6">
+      <h2 className="text-xl font-semibold mb-4">Seasonality Chart</h2>
+      
+      <div className="mb-4">
+        <Select
+          isMulti
+          name="periods"
+          options={periodOptions}
+          value={selectedPeriods}
+          onChange={handlePeriodChange}
+          className="period-selector"
+          placeholder="Select time periods..."
+          closeMenuOnSelect={false}
+        />
       </div>
       
-      <div className="card-body">
-        <div className="chart-area" style={{ height: '400px', position: 'relative' }}>
-          {isLoading ? (
-            <div className="d-flex justify-content-center align-items-center h-100">
-              <div className="spinner">
-                <div className="spinner-border" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="text-center text-danger h-100 d-flex align-items-center justify-content-center">
-              {error}
-            </div>
-          ) : chartData ? (
-            <Line data={chartData} options={chartOptions} />
-          ) : (
-            <div className="text-center text-muted h-100 d-flex align-items-center justify-content-center">
-              No data available. Please select different time ranges.
-            </div>
-          )}
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64 bg-gray-50">
+          <p className="text-gray-500">Loading chart data...</p>
         </div>
+      ) : error ? (
+        <div className="p-4 bg-red-50 text-red-600 rounded">
+          <p>{error}</p>
+        </div>
+      ) : (
+        <div style={{ height: '500px' }}>
+          <Line options={options} data={chartData} />
+        </div>
+      )}
+      
+      <div className="mt-4 text-sm text-gray-600">
+        <p><strong>Note:</strong> For averaged periods, gaps in lines indicate dates where data isn't available for all years.</p>
       </div>
     </div>
   );
