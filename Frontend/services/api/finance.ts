@@ -2202,6 +2202,12 @@ export async function fetchPatternCorrelation(
  * Helper function to convert period strings to milliseconds
  */
 function periodToMs(period: string): number {
+  if (period === "Current Year") {
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1); // January 1st of current year
+    return now.getTime() - startOfYear.getTime();
+  }
+  
   const value = parseInt(period);
   if (period.includes('Year')) {
     return value * 365 * 24 * 60 * 60 * 1000;

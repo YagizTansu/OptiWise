@@ -3,7 +3,7 @@ import SeasonalityAnalysis from './SeasonalityAnalysis';
 import PatternCorrelation from './PatternCorrelation';
 import TimeAverageReturns from './TimeAverageReturns';
 import SeasonalStrategyInsights from './SeasonalStrategyInsights';
-import SeasonalityGraph from './SeasonalityGraph';
+import SeasonalityChart from './SeasonalityChart';
 
 interface SeasonalityProps {
   symbol: string;
@@ -18,10 +18,10 @@ const Seasonality: React.FC<SeasonalityProps> = ({ symbol }) => {
 
   return (
     <div >
+      <SeasonalityChart symbol={symbol} />
+      
       {/* <SeasonalityGraph symbol={symbol} /> */}
    
-      <SeasonalityAnalysis symbol={symbol} />
-
       <PatternCorrelation symbol={symbol} />
 
       <TimeAverageReturns symbol={symbol} />

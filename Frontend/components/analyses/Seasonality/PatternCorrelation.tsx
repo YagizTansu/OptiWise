@@ -14,7 +14,7 @@ interface PatternCorrelationProps {
 
 const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
   // Internal state management
-  const [comparisonPeriods, setComparisonPeriods] = useState({ first: '3 Years', second: '5 Years' });
+  const [comparisonPeriods, setComparisonPeriods] = useState({ first: 'Current Year', second: '5 Years' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Add state for modal visibility
@@ -87,6 +87,15 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
   useEffect(() => {
     fetchDataAndCalculateCorrelation();
   }, [symbol, comparisonPeriods.first, comparisonPeriods.second]);
+
+  // Get period description
+  const getPeriodDescription = (period: string): string => {
+    if (period === 'Current Year') {
+      const currentYear = new Date().getFullYear();
+      return `Jan 1, ${currentYear} to Today`;
+    }
+    return period;
+  };
 
   return (
     <div className={`${styles.patternCorrelationSection} ${styles.analysisCard}`}>
@@ -195,6 +204,7 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
               onChange={(e) => setComparisonPeriods({...comparisonPeriods, first: e.target.value})}
               className={styles.modernSelect}
             >
+              <option value="Current Year">Current Year</option>
               <option value="1 Year">1 Year</option>
               <option value="3 Years">3 Years</option>
               <option value="5 Years">5 Years</option>
@@ -208,6 +218,7 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
               onChange={(e) => setComparisonPeriods({...comparisonPeriods, second: e.target.value})}
               className={styles.modernSelect}
             >
+              <option value="Current Year">Current Year</option>
               <option value="1 Year">1 Year</option>
               <option value="3 Years">3 Years</option>
               <option value="5 Years">5 Years</option>
@@ -278,7 +289,7 @@ const PatternCorrelation: React.FC<PatternCorrelationProps> = ({ symbol }) => {
                 Pattern Correlation Analysis
               </h3>
               <p className={styles.analysisDescription}>
-                Comparing <span className={styles.periodHighlight}>{comparisonPeriods.first}</span> vs <span className={styles.periodHighlight}>{comparisonPeriods.second}</span> for <strong>{symbol}</strong>
+                Comparing <span className={styles.periodHighlight}>{getPeriodDescription(comparisonPeriods.first)}</span> vs <span className={styles.periodHighlight}>{getPeriodDescription(comparisonPeriods.second)}</span> for <strong>{symbol}</strong>
               </p>
               
               <div className={styles.correlationQuickStats}>
