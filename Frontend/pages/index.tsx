@@ -44,10 +44,19 @@ export default function Home() {
         {/* Hero Section */}
         <section className={styles.heroSection}>
           <div className={styles.heroContent}>
-            <h1 className={styles.heroTitle}>
-              <span className={styles.titlePrefix}>Opti</span>
-              <span className={styles.titleSuffix}>Wise</span>
-            </h1>
+            <div className={styles.logoTitleContainer}>
+              <h1 className={styles.heroTitle}>
+              <Image 
+                  src="/images/logo.png" 
+                  alt="OptiWise Logo" 
+                  width={100}
+                  height={60}
+                  className={styles.logo}
+                />
+                <span className={styles.titlePrefix}>Opti</span>
+                <span className={styles.titleSuffix}>Wise</span>
+              </h1>
+            </div>
             <h2 className={styles.heroSubtitle}>Empowering Your Financial Decisions</h2>
             <p className={styles.heroDescription}>
               Best Stock Market Analysis & Decisions for Traders and Investors with Forecaster Terminal.
