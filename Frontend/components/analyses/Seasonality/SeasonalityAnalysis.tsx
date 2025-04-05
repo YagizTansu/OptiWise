@@ -60,11 +60,9 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
   
   // Internal state management with multi-period selection
   const [selectedPeriods, setSelectedPeriods] = useState<PeriodOption[]>(periodOptions);
-  // Use 'monthly' as default timeframe and don't expose the selector
-  const [activeTimeframe] = useState('monthly'); 
   const [showDataPoints, setShowDataPoints] = useState(true);
   const [viewMode, setViewMode] = useState('line');
-  const [showPriceChart, setShowPriceChart] = useState(false); // New state to toggle between percent and price charts
+  const [showPriceChart, setShowPriceChart] = useState(false);
 
   // State for data loading
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -76,18 +74,10 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
   const chartRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // State for API data - now tracking multiple datasets per timeframe
-  const [seasonalityData, setSeasonalityData] = useState<{
-    monthly: { [key: string]: SeasonalityChartData | null };
-    daily: { [key: string]: SeasonalityChartData | null };
-    weekly: { [key: string]: SeasonalityChartData | null };
-    yearly: { [key: string]: SeasonalityChartData | null };
-  }>({
-    monthly: {},
-    daily: {},
-    weekly: {},
-    yearly: {}
-  });
+  // Simplified state for API data - only tracking monthly datasets
+  const [monthlyData, setMonthlyData] = useState<{
+    [key: string]: SeasonalityChartData | null
+  }>({});
 
   // Enhanced chart options with better styling and responsiveness
   const seasonalityChartOptions = {
@@ -255,12 +245,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     const loadData = async () => {
       try {
         // We'll track all the data we're fetching
-        const newData = {
-          daily: { ...seasonalityData.daily },
-          weekly: { ...seasonalityData.weekly },
-          monthly: { ...seasonalityData.monthly },
-          yearly: { ...seasonalityData.yearly }
-        };
+        const newData = { ...monthlyData };
         
         // Create a queue of promises for each period
         const promises = activePeriods.map(async period => {
@@ -270,7 +255,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
             : `${period.years}_years`;
           
           // If we don't have data for this period, fetch it
-          if (!newData[activeTimeframe as keyof typeof newData][periodKey]) {
+          if (!newData[periodKey]) {
             try {
               // Special handling for Current Year (Jan 1 to today)
               const periodParam = period.isCurrentYear 
@@ -286,7 +271,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               
               const allData = await fetchSeasonalityData(
                 symbol,
-                activeTimeframe,
+                'monthly',
                 [periodParam]
               );
               
@@ -301,10 +286,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                 };
                 
                 // Store data for this period
-                if (activeTimeframe === 'daily') newData.daily[periodKey] = updatedDataset;
-                if (activeTimeframe === 'weekly') newData.weekly[periodKey] = updatedDataset;
-                if (activeTimeframe === 'monthly') newData.monthly[periodKey] = updatedDataset;
-                if (activeTimeframe === 'yearly') newData.yearly[periodKey] = updatedDataset;
+                newData[periodKey] = updatedDataset;
               }
             } catch (error) {
               console.error(`Error fetching data for ${period.label}:`, error);
@@ -317,7 +299,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
         await Promise.all(promises);
         
         // Update state with all the data
-        setSeasonalityData(newData);
+        setMonthlyData(newData);
         setIsLoading(false);
       } catch (err) {
         console.error(`Error loading seasonality data:`, err);
@@ -327,17 +309,15 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     };
     
     loadData();
-  }, [selectedPeriods, activeTimeframe, symbol]);
+  }, [selectedPeriods, symbol]);
 
-  // Function to get the current seasonality data based on the timeframe
+  // Function to get the current seasonality data
   const getCurrentSeasonalityData = () => {
-    const timeframeData = seasonalityData[activeTimeframe as keyof typeof seasonalityData];
-    
     // Get active periods
     const activePeriods = selectedPeriods.filter(p => p.selected);
     
     // Check if we have any data
-    if (Object.keys(timeframeData).length === 0) {
+    if (Object.keys(monthlyData).length === 0) {
       return {
         labels: [],
         datasets: []
@@ -366,7 +346,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
         ? 'current_year' 
         : `${period.years}_years`;
         
-      const periodData = timeframeData[periodKey];
+      const periodData = monthlyData[periodKey];
       
       if (periodData && periodData.labels && periodData.datasets && periodData.datasets.length > 0) {
         // Use the first dataset with data as the source of labels
@@ -407,10 +387,9 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
 
   // Function to get the current seasonality data for price chart
   const getCurrentPriceData = () => {
-    const timeframeData = seasonalityData[activeTimeframe as keyof typeof seasonalityData];
     const activePeriods = selectedPeriods.filter(p => p.selected);
   
-    if (Object.keys(timeframeData).length === 0) {
+    if (Object.keys(monthlyData).length === 0) {
       return {
         labels: [],
         datasets: []
@@ -431,7 +410,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
   
     activePeriods.forEach((period, index) => {
       const periodKey = period.isCurrentYear ? 'current_year' : `${period.years}_years`;
-      const periodData = timeframeData[periodKey];
+      const periodData = monthlyData[periodKey];
   
       if (periodData && periodData.labels && periodData.datasets && periodData.datasets.length > 0) {
         if (labels.length === 0) {
@@ -495,61 +474,6 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     }
   };
 
-  // Listen for fullscreen changes
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
-
-  // Download chart as image with improved quality
-  const downloadChart = async () => {
-    if (!chartRef.current) return;
-    
-    try {
-      // Set loading indicator or cursor if needed
-      document.body.style.cursor = 'wait';
-      
-      const canvas = await html2canvas(chartRef.current, {
-        backgroundColor: '#ffffff',
-        scale: 3, // Higher scale for better quality
-        useCORS: true,
-        logging: false
-      });
-      
-      // Create download link
-      const link = document.createElement('a');
-      link.download = `${symbol}-seasonality-${activeTimeframe}-${new Date().toISOString().split('T')[0]}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    } catch (error) {
-      console.error('Failed to download chart:', error);
-      alert('Failed to download chart. Please try again.');
-    } finally {
-      document.body.style.cursor = 'default';
-    }
-  };
-
-  // Get chart title based on timeframe
-  const getChartTitle = () => {
-    switch(activeTimeframe) {
-      case 'daily':
-        return 'Daily Seasonality';
-      case 'weekly':
-        return 'Weekly Seasonality';
-      case 'yearly':
-        return 'Yearly Seasonality';
-      case 'monthly':
-      default:
-        return 'Monthly Seasonality';
-    }
-  };
-
   // Loading spinner component
   const LoadingSpinner = () => (
     <div className={styles.loadingSpinner}>
@@ -563,7 +487,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
     <div className={styles.noDataPlaceholder}>
       <div className={styles.noDataIcon}>📊</div>
       <h3>No seasonality data available</h3>
-      <p>Try selecting a different timeframe or period</p>
+      <p>Try selecting a different period</p>
     </div>
   );
 
@@ -579,7 +503,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
       <div className={styles.analysisCard} ref={containerRef}>        
         {/* Chart Controls */}
         <div className={styles.chartHeader}>
-          <h3>{getChartTitle()}</h3>
+          <h3>Monthly Seasonality</h3>
           <div className={styles.chartControls}>
             <button 
               className={styles.modernIconButton} 
@@ -643,7 +567,6 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               ))}
             </div>
           </div>
-          {/* Removed the timeframe selector section */}
         </div>
         
         {/* Chart */}
@@ -678,7 +601,7 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
           <div className={styles.modalOverlay} onClick={() => setShowInfoModal(false)}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
               <div className={styles.modalHeader}>
-                <h3>Understanding Seasonality Analysis</h3>
+                <h3>Understanding Monthly Seasonality Analysis</h3>
                 <button 
                   className={styles.closeButton}
                   onClick={() => setShowInfoModal(false)}
@@ -687,13 +610,11 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                 </button>
               </div>
               <div className={styles.modalBody}>
-                <h4>Understanding Seasonality:</h4>
-                <ul className={styles.infoList}>
-                  <li><strong>Daily:</strong> Performance trends by day of month</li>
-                  <li><strong>Weekly:</strong> Performance by day of the week (Mon-Fri)</li>
-                  <li><strong>Monthly:</strong> Performance patterns across months of the year</li>
-                  <li><strong>Yearly:</strong> Year-to-year performance comparison</li>
-                </ul>
+                <h4>Understanding Monthly Seasonality:</h4>
+                <p>
+                  Monthly seasonality shows performance patterns across different months of the year.
+                  This analysis helps identify which months historically perform better or worse for this asset.
+                </p>
                 <h4>How to use this chart:</h4>
                 <ul className={styles.infoList}>
                   <li>Select multiple time periods to overlay historical performance patterns</li>
@@ -702,8 +623,8 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
                   <li>Download the chart as an image using the download button</li>
                 </ul>
                 <p>
-                  Seasonal patterns can help inform trading and investment decisions, particularly for assets 
-                  that show consistent performance during specific periods.
+                  Monthly patterns can help inform trading and investment decisions, particularly for assets 
+                  that show consistent performance during specific months of the year.
                 </p>
                 <div className={styles.infoTip}>
                   <strong>Pro tip:</strong> Compare patterns across different time horizons to identify 

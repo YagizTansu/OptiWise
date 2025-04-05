@@ -1,0 +1,321 @@
+/* Seasonality Chart Styles - Modern design aligned with SeasonalityAnalysis */
+
+.chartCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  margin-bottom: 24px;
+}
+
+.chartContainer {
+  position: relative;
+  width: 100%;
+  height: 400px;
+}
+
+/* Chart Header */
+.chartHeader {
+  margin-bottom: 16px;
+}
+
+.chartHeader h6 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* Chart Controls */
+.chartControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  background-color: #f9fafb;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.controlGroup {
+  margin-bottom: 16px;
+}
+
+.controlLabel {
+  font-weight: 500;
+  color: #475569;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Input Fields */
+.inputField {
+  width: 100px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+}
+
+.inputField:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.inputFieldWithMargin {
+  margin-right: 12px;
+}
+
+/* Buttons */
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f0f9ff;
+  color: #0288d1;
+  border: 1px solid #bbdefb;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 16px;
+}
+
+.refreshButton:hover {
+  background-color: #e1f5fe;
+  box-shadow: 0 2px 5px rgba(2,136,209,0.15);
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Toggle Buttons */
+.toggleGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.toggleButton.active {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+  font-weight: 500;
+}
+
+/* Loading and Error States */
+.centeredContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.errorMessage {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 20px 0;
+  font-weight: 500;
+}
+
+.noDataMessage {
+  color: #64748b;
+  text-align: center;
+}
+
+/* Modern Custom Range Styling */
+.customRangeContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.yearInputsContainer {
+  display: flex;
+  align-items: center;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  transition: all 0.2s ease;
+}
+
+.customRangeContainer .toggleButton {
+  padding: 6px 12px;
+}
+
+.customRangeContainer .toggleButton.active + .yearInputsContainer {
+  border-color: #93c5fd;
+  background-color: #f8faff;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
+.yearInput {
+  width: 80px !important;
+  margin: 0 !important;
+}
+
+.yearInputField {
+  border: none !important;
+  background: transparent !important;
+  font-size: 14px !important;
+  padding: 4px 8px !important;
+}
+
+.yearInputField:focus {
+  box-shadow: none !important;
+}
+
+.yearInputField:disabled {
+  opacity: 0.5;
+  background: transparent !important;
+}
+
+.yearInputSeparator {
+  color: #94a3b8;
+  margin: 0 4px;
+  font-weight: 500;
+}
+
+/* Minimal Time Range Selector */
+.timeRangeSelector {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.timeRangeLabel {
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.timeRangeOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex: 1;
+}
+
+.timeRangeButton {
+  padding: 5px 10px;
+  min-width: 0;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.timeRangeButton:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.timeRangeButton.active {
+  background-color: #dbeafe;
+  border-color: #93c5fd;
+  color: #1e40af;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chartCard {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .chartContainer {
+    height: 300px;
+  }
+  
+  .chartControls {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .refreshButton {
+    padding: 6px 12px;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  
+  .inputField, .inputFieldWithMargin {
+    width: 80px;
+  }
+  
+  .controlLabel {
+    font-size: 14px;
+  }
+
+  .customRangeContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .yearInputsContainer {
+    width: 100%;
+  }
+  
+  .yearInput {
+    flex: 1;
+  }
+
+  .timeRangeSelector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .timeRangeOptions {
+    width: 100%;
+  }
+  
+  .timeRangeButton {
+    flex: 1;
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+}

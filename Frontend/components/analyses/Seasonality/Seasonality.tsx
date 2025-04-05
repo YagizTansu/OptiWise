@@ -19,13 +19,13 @@ const Seasonality: React.FC<SeasonalityProps> = ({ symbol }) => {
   return (
     <div >
       <SeasonalityChart symbol={symbol} />
-      
-      {/* <SeasonalityGraph symbol={symbol} /> */}
-   
-      <PatternCorrelation symbol={symbol} />
 
       <TimeAverageReturns symbol={symbol} />
-      
+
+      <SeasonalityAnalysis symbol={symbol} />
+         
+      <PatternCorrelation symbol={symbol} />
+
       <SeasonalStrategyInsights symbol={symbol} />
     </div>
   );
