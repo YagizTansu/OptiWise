@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { FaFilter, FaArrowDown, FaArrowUp, FaCalendarAlt, FaChartLine, FaPercentage, FaTrophy, FaExclamationTriangle } from 'react-icons/fa';
+import { FaFilter, FaArrowDown, FaArrowUp, FaExclamationTriangle } from 'react-icons/fa';
 import styles from '../styles/QuantumScreener.module.css';
 import { fetchSeasonalityData, fetchSeasonalStrategyInsights, SeasonalStrategyResponse } from '../services/api/finance';
-import Layout from '../components/Layout';
+import Layout from '@/components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 // Types for our data
@@ -13,6 +13,7 @@ interface ScreenerItem {
   correlation: number;
   winRate: number;
   avgReturn: number;
+  volatility: number;
   openDate: string;
   closeDate: string;
   score: number;
@@ -27,6 +28,39 @@ const SYMBOLS_TO_ANALYZE = [
   { symbol: 'TSLA', name: 'Tesla Inc' },
   { symbol: 'NVDA', name: 'NVIDIA Corp' },
   { symbol: 'META', name: 'Meta Platforms Inc' },
+  { symbol: 'MS', name: 'Morgan Stanley' },
+  { symbol: 'NFLX', name: 'Netflix Inc' },
+  { symbol: 'DIS', name: 'Walt Disney Co' },
+  { symbol: 'VZ', name: 'Verizon Communications Inc' },
+  { symbol: 'T', name: 'AT&T Inc' },
+  { symbol: 'PFE', name: 'Pfizer Inc' },
+  { symbol: 'KO', name: 'Coca-Cola Co' },
+  { symbol: 'PEP', name: 'PepsiCo Inc' },
+  { symbol: 'MRK', name: 'Merck & Co Inc' },
+  { symbol: 'CSCO', name: 'Cisco Systems Inc' },
+  { symbol: 'INTC', name: 'Intel Corp' },
+  { symbol: 'AMD', name: 'Advanced Micro Devices Inc' },
+  { symbol: 'NFLX', name: 'Netflix Inc' },
+  { symbol: 'XOM', name: 'Exxon Mobil Corp' },
+  { symbol: 'CVX', name: 'Chevron Corp' },
+  { symbol: 'BA', name: 'Boeing Co' },
+  { symbol: 'IBM', name: 'International Business Machines Corp' },
+  { symbol: 'WFC', name: 'Wells Fargo & Co' },
+  { symbol: 'UNH', name: 'UnitedHealth Group Inc' },
+  { symbol: 'HD', name: 'Home Depot Inc' },
+  { symbol: 'VZ', name: 'Verizon Communications Inc' },
+  { symbol: 'CMCSA', name: 'Comcast Corp' },
+  { symbol: 'TGT', name: 'Target Corp' },
+  { symbol: 'NKE', name: 'Nike Inc' },
+  { symbol: 'ADBE', name: 'Adobe Inc' },
+  { symbol: 'CRM', name: 'Salesforce.com Inc' },
+  { symbol: 'ORCL', name: 'Oracle Corp' },
+  { symbol: 'INTU', name: 'Intuit Inc' },
+  { symbol: 'QCOM', name: 'Qualcomm Inc' },
+  { symbol: 'TXN', name: 'Texas Instruments Inc' },
+  { symbol: 'AVGO', name: 'Broadcom Inc' },
+  { symbol: 'NOW', name: 'ServiceNow Inc' },
+  { symbol: 'HON', name: 'Honeywell International Inc' },
   { symbol: 'JPM', name: 'JPMorgan Chase & Co' },
   { symbol: 'V', name: 'Visa Inc' },
   { symbol: 'JNJ', name: 'Johnson & Johnson' },
@@ -39,7 +73,7 @@ const SYMBOLS_TO_ANALYZE = [
   { symbol: 'GLD', name: 'Gold ETF' },
   { symbol: 'BTC-USD', name: 'Bitcoin USD' },
   { symbol: 'ETH-USD', name: 'Ethereum USD' },
-  { symbol: 'EUR=X', name: 'EUR/USD' }
+  { symbol: 'EUR=X', name: 'EUR/USD' },
 ];
 
 // Periods to check for seasonality correlation
@@ -91,18 +125,18 @@ export default function QuantumScreener() {
               
               if (strategyData && !strategyData.error) {
                 // Find relevant month based on duration
-                const currentDate = new Date();
-                const targetMonth = new Date(
-                  direction === 'long' 
-                    ? currentDate.setMonth(currentDate.getMonth()) 
-                    : currentDate.setMonth(currentDate.getMonth() - months)
-                );
-                
-                const endDate = new Date(
-                  direction === 'long' 
-                    ? currentDate.setMonth(currentDate.getMonth() + months) 
-                    : currentDate.setMonth(currentDate.getMonth())
-                );
+                const targetMonth = new Date();
+                const endDate = new Date();
+
+                if (direction === 'long') {
+                  // For long positions, analyze from current month forward
+                  targetMonth.setMonth(targetMonth.getMonth());
+                  endDate.setMonth(targetMonth.getMonth() + months);
+                } else {
+                  // For short positions, still analyze forward but expect opposite movement
+                  targetMonth.setMonth(targetMonth.getMonth());
+                  endDate.setMonth(targetMonth.getMonth() + months);
+                }
                 
                 // Format dates
                 const startDateStr = formatDate(targetMonth);
@@ -114,17 +148,19 @@ export default function QuantumScreener() {
                 // Calculate win rate (percentage of profitable periods)
                 const winRate = calculateAverage(monthDetails.map(m => m.consistency));
                 
-                // Calculate average return for profitable periods only
+                // Calculate average return for all periods
                 const monthlyReturns = monthDetails.map(m => 
                   direction === 'long' ? m.avgReturn : -m.avgReturn
                 );
-                const avgReturn = calculateAverageOfProfitablePeriods(monthlyReturns);
+                const avgReturn = calculateAverageReturn(monthlyReturns);
+                const volatility = calculateVolatility(monthlyReturns);
                 
                 // Calculate overall score
                 const score = (
-                  (correlation * 0.3) + 
-                  ((winRate / 100) * 0.4) + 
-                  (Math.min(Math.abs(avgReturn), 10) / 10 * 0.3)
+                  (correlation * 0.25) + 
+                  ((winRate / 100) * 0.30) + 
+                  (avgReturn > 0 ? (Math.min(Math.abs(avgReturn), 10) / 10 * 0.30) : 0) +
+                  (volatility > 0 ? (1 / Math.min(volatility, 10) * 0.15) : 0)  // Lower volatility = higher score
                 );
                 
                 screenerResults.push({
@@ -134,6 +170,7 @@ export default function QuantumScreener() {
                   correlation,
                   winRate,
                   avgReturn,
+                  volatility,
                   openDate: startDateStr,
                   closeDate: endDateStr,
                   score
@@ -288,11 +325,18 @@ export default function QuantumScreener() {
     return numbers.reduce((sum, val) => sum + val, 0) / numbers.length;
   }
 
-  // Calculate average of only positive numbers (for profitable periods)
-  function calculateAverageOfProfitablePeriods(numbers: number[]): number {
-    const profitable = numbers.filter(val => val > 0);
-    if (profitable.length === 0) return 0;
-    return profitable.reduce((sum, val) => sum + val, 0) / profitable.length;
+  // Calculate average return for all periods
+  function calculateAverageReturn(numbers: number[]): number {
+    if (numbers.length === 0) return 0;
+    return numbers.reduce((sum, val) => sum + val, 0) / numbers.length;
+  }
+
+  // Calculate volatility
+  function calculateVolatility(numbers: number[]): number {
+    if (numbers.length < 2) return 0;
+    const mean = numbers.reduce((sum, val) => sum + val, 0) / numbers.length;
+    const variance = numbers.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / numbers.length;
+    return Math.sqrt(variance);
   }
 
   // Sort the results
@@ -451,6 +495,19 @@ export default function QuantumScreener() {
                             </div>
                           </th>
                           <th 
+                            onClick={() => handleSort('volatility')} 
+                            className={`${styles.sortableHeader} ${styles.dataColumn}`}
+                          >
+                            <div className={styles.headerContent}>
+                              <span>Volatility %</span>
+                              {sortBy === 'volatility' && (
+                                <span className={styles.sortIcon}>
+                                  {sortDirection === 'asc' ? <FaArrowUp /> : <FaArrowDown />}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
                             onClick={() => handleSort('openDate')} 
                             className={`${styles.sortableHeader} ${styles.dateColumn}`}
                           >
@@ -512,6 +569,7 @@ export default function QuantumScreener() {
                             <td className={`${styles.returnCell} ${styles.returnColumn} ${item.avgReturn >= 0 ? styles.positive : styles.negative}`}>
                               {item.avgReturn >= 0 ? '+' : ''}{item.avgReturn.toFixed(1)}%
                             </td>
+                            <td className={styles.dataColumn}>{item.volatility?.toFixed(2) || "N/A"}%</td>
                             <td className={styles.dateColumn}>{item.openDate}</td>
                             <td className={styles.dateColumn}>{item.closeDate}</td>
                           </tr>
