@@ -133,7 +133,7 @@ export default function Navbar() {
                         </div>
                       </Link>
                       
-                      <Link href="/breakeven" className={styles.dropdownGridItem}>
+                      {/* <Link href="/breakeven" className={styles.dropdownGridItem}>
                         <div className={styles.dropdownItemIconWrap}>
                           <FaBalanceScale className={styles.dropdownItemIcon} />
                         </div>
@@ -141,7 +141,7 @@ export default function Navbar() {
                           <span className={styles.dropdownItemTitle}>Breakeven</span>
                           <p className={styles.dropdownItemDesc}>Stocks turning profitable</p>
                         </div>
-                      </Link>
+                      </Link> */}
   
                       <Link href="/quantum-screener" className={styles.dropdownGridItem}>
                         <div className={styles.dropdownItemIconWrap}>
@@ -236,7 +236,9 @@ export default function Navbar() {
             </button>
             {userDropdownOpen && (
               <div className={styles.userDropdown} role="menu">
+                <Link href="/favorites" className={styles.dropdownItem}>Favorites</Link>
                 <Link href="/settings" className={styles.dropdownItem}>Settings</Link>
+                
                 {!user && (
                   <Link href="/login" className={styles.dropdownItem}>Sign In</Link>
                 )}

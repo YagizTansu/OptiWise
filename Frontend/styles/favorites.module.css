@@ -1,0 +1,278 @@
+.favoritesContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+}
+
+.searchContainer {
+  position: relative;
+}
+
+.searchInput {
+  padding: 10px 16px 10px 36px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  width: 250px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+}
+
+.tableContainer {
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  border: 1px solid #e0e0e0;
+}
+
+.favoritesTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.favoritesTable th {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 2px solid #e0e0e0;
+  font-weight: 600;
+  color: #333;
+  background-color: #f9f9f9;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.sortableHeader {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.sortableHeader span {
+  display: flex;
+  align-items: center;
+}
+
+.sortableHeader:hover {
+  color: #0066cc;
+}
+
+.favoritesTable td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  color: #444;
+  vertical-align: middle;
+}
+
+.favoriteItem {
+  transition: background-color 0.2s;
+}
+
+.favoriteItem:hover {
+  background-color: #f5f8ff;
+}
+
+.symbolCell {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.symbolInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.starIcon {
+  font-size: 16px;
+}
+
+.symbolName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.price {
+  font-weight: 600;
+  color: #333;
+}
+
+.positive {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.negative {
+  color: #F44336;
+  font-weight: 500;
+}
+
+.sparklineCell {
+  padding: 10px 16px;
+  width: 150px;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.actionButton, .removeButton {
+  background-color: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.actionButton {
+  color: #0066cc;
+}
+
+.actionButton:hover {
+  background-color: #e6f0ff;
+}
+
+.removeButton {
+  color: #ff4d4d;
+}
+
+.removeButton:hover {
+  background-color: #ffebeb;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background-color: #ffffff;
+  border-radius: 12px;
+  margin-top: 20px;
+  border: 1px dashed #ddd;
+}
+
+.emptyState p {
+  margin-top: 16px;
+  font-size: 18px;
+  color: #666;
+}
+
+.emptyStateHint {
+  font-size: 14px !important;
+  max-width: 400px;
+  color: #888;
+}
+
+.loadingSection {
+  margin-top: 20px;
+}
+
+.skeleton {
+  height: 60px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.loading {
+  color: #888;
+  font-style: italic;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .sparklineCell {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .searchInput {
+    width: 100%;
+  }
+  
+  .favoritesTable {
+    font-size: 14px;
+  }
+  
+  .favoritesTable thead {
+    display: table-header-group;
+  }
+  
+  .favoritesTable th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+}
+
+@media (max-width: 640px) {
+  .favoritesTable {
+    min-width: 640px;
+  }
+  
+  .tableContainer {
+    overflow-x: auto;
+  }
+}
