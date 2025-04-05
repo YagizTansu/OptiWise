@@ -45,10 +45,6 @@
   font-weight: 700;
 }
 
-.titleSuffix {
-  color: var(--secondary-color);
-  font-weight: 600;
-}
 
 .tagline {
   color: var(--text-light);
@@ -402,8 +398,12 @@
 }
 
 .titleSuffix {
-  color: var(--text-primary);
-  font-weight: 300;
+  background: linear-gradient(120deg, #000000, #000000);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 500;
+
 }
 
 .tagline {

@@ -65,10 +65,12 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
         calculateValuations(financialDataResult, dashboardResult);
 
         setLoading(false);
-      } catch (err) {
-        const errorMessage = err.message?.includes('collectConsentSubmitResponse') 
-          ? 'Yahoo Finance API is experiencing issues. Please try again later.'
-          : 'Failed to fetch data. Please try again later.';
+      } catch (err: unknown) {
+        let errorMessage = 'Failed to fetch data. Please try again later.';
+        
+        if (err instanceof Error && err.message?.includes('collectConsentSubmitResponse')) {
+          errorMessage = 'Yahoo Finance API is experiencing issues. Please try again later.';
+        }
           
         setError(errorMessage);
         setLoading(false);
@@ -198,8 +200,8 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
           baseFreeCashFlow: baseFCF
         }
       }));
-    } catch (error) {
-      console.error('DCF calculation error:', error);
+    } catch (err: unknown) {
+      console.error('DCF calculation error:', err);
       setDcfValue(null);
       setDcfUpside(null);
     }
@@ -263,8 +265,8 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
           formula: "Growth Rate (%) × TTM EPS"
         }
       }));
-    } catch (error) {
-      console.error('Lynch calculation error:', error);
+    } catch (err: unknown) {
+      console.error('Lynch calculation error:', err);
       setLynchValue(null);
       setLynchUpside(null);
     }
@@ -389,8 +391,8 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
           spreadROICWACC: roic - wacc
         }
       }));
-    } catch (error) {
-      console.error('EVA calculation error:', error);
+    } catch (err: unknown) {
+      console.error('EVA calculation error:', err);
       setEvaValue(null);
       setEvaUpside(null);
     }
@@ -468,9 +470,10 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
                   calculateValuations(financialDataResult, dashboardResult);
 
                   setLoading(false);
-                } catch (err) {
+                } catch (err: unknown) {
                   setError('Failed to fetch data. Please try again later.');
                   setLoading(false);
+                  console.error('Error retrying data fetch:', err);
                 }
               };
               fetchData();
