@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../../styles/reports/EventsAndDevelopments.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 interface EventsAndDevelopmentsProps {
   symbol: string;
@@ -65,27 +66,41 @@ const EventsAndDevelopments: React.FC<EventsAndDevelopmentsProps> = ({ symbol })
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>Loading events and developments data...</p>
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Events and Developments</h3>
+        <p>Retrieving company events and significant developments for {symbol}...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
+      <div className={styles.modernErrorContainer}>
+        <div className={styles.errorIconLarge}><FaExclamationTriangle /></div>
+        <h3>Unable to Load Data</h3>
         <p>{error}</p>
+        <button 
+          className={styles.modernRetryButton}
+          onClick={() => {
+            setLoading(true);
+            loadInsights();
+          }}
+        >
+          Try Again
+        </button>
       </div>
     );
   }
 
   if (!insightsData || (!insightsData.events?.length && !insightsData.sigDevs?.length)) {
     return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
-        <p>No events or developments data available for {symbol}</p>
+      <div className={styles.analysisCard}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Events or Developments Available</h4>
+          <p>We couldn't find any events or developments for {symbol} at this time. This may be due to limited data availability or the company being newly listed.</p>
+        </div>
       </div>
     );
   }

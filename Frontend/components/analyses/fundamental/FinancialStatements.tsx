@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from '../../../styles/fundamental/FinancialStatements.module.css';
-import { FaChartLine, FaBalanceScale, FaMoneyBillWave, FaRegCalendarAlt, FaRegCalendar, FaInfoCircle } from 'react-icons/fa';
+import { FaChartLine, FaBalanceScale, FaMoneyBillWave, FaRegCalendarAlt, FaRegCalendar, FaInfoCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { fetchFundamentalsTimeSeries } from '../../../services/api/finance';
 
 // Financial statement data types
@@ -94,7 +94,6 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
           'all',
           periodType
         );
-        debugger
         
         if (!financialData || financialData.length === 0) {
           setHasError(true);
@@ -285,10 +284,60 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
         };
     }
   };
-  
+
+  if (isLoading) {
+    return (
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Financial Statements</h3>
+        <p>Retrieving financial data for {symbol}...</p>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className={styles.modernErrorContainer}>
+        <div className={styles.errorIconLarge}><FaExclamationTriangle /></div>
+        <h3>Unable to Load Data</h3>
+        <p>There was an error loading the financial data. Please try again later.</p>
+        <button 
+          className={styles.modernRetryButton}
+          onClick={() => {
+            setIsLoading(true);
+          }}
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  const visibleYears = getVisibleYears();
+  const isDataEmpty = visibleYears.length === 0;
+
+  if (isDataEmpty) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Financial Data Available</h4>
+          <p>We couldn't find any financial statements for {symbol} at this time. This may be due to the company being newly listed, delayed reporting, or limited data availability.</p>
+          <button 
+            className={styles.modernRetryButton}
+            onClick={() => {
+              setIsLoading(true);
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const { title, icon } = getStatementTitle();
   const currentData = getCurrentData();
-  const visibleYears = getVisibleYears();
   
   return (
     <div className={styles.financialStatementCard}>
@@ -348,82 +397,67 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
       </div>
       
       <div className={styles.tableContainer}>
-        {isLoading ? (
-          <div className={styles.loadingContainer}>
-            <div className={styles.loader}></div>
-            <p>Loading financial data...</p>
-          </div>
-        ) : hasError ? (
-          <div className={styles.errorContainer}>
-            <p>There was an error loading the financial data. Please try again later.</p>
-          </div>
-        ) : visibleYears.length === 0 ? (
-          <div className={styles.noDataContainer}>
-            <p>No financial data available for {symbol}.</p>
-          </div>
-        ) : (
-          <div className={styles.financialTableContainer}>
-            <table className={styles.financialTable}>
-              <thead>
-                <tr>
-                  <th>Line Item</th>
-                  {visibleYears.map((year, index) => (
-                    <th key={year} className={styles.numericCell}>
-                      {formatPeriodHeader(year)}
-                    </th>
+        <div className={styles.financialTableContainer}>
+          <table className={styles.financialTable}>
+            <thead>
+              <tr>
+                <th>Line Item</th>
+                {visibleYears.map((year, index) => (
+                  <th key={year} className={styles.numericCell}>
+                    {formatPeriodHeader(year)}
+                  </th>
+                ))}
+                {showYoY && visibleYears.length > 1 && (
+                  <th className={styles.numericCell}>
+                    {periodType === 'quarterly' ? 'QoQ Change' : 'YoY Change'}
+                  </th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(currentData).map(([lineItem, yearData]) => (
+                <tr 
+                  key={lineItem} 
+                  className={
+                    lineItem === 'Net Income' || lineItem === 'Total Assets' || 
+                    lineItem === 'Free Cash Flow' ? styles.highlightRow : ''
+                  }
+                >
+                  <td className={lineItem.startsWith('-') ? styles.subItem : ''}>
+                    {lineItem}
+                  </td>
+                  {visibleYears.map(year => (
+                    <td 
+                      key={year} 
+                      className={`${styles.numericCell}`}
+                    >
+                      {formatValue(yearData[year])}
+                    </td>
                   ))}
                   {showYoY && visibleYears.length > 1 && (
-                    <th className={styles.numericCell}>
-                      {periodType === 'quarterly' ? 'QoQ Change' : 'YoY Change'}
-                    </th>
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(currentData).map(([lineItem, yearData]) => (
-                  <tr 
-                    key={lineItem} 
-                    className={
-                      lineItem === 'Net Income' || lineItem === 'Total Assets' || 
-                      lineItem === 'Free Cash Flow' ? styles.highlightRow : ''
-                    }
-                  >
-                    <td className={lineItem.startsWith('-') ? styles.subItem : ''}>
-                      {lineItem}
-                    </td>
-                    {visibleYears.map(year => (
-                      <td 
-                        key={year} 
-                        className={`${styles.numericCell}`}
-                      >
-                        {formatValue(yearData[year])}
-                      </td>
-                    ))}
-                    {showYoY && visibleYears.length > 1 && (
-                      <td className={`${styles.numericCell} ${
+                    <td className={`${styles.numericCell} ${
+                      calculateYoYChange(
+                        yearData[visibleYears[visibleYears.length - 1]], 
+                        yearData[visibleYears[visibleYears.length - 2]]
+                      ).startsWith('+') ? 
+                        styles.positive : 
                         calculateYoYChange(
                           yearData[visibleYears[visibleYears.length - 1]], 
                           yearData[visibleYears[visibleYears.length - 2]]
-                        ).startsWith('+') ? 
-                          styles.positive : 
-                          calculateYoYChange(
-                            yearData[visibleYears[visibleYears.length - 1]], 
-                            yearData[visibleYears[visibleYears.length - 2]]
-                          ).startsWith('-') ? 
-                            styles.negative : ''
-                      }`}>
-                        {calculateYoYChange(
-                          yearData[visibleYears[visibleYears.length - 1]], 
-                          yearData[visibleYears[visibleYears.length - 2]]
-                        )}
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                        ).startsWith('-') ? 
+                          styles.negative : ''
+                    }`}>
+                      {calculateYoYChange(
+                        yearData[visibleYears[visibleYears.length - 1]], 
+                        yearData[visibleYears[visibleYears.length - 2]]
+                      )}
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       
       {/* Tooltip for info hover */}

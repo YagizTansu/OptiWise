@@ -402,7 +402,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-weight: 500;
+  font-weight: 300;
 
 }
 
@@ -1484,14 +1484,7 @@
 
 .heroTitle {
   font-size: 5.0rem;
-  line-height: 1.1;
-  margin-bottom: 0.5rem;
-  font-weight: 800;
-  background: linear-gradient(90deg, #2a4da3 0%, #000000 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-emphasis-color: transparent;
+  line-height: 1.05;
 }
 
 .heroSubtitle {

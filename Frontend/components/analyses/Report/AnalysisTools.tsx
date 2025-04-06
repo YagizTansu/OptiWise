@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from '../../../styles/reports/AnalysisTools.module.css';
 import { fetchAnalysisData, AnalysisData } from '../../../services/api/finance';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 interface AnalysisToolsProps {
   symbol: string;
@@ -44,13 +45,11 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
 
   // Format recommendation period to be more descriptive
   const formatRecommendationPeriod = (period: string) => {
-    // Yahoo Finance typically returns periods like "0m", "+1m", "-1m" etc.
     if (period === "0m") return "Current Month";
     if (period === "-1m") return "Last Month";
     if (period === "-2m") return "Two Months Ago";
     if (period === "-3m") return "Three Months Ago";
     
-    // For other formats, try to parse and provide better description
     if (period.endsWith('m')) {
       const num = parseInt(period);
       if (!isNaN(num)) {
@@ -58,7 +57,7 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
       }
     }
     
-    return period; // Return original if we can't parse it
+    return period;
   };
 
   // Get section description based on section name
@@ -77,12 +76,90 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
     }
   };
 
+  // Loading and error state handling
+  if (loading) {
+    return (
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Analysis Data</h3>
+        <p>Retrieving analyst recommendations and earnings data for {symbol}...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.modernErrorContainer}>
+        <div className={styles.errorIconLarge}><FaExclamationTriangle /></div>
+        <h3>Unable to Load Data</h3>
+        <p>{error}</p>
+        <button 
+          className={styles.modernRetryButton}
+          onClick={() => {
+            setError(null);
+            setLoading(true);
+            const fetchData = async () => {
+              try {
+                const modules = [
+                  'recommendationTrend', 
+                  'earningsHistory', 
+                  'earningsTrend',
+                  'calendarEvents'
+                ];
+                
+                const response = await fetchAnalysisData(symbol, modules);
+                setData(response);
+                setLoading(false);
+              } catch (err) {
+                setError('Failed to fetch analysis data');
+                setLoading(false);
+                console.error(err);
+              }
+            };
+            
+            if (symbol) {
+              fetchData();
+            }
+          }}
+        >
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  // Check if all data sections are empty
+  const isAllDataEmpty = 
+    (!data.recommendationTrend?.trend || data.recommendationTrend.trend.length === 0) && 
+    (!data.earningsHistory?.history || data.earningsHistory.history.length === 0) && 
+    (!data.earningsTrend?.trend || data.earningsTrend.trend.length === 0) &&
+    (!data.calendarEvents?.earnings?.earningsDate || data.calendarEvents.earnings.earningsDate.length === 0) &&
+    !data.calendarEvents?.dividendDate;
+
+  // Return centralized "no data" message if all sections are empty
+  if (isAllDataEmpty) {
+    return (
+      <div className={styles.analysisCard}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Analysis Data Available</h4>
+          <p>We couldn't find any analyst recommendations, earnings history, or forecast data for {symbol} at this time. This may be due to limited analyst coverage or the company being newly listed.</p>
+        </div>
+      </div>
+    );
+  }
+
   // Render recommendation trends
   const renderRecommendations = () => {
     const recommendations = data.recommendationTrend?.trend || [];
-    if (recommendations.length === 0) return <div className={styles.noStatementData}>No recommendation data available</div>;
+    if (recommendations.length === 0) return (
+      <div className={styles.enhancedNoDataMessage}>
+        <FaExclamationTriangle className={styles.noDataIcon} />
+        <h4>No Recommendation Data Available</h4>
+        <p>We couldn't find any analyst recommendation data for {symbol} at this time. This may be due to limited analyst coverage or recent changes in the company's status.</p>
+      </div>
+    );
     
-    // Calculate totals and sentiment for most recent recommendation period (current period)
     const currentRecommendation = recommendations.find((rec: { period: string; }) => rec.period === '0m') || recommendations[0];
     const totalAnalysts = currentRecommendation ? 
       currentRecommendation.strongBuy + 
@@ -91,19 +168,15 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
       currentRecommendation.sell + 
       currentRecommendation.strongSell : 0;
     
-    // Calculate bullish percentage (strongBuy + buy)
     const bullishPercentage = totalAnalysts ? 
       Math.round(((currentRecommendation.strongBuy + currentRecommendation.buy) / totalAnalysts) * 100) : 0;
     
-    // Calculate bearish percentage (sell + strongSell)
     const bearishPercentage = totalAnalysts ? 
       Math.round(((currentRecommendation.sell + currentRecommendation.strongSell) / totalAnalysts) * 100) : 0;
     
-    // Calculate neutral percentage (hold)
     const neutralPercentage = totalAnalysts ? 
       Math.round((currentRecommendation.hold / totalAnalysts) * 100) : 0;
     
-    // Determine overall sentiment
     let overallSentiment = 'Neutral';
     let sentimentClass = styles.neutral;
     if (bullishPercentage > 60) {
@@ -239,17 +312,14 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
             </thead>
             <tbody>
               {recommendations.map((rec: any, index: number) => {
-                // Calculate average rating (1=Strong Buy, 5=Strong Sell)
                 const totalRecs = rec.strongBuy + rec.buy + rec.hold + rec.sell + rec.strongSell;
                 const avgRating = totalRecs > 0 ? 
                   ((rec.strongBuy * 1) + (rec.buy * 2) + (rec.hold * 3) + (rec.sell * 4) + (rec.strongSell * 5)) / totalRecs : 0;
                 
-                // Determine sentiment class based on average rating
                 const ratingClass = avgRating < 2.5 ? styles.positive : 
                                     avgRating > 3.5 ? styles.negative : 
                                     styles.neutral;
                                     
-                // Get rating description
                 const ratingDesc = avgRating < 1.5 ? 'Strong Buy' :
                                   avgRating < 2.5 ? 'Buy' :
                                   avgRating < 3.5 ? 'Hold' :
@@ -278,17 +348,14 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
             <h5>Recommendation Trend</h5>
             <p>
               {(() => {
-                // Compare current and previous period
                 const current = recommendations.find((rec: { period: string; }) => rec.period === '0m') || recommendations[0];
                 const previous = recommendations.find((rec: { period: string; }) => rec.period === '-1m') || recommendations[1];
                 
                 if (!previous) return "No trend data available";
                 
-                // Calculate current and previous bullishness
                 const currentBullish = current.strongBuy + current.buy;
                 const previousBullish = previous.strongBuy + previous.buy;
                 
-                // Calculate current and previous bearishness
                 const currentBearish = current.sell + current.strongSell;
                 const previousBearish = previous.sell + previous.strongSell;
                 
@@ -327,9 +394,14 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
   // Render earnings history
   const renderEarningsHistory = () => {
     const earningsHistory = data.earningsHistory?.history || [];
-    if (earningsHistory.length === 0) return <div className={styles.noStatementData}>No earnings history available</div>;
+    if (earningsHistory.length === 0) return (
+      <div className={styles.enhancedNoDataMessage}>
+        <FaExclamationTriangle className={styles.noDataIcon} />
+        <h4>No Earnings History Available</h4>
+        <p>We couldn't find any earnings history data for {symbol} at this time. This may be due to the company being newly listed or changes in reporting requirements.</p>
+      </div>
+    );
     
-    // Calculate some summary statistics
     let beatsCount = 0;
     let missesCount = 0;
     earningsHistory.forEach((eh: any) => {
@@ -337,11 +409,9 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
       else if (eh.epsDifference < 0) missesCount++;
     });
     
-    // Calculate average surprise percentage
     const avgSurprise = earningsHistory.reduce((acc: number, curr: any) => 
       acc + (curr.surprisePercent || 0), 0) / earningsHistory.length;
     
-    // Get most recent earnings data
     const latestEarnings = earningsHistory[0];
     const latestQuarter = latestEarnings ? formatDate(latestEarnings.quarter) : 'N/A';
     const latestResult = latestEarnings?.epsDifference > 0 ? 'beat' : 
@@ -427,10 +497,22 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
 
   // Render earnings forecast
   const renderEarningsForecast = () => {
-    const earningsTrend = data.earningsTrend?.trend || [];
-    if (earningsTrend.length === 0) return <div className={styles.noStatementData}>No earnings forecast available</div>;
+    // More comprehensive check to catch all cases of missing data
+    if (!data.earningsTrend || 
+        !data.earningsTrend.trend || 
+        data.earningsTrend.trend.length === 0 ||
+        data.earningsTrend.trend.every(trend => !trend.earningsEstimate || !trend.earningsEstimate.avg)) {
+      return (
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Earnings Forecast Available</h4>
+          <p>We couldn't find any earnings forecast data for {symbol} at this time. This may be due to limited analyst coverage or recent significant changes in the company's operations.</p>
+        </div>
+      );
+    }
 
-    // Function to convert period code to more descriptive text
+    const earningsTrend = data.earningsTrend?.trend || [];
+
     const getDescriptivePeriod = (periodCode: string) => {
       switch(periodCode) {
         case '0q': return 'Current Quarter';
@@ -442,7 +524,6 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
       }
     };
     
-    // Find current quarter and year forecasts if they exist
     const currentQuarter = earningsTrend.find((et: { period: string; }) => et.period === '0q');
     const nextQuarter = earningsTrend.find((et: { period: string; }) => et.period === '+1q');
     const currentYear = earningsTrend.find((et: { period: string; }) => et.period === '0y');
@@ -559,7 +640,13 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
     const calendarEvents = data.calendarEvents || {};
     
     if (!calendarEvents.earnings?.earningsDate || calendarEvents.earnings.earningsDate.length === 0) {
-      return <div className={styles.noStatementData}>No upcoming events available</div>;
+      return (
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Upcoming Events Available</h4>
+          <p>We couldn't find any upcoming earnings or dividend dates for {symbol} at this time. Check back later for updates on future events.</p>
+        </div>
+      );
     }
 
     return (
@@ -628,57 +715,6 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
       </div>
     );
   };
-
-  // Loading and error state handling
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>Loading analysis data...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
-        <p>{error}</p>
-        <button 
-          className={styles.retryButton} 
-          onClick={() => {
-            setError(null);
-            setLoading(true);
-            // Re-fetch data logic
-            const fetchData = async () => {
-              try {
-                const modules = [
-                  'recommendationTrend', 
-                  'earningsHistory', 
-                  'earningsTrend',
-                  'calendarEvents'
-                ];
-                
-                const response = await fetchAnalysisData(symbol, modules);
-                setData(response);
-                setLoading(false);
-              } catch (err) {
-                setError('Failed to fetch analysis data');
-                setLoading(false);
-                console.error(err);
-              }
-            };
-            
-            if (symbol) {
-              fetchData();
-            }
-          }}
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
 
   return (
     <div>

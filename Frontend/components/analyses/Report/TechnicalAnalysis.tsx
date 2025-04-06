@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../../styles/fundamental/TechnicalAnalysis.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
-import { FaQuestion, FaTimes } from 'react-icons/fa';
+import { FaQuestion, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 
 interface TechnicalAnalysisProps {
   symbol: string;
@@ -105,6 +105,13 @@ const TechnicalAnalysis: React.FC<TechnicalAnalysisProps> = ({ symbol }) => {
     loadInsights();
   }, [symbol]);
 
+  // Add a debug log to help diagnose issues
+  useEffect(() => {
+    if (!loading && !error) {
+      console.log("Technical Analysis data received:", insightsData);
+    }
+  }, [loading, error, insightsData]);
+
   // Enhanced score indicator with better visual cues
   const renderScoreIndicator = (score: number, direction: string) => {
     const getColorClass = () => {
@@ -175,58 +182,41 @@ const TechnicalAnalysis: React.FC<TechnicalAnalysisProps> = ({ symbol }) => {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer} style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '30px',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '8px',
-        boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-      }}>
-        <div className={styles.loadingSpinner} style={{
-          width: '40px',
-          height: '40px',
-          border: '3px solid rgba(0,0,0,0.1)',
-          borderTopColor: '#4a90e2',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite'
-        }}></div>
-        <p style={{ marginTop: '15px', color: '#666' }}>Loading technical analysis data...</p>
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Technical Analysis</h3>
+        <p>Retrieving technical indicators and market analysis for {symbol}...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.errorContainer} style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '30px',
-        backgroundColor: '#fff5f5',
-        borderRadius: '8px',
-        border: '1px solid #ffe5e5'
-      }}>
-        <div className={styles.errorIcon} style={{ fontSize: '32px', marginBottom: '15px' }}>⚠️</div>
-        <p style={{ color: '#d32f2f', textAlign: 'center' }}>{error}</p>
+      <div className={styles.modernErrorContainer}>
+        <div className={styles.errorIconLarge}><FaExclamationTriangle /></div>
+        <h3>Unable to Load Data</h3>
+        <p>{error}</p>
+
       </div>
     );
   }
 
-  if (!insightsData) {
+  // Even more comprehensive check for technical analysis data
+  const hasValidData = insightsData && 
+                      insightsData.instrumentInfo && 
+                      (insightsData.instrumentInfo.valuation || 
+                       insightsData.instrumentInfo.keyTechnicals || 
+                       (insightsData.instrumentInfo.technicalEvents && 
+                        Object.keys(insightsData.instrumentInfo.technicalEvents).length > 0));
+
+  if (!hasValidData) {
     return (
-      <div className={styles.errorContainer} style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '30px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px'
-      }}>
-        <div className={styles.errorIcon} style={{ fontSize: '32px', marginBottom: '15px' }}>⚠️</div>
-        <p style={{ color: '#666', textAlign: 'center' }}>No technical analysis data available for {symbol}</p>
+      <div className={styles.analysisCard}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Technical Analysis Data Available</h4>
+          <p>We couldn't find any technical analysis data for {symbol} at this time. This may be due to limited market data or the security being newly listed.</p>
+        </div>
       </div>
     );
   }

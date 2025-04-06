@@ -5,6 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 interface ValuationModelsProps {
   symbol: string;
@@ -31,6 +32,8 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Add debug log to trace data
+        console.log("Fetching valuation model data for:", symbol);
         setLoading(true);
         setError(null);
 
@@ -80,6 +83,18 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
 
     fetchData();
   }, [symbol, periodType]);
+
+  // Add debug log when rendering
+  useEffect(() => {
+    if (!loading) {
+      console.log("Valuation model data state:", { 
+        financialData, 
+        dashboardData, 
+        hasFinancialData: financialData?.length > 0,
+        hasDashboardData: !!dashboardData
+      });
+    }
+  }, [loading, financialData, dashboardData]);
 
   const calculateValuations = (financialData: any[], dashboardData: any) => {
     if (!financialData?.length || !dashboardData) return;
@@ -431,57 +446,57 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
 
   if (loading) {
     return (
-      <div className={styles.loadingWrapper}>
-        <div className={styles.spinner}></div>
-        <p className={styles.loadingText}>Loading valuation models...</p>
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Valuation Models</h3>
+        <p>Calculating financial models and valuations for {symbol}...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.errorWrapper}>
-        <div className={styles.errorIcon}>⚠️</div>
+      <div className={styles.modernErrorContainer}>
+        <div className={styles.errorIconLarge}><FaExclamationTriangle /></div>
+        <h3>Unable to Load Data</h3>
         <p>{error}</p>
         <button 
-          className={styles.retryButton}
+          className={styles.modernRetryButton}
           onClick={() => {
             setLoading(true);
-            setError(null);
-            // Retry data fetching
-            setTimeout(() => {
-              const fetchData = async () => {
-                try {
-                  // Fetch fundamental time series data
-                  const financialDataResult = await fetchFundamentalsTimeSeries(
-                    symbol,
-                    '2000-01-01',
-                    'all',
-                    periodType
-                  );
-
-                  // Fetch stock dashboard data
-                  const dashboardResult = await fetchStockDashboardData(symbol);
-
-                  setFinancialData(financialDataResult);
-                  setDashboardData(dashboardResult);
-
-                  // Calculate valuations
-                  calculateValuations(financialDataResult, dashboardResult);
-
-                  setLoading(false);
-                } catch (err: unknown) {
-                  setError('Failed to fetch data. Please try again later.');
-                  setLoading(false);
-                  console.error('Error retrying data fetch:', err);
-                }
-              };
-              fetchData();
-            }, 1000);
+            fetchData();
           }}
         >
-          Retry
+          Try Again
         </button>
+      </div>
+    );
+  }
+
+  // Improved check for missing data with more specific conditions
+  const hasValidData = Array.isArray(financialData) && 
+                      financialData.length >= 2 && 
+                      dashboardData && 
+                      dashboardData.price && 
+                      dashboardData.price.regularMarketPrice;
+
+  if (!hasValidData) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Valuation Data Available</h4>
+          <p>We couldn't calculate valuation models for {symbol} at this time. This requires at least 2 years of financial data, which may not be available for newly listed companies or those with limited financial history.</p>
+          <button 
+            className={styles.modernRetryButton}
+            onClick={() => {
+              setLoading(true);
+              fetchData();
+            }}
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }

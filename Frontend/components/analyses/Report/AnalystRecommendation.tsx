@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../../styles/reports/AnalystRecommendation.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 interface AnalystRecommendationProps {
   symbol: string;
@@ -56,27 +57,41 @@ const AnalystRecommendation: React.FC<AnalystRecommendationProps> = ({ symbol })
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>Loading analyst recommendation data...</p>
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Analyst Recommendations</h3>
+        <p>Retrieving analyst ratings and price targets for {symbol}...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
+      <div className={styles.modernErrorContainer}>
+        <div className={styles.errorIconLarge}><FaExclamationTriangle /></div>
+        <h3>Unable to Load Data</h3>
         <p>{error}</p>
+        <button 
+          className={styles.modernRetryButton}
+          onClick={() => {
+            setLoading(true);
+            loadInsights();
+          }}
+        >
+          Try Again
+        </button>
       </div>
     );
   }
 
   if (!insightsData || !insightsData.recommendation) {
     return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
-        <p>No analyst recommendation data available for {symbol}</p>
+      <div className={styles.analysisCard}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Analyst Recommendations Available</h4>
+          <p>We couldn't find any analyst recommendation data for {symbol} at this time. This may be due to limited analyst coverage or the company being newly listed.</p>
+        </div>
       </div>
     );
   }

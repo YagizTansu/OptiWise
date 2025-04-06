@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../../styles/fundamental/CompanySnapshot.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
-import { FaQuestion } from 'react-icons/fa';
+import { FaQuestion, FaExclamationTriangle } from 'react-icons/fa';
 
 interface CompanySnapshotProps {
   symbol: string;
@@ -32,11 +32,25 @@ const CompanySnapshot: React.FC<CompanySnapshotProps> = ({ symbol }) => {
   }, [symbol]);
 
   if (loading) {
-    return <div className={styles.loadingContainer}>Loading...</div>;
+    return (
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Company Snapshot</h3>
+        <p>Retrieving company metrics and sector comparisons for {symbol}...</p>
+      </div>
+    );
   }
 
   if (error || !insightsData || !insightsData.companySnapshot) {
-    return <div className={styles.errorContainer}>{error || `No data for ${symbol}`}</div>;
+    return (
+      <div className={styles.analysisCard}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Company Snapshot Data Available</h4>
+          <p>We couldn't find any company snapshot data for {symbol} at this time. This may be due to incomplete market data or the company being newly listed.</p>
+        </div>
+      </div>
+    );
   }
 
   // Simplified metric explanations

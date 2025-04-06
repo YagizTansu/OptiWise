@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../../styles/reports/SECFilings.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 interface SECFilingsProps {
   symbol: string;
@@ -65,27 +66,57 @@ const SECFilings: React.FC<SECFilingsProps> = ({ symbol }) => {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>Loading SEC filings data...</p>
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading SEC Filings</h3>
+        <p>Retrieving regulatory filings data for {symbol}...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
+      <div className={styles.modernErrorContainer}>
+        <div className={styles.errorIconLarge}><FaExclamationTriangle /></div>
+        <h3>Unable to Load Data</h3>
         <p>{error}</p>
+        <button 
+          className={styles.modernRetryButton}
+          onClick={() => {
+            setLoading(true);
+            const loadInsights = async () => {
+              try {
+                const data = await fetchInsightsData(symbol);
+                setInsightsData(data);
+                setError(null);
+              } catch (err) {
+                console.error('Error loading insights:', err);
+                setError('Failed to load SEC filings data. Please try again later.');
+              } finally {
+                setLoading(false);
+              }
+            };
+            loadInsights();
+          }}
+        >
+          Try Again
+        </button>
       </div>
     );
   }
 
-  if (!insightsData || !insightsData.secReports || insightsData.secReports.length === 0) {
+  // Improved check to ensure secReports exists and has meaningful content
+  if (!insightsData || 
+      !insightsData.secReports || 
+      insightsData.secReports.length === 0 ||
+      (insightsData.secReports && insightsData.secReports.every(filing => !filing.formType))) {
     return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
-        <p>No SEC filings available for {symbol}</p>
+      <div className={styles.analysisCard}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No SEC Filings Available</h4>
+          <p>We couldn't find any SEC filings for {symbol} at this time. This may be due to recent filing periods or changes in reporting requirements.</p>
+        </div>
       </div>
     );
   }

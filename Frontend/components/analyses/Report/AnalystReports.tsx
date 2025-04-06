@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../../../styles/reports/AnalystReports.module.css';
 import { fetchInsightsData, InsightsData } from '../../../services/api/finance';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 interface AnalystReportsProps {
   symbol: string;
@@ -65,27 +66,45 @@ const AnalystReports: React.FC<AnalystReportsProps> = ({ symbol }) => {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
-        <p>Loading analyst reports data...</p>
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Analyst Reports</h3>
+        <p>Retrieving research reports and analysis for {symbol}...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
+      <div className={styles.modernErrorContainer}>
+        <div className={styles.errorIconLarge}><FaExclamationTriangle /></div>
+        <h3>Unable to Load Data</h3>
         <p>{error}</p>
+        <button 
+          className={styles.modernRetryButton}
+          onClick={() => {
+            setLoading(true);
+            loadInsights();
+          }}
+        >
+          Try Again
+        </button>
       </div>
     );
   }
 
-  if (!insightsData || !insightsData.reports || insightsData.reports.length === 0) {
+  // Enhanced check to ensure reports exist and have content
+  if (!insightsData || 
+      !insightsData.reports || 
+      insightsData.reports.length === 0 ||
+      (insightsData.reports && insightsData.reports.every(report => !report.title && !report.provider))) {
     return (
-      <div className={styles.errorContainer}>
-        <div className={styles.errorIcon}>⚠️</div>
-        <p>No analyst reports available for {symbol}</p>
+      <div className={styles.analysisCard}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Analyst Reports Available</h4>
+          <p>We couldn't find any analyst reports for {symbol} at this time. This may be due to limited analyst coverage or the company being newly listed.</p>
+        </div>
       </div>
     );
   }

@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from '../../../styles/fundamental/StockDashboard.module.css';
 import { fetchStockDashboardData, QuoteSummaryData } from '../../../services/api/finance';
-import { FaQuestion } from 'react-icons/fa';
-import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
+import { FaQuestion, FaAngleDown, FaAngleUp, FaExclamationTriangle } from 'react-icons/fa';
 
 interface StockDashboardProps {
   symbol: string;
@@ -20,7 +19,6 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
       try {
         setLoading(true);
         const response = await fetchStockDashboardData(symbol);
-        debugger
         setData(response);
         setLoading(false);
       } catch (err) {
@@ -32,8 +30,33 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
     if (symbol) fetchData();
   }, [symbol]);
 
-  if (loading) return <div className={styles.loader}>Loading...</div>;
-  if (error || !data.price) return <div className={styles.error}>{error || 'No data available'}</div>;
+  if (loading) {
+    return (
+      <div className={styles.modernLoadingContainer}>
+        <div className={styles.loadingSpinnerLarge}></div>
+        <h3>Loading Stock Data</h3>
+        <p>Retrieving price information and key metrics for {symbol}...</p>
+      </div>
+    );
+  }
+  
+  const hasValidData = data && 
+                      data.price && 
+                      Object.keys(data.price).length > 1 &&
+                      (data.summaryDetail || data.defaultKeyStatistics);
+
+  if (error || !hasValidData) {
+    return (
+      <div className={styles.dashboard}>
+        <div className={styles.enhancedNoDataMessage}>
+          <FaExclamationTriangle className={styles.noDataIcon} />
+          <h4>No Stock Data Available</h4>
+          <p>We couldn't find any stock data for {symbol} at this time. This may be due to a temporary issue with our data provider or the symbol may not be actively traded.</p>
+
+        </div>
+      </div>
+    );
+  }
 
   const formatNumber = (num: number, decimals = 2) => num ? num.toFixed(decimals) : 'N/A';
   const formatPercent = (num: number) => num ? `${(num * 100).toFixed(2)}%` : 'N/A';
