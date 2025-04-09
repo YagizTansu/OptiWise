@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
 // Base API URL
-export const API_BASE_URL = 'http://localhost:3001/api/finance';
+export const API_BASE_URL = 'https://optiwise.onrender.com/api/finance';
 
 /**
  * Common API request handler with error handling

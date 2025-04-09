@@ -110,9 +110,6 @@ export type {
   FundamentalsTimeSeriesDataPoint
 };
 
-// Base API URL
-const API_BASE_URL = 'http://localhost:3001/api/finance';
-
 // =============================================================================
 // CHART DATA FUNCTIONS
 // =============================================================================
