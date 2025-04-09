@@ -43,11 +43,6 @@ interface QuoteOptions {
 type HistoricalInterval = '1d' | '1wk' | '1mo';
 
 // Interface for trending symbols query options
-interface TrendingQueryOptions {
-  count?: number;
-  lang?: string;
-  region?: string;
-}
 
 // Interface for fundamentalsTimeSeries options
 interface FundamentalsTimeSeriesOptions {
@@ -378,20 +373,4 @@ export class FinanceService implements OnModuleInit {
     }
   }
 
-  /**
-   * Get daily gainers - stocks with biggest percentage gains
-   */
-  async getDailyGainers(options: TrendingQueryOptions = {}) {
-    try {
-      return await this.retryOperation(
-        () => yahooFinance.dailyGainers(options),
-        3,
-        1000,
-        `getDailyGainers`
-      );
-    } catch (error) {
-      this.logger.error('Failed to fetch daily gainers', error);
-      return { finance: { result: [] } }; // Return empty structure
-    }
-  }
 }

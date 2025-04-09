@@ -238,12 +238,6 @@ export class FinanceController {
     return this.financeService.getQuote(symbols, options);
   }
 
-  @Get('trending')
-  async getTrending(
-    @Query('region', new DefaultValuePipe('US')) region: string
-  ) {
-    return this.financeService.getTrending(region);
-  }
 
   /**
    * Get historical data with more limited options than chart
@@ -270,7 +264,7 @@ export class FinanceController {
     const options = {
       modules
     };
-    
+    debugger
     return this.financeService.getQuoteSummary(symbol, options);
   }
 
