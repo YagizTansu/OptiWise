@@ -251,11 +251,13 @@ export class FinanceController {
   @Get('quoteSummary')
   async getQuoteSummary(
     @Query('symbol', new DefaultValuePipe('AAPL')) symbol: string,
-    @Query('modules', new ParseArrayPipe(), new QuoteSummaryModulesValidationPipe()) modules: string[]
+    @Query('modules', new ParseArrayPipe()) modules: string[]
   ): Promise<any> {
     const options = {
       modules
     };
+
+    
     
     return this.financeService.getQuoteSummary(symbol, options);
   }

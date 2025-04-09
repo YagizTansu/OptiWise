@@ -264,7 +264,7 @@ export class FinanceService implements OnModuleInit {
       if (!options.modules || options.modules.length === 0) {
         options.modules = ['summaryProfile'];
       }
-      
+            
       return await yahooFinance.quoteSummary(symbol, { modules: options.modules } as any);
     } catch (error) {
       this.logger.error(`Failed to fetch quote summary for ${symbol}`, error);
