@@ -323,43 +323,11 @@ export class FinanceController {
     
     return this.financeService.getInsights(symbol, options);
   }
-
-  /**
-   * Get daily gainers - stocks with biggest percentage gains
-   */
-  @Get('daily-gainers')
-  async getDailyGainers(
-    @Query('count', new DefaultValuePipe(5), ParseIntPipe) count: number,
-    @Query('lang', new DefaultValuePipe('en-US')) lang: string,
-    @Query('region', new DefaultValuePipe('US')) region: string,
-  ) {
-    return this.financeService.getDailyGainers({ count, lang, region });
-  }
-
-  /**
-   * Get daily losers - stocks with biggest percentage losses
-   */
-  // @Get('daily-losers')
-  // async getDailyLosers(
-  //   @Query('count', new DefaultValuePipe(5), ParseIntPipe) count: number,
-  //   @Query('lang', new DefaultValuePipe('en-US')) lang: string,
-  //   @Query('region', new DefaultValuePipe('US')) region: string,
-  // ) {
-  //   return this.financeService.getDailyLosers({ count, lang, region });
-  // }
-
-  // /**
-  //  * Get most active stocks by volume
-  //  */
-  // @Get('most-actives')
-  // async getMostActives(
-  //   @Query('count', new DefaultValuePipe(5), ParseIntPipe) count: number,
-  //   @Query('lang', new DefaultValuePipe('en-US')) lang: string,
-  //   @Query('region', new DefaultValuePipe('US')) region: string,
-  // ) {
-  //   return this.financeService.getMostActives({ count, lang, region });
-  // }
 }
+
+
+
+
 
 /* 
 Example test URLs:

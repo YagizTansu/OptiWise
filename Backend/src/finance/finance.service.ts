@@ -394,38 +394,4 @@ export class FinanceService implements OnModuleInit {
       return { finance: { result: [] } }; // Return empty structure
     }
   }
-
-  /**
-   * Get daily losers - stocks with biggest percentage losses
-   */
-  // async getDailyLosers(options: TrendingQueryOptions = {}) {
-  //   try {
-  //     return await this.retryOperation(
-  //       () => yahooFinance.dailyLosers(options),
-  //       3,
-  //       1000,
-  //       `getDailyLosers`
-  //     );
-  //   } catch (error) {
-  //     this.logger.error('Failed to fetch daily losers', error);
-  //     return { finance: { result: [] } }; // Return empty structure
-  //   }
-  // }
-
-  // /**
-  //  * Get most active stocks by volume
-  //  */
-  // async getMostActives(options: TrendingQueryOptions = {}) {
-  //   try {
-  //     return await this.retryOperation(
-  //       () => yahooFinance.mostActives(options),
-  //       3,
-  //       1000,
-  //       `getMostActives`
-  //     );
-  //   } catch (error) {
-  //     this.logger.error('Failed to fetch most actives', error);
-  //     return { finance: { result: [] } }; // Return empty structure
-  //   }
-  // }
 }
