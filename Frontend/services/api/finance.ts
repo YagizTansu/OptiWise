@@ -1,396 +1,82 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
+// Import all types from the types directory
+import {
+  ChartDataPoint,
+  ChartDataResponse,
+  QuoteData,
+  PriceVolumeData,
+  PeriodData,
+  HistoricalDataPoint,
+  AnnualReturnData,
+  StatisticsData,
+  TimeAverageReturnData,
+  ReturnStatisticData,
+  TimeAverageReturnResponse,
+  DividendEvent,
+  DividendSummary,
+  DividendChartData,
+  DividendHistoryResponse,
+  SeasonalityDataPoint,
+  SeasonalityDataset,
+  SeasonalityChartData,
+  SeasonalityResponse,
+  SeasonalPattern,
+  MonthlyStatistics,
+  SeasonalStrategyResponse,
+  PatternCorrelationData,
+  InsightsData,
+  WyckoffIndicatorData,
+  AnalysisData,
+  QuoteSummaryData,
+  CompanyProfile,
+  SearchResult,
+  InsiderHolder,
+  InsiderTransaction,
+  InstitutionalOwner,
+  InsiderOwnershipData,
+  FundamentalsTimeSeriesDataPoint
+} from './types';
+
+export type {
+  ChartDataPoint,
+  ChartDataResponse,
+  QuoteData,
+  PriceVolumeData,
+  PeriodData,
+  HistoricalDataPoint,
+  AnnualReturnData,
+  StatisticsData,
+  TimeAverageReturnData,
+  ReturnStatisticData,
+  TimeAverageReturnResponse,
+  DividendEvent,
+  DividendSummary,
+  DividendChartData,
+  DividendHistoryResponse,
+  SeasonalityDataPoint,
+  SeasonalityDataset,
+  SeasonalityChartData,
+  SeasonalityResponse,  
+  SeasonalPattern,
+  MonthlyStatistics,  
+  SeasonalStrategyResponse,  
+  PatternCorrelationData, 
+  InsightsData,
+  WyckoffIndicatorData,
+  AnalysisData,
+  QuoteSummaryData,
+  CompanyProfile,
+  SearchResult,
+  InsiderHolder,
+  InsiderTransaction,
+  InstitutionalOwner,
+  InsiderOwnershipData,
+  FundamentalsTimeSeriesDataPoint
+};
+
 // Base API URL
 const API_BASE_URL = 'http://localhost:3001/api/finance';
-
-// =============================================================================
-// TYPE DEFINITIONS
-// =============================================================================
-
-// Chart data types
-export interface ChartDataPoint {
-  timestamp: number;
-  close: number;
-  open: number | undefined;  // Changed from optional to required but can be undefined
-  high: number | undefined;  // Changed from optional to required but can be undefined
-  low: number | undefined;   // Changed from optional to required but can be undefined
-  volume: number | undefined; // Changed from optional to required but can be undefined
-  date: string;  // Required to be string to match implementation
-  fullDate: Date; // Changed to required and non-undefined since we always create a Date object
-  currency?: string; // Added currency field
-}
-
-export interface ChartDataResponse {
-  meta: {
-    symbol: string;
-    currency: string;
-    exchangeName?: string;
-    instrumentType?: string;
-    firstTradeDate?: number;
-    regularMarketTime?: number;
-    gmtoffset?: number;
-    timezone?: string;
-    exchangeTimezoneName?: string;
-    chartPreviousClose?: number;
-    priceHint?: number;
-  };
-  quotes: {
-    timestamp?: number;
-    date?: string | number;
-    time?: string | number;
-    open?: number;
-    high?: number;
-    low?: number;
-    close: number;
-    volume?: number;
-  }[];
-}
-
-export interface QuoteData {
-  symbol: string;
-  shortName?: string;
-  longName?: string;
-  regularMarketPrice?: number;
-  [key: string]: any; // For other potential fields
-}
-
-// Performance metrics types
-export interface PeriodData {
-  label: string;
-  value: number;
-  months: number;
-  currency?: string; // Added currency field
-}
-
-export interface HistoricalDataPoint {
-  date: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-  adjClose: number;
-}
-
-export interface AnnualReturnData {
-  labels: string[];
-  returns: number[];
-  statistics: {
-    bestYear: string;
-    worstYear: string;
-    average: string;
-  };
-  currency?: string; // Added currency field
-}
-
-// Statistics types
-export interface StatisticsData {
-  allTimeHigh: number | string ;
-  allTimeLow: number | string;
-  profitDays: string;
-  avgHoldPeriod: string;
-  currency?: string; // Added currency field
-}
-
-// Dividend types
-export interface DividendEvent {
-  date: string;
-  timestamp: number;
-  amount: number;
-  fullDate: Date;
-}
-
-export interface DividendSummary {
-  dividendRate?: number;
-  dividendYield?: number;
-  payoutRatio?: number;
-  exDividendDate?: string;
-  fiveYearAvgDividendYield?: number;
-}
-
-export interface DividendChartData {
-  labels: string[];
-  datasets: Array<{
-    label: string;
-    data: number[];
-    borderColor: string;
-    backgroundColor: string;
-    fill: boolean;
-    tension: number;
-    pointRadius: number;
-    pointHoverRadius: number;
-    pointHoverBackgroundColor: string;
-    pointHoverBorderColor: string;
-    pointHoverBorderWidth: number;
-  }>;
-}
-
-export interface DividendHistoryResponse {
-  events: DividendEvent[];
-  chartData: DividendChartData | null;
-  error: string | null;
-  currency?: string; // Added currency field
-}
-
-// Time Average Returns types
-export interface TimeAverageReturnData {
-  labels: string[];
-  datasets: Array<{
-    label: string;
-    data: number[];
-    backgroundColor: string;
-  }>;
-}
-
-export interface ReturnStatisticData {
-  period: string;
-  avgReturn: number;
-  stdDev: number;
-  winRate: number;
-  best: number;
-  worst: number;
-}
-
-export interface TimeAverageReturnResponse {
-  chartData: TimeAverageReturnData;
-  statistics: ReturnStatisticData[];
-  currency?: string; // Added currency field
-}
-
-// Seasonality types
-export interface SeasonalityDataPoint {
-  period: string;
-  avgChange: number;
-}
-
-export interface SeasonalityDataset {
-  label: string;
-  data: number[];
-  borderColor?: string;
-  backgroundColor: string;
-}
-
-export interface SeasonalityChartData {
-  currency: any;
-  labels: string[];
-  datasets: SeasonalityDataset[];
-}
-
-export interface SeasonalityResponse {
-  daily?: SeasonalityChartData;
-  weekly?: SeasonalityChartData;
-  monthly?: SeasonalityChartData;
-  yearly?: SeasonalityChartData;
-  error?: string;
-  currency?: string; // Added currency field
-}
-
-// Seasonal Strategy Insights types
-export interface SeasonalPattern {
-  period: string;
-  return: number;
-  consistency?: number; // Added consistency (Win Rate)
-}
-
-export interface MonthlyPerformance {
-  month: string;
-  avgReturn: number;
-  consistency: number;
-  cumulativeReturn: number;
-}
-
-export interface MonthlyStatistics {
-  avgReturn: number;
-  profitableAvgReturn?: number; // Added for Avg Return % during profitable periods
-  consistency: number;
-  years: number;
-  positiveYears: number;
-  maxReturn: number;
-  minReturn: number;
-  volatility: number;
-}
-
-export interface SeasonalStrategyResponse {
-  strongestPattern: SeasonalPattern | null;
-  riskPattern: SeasonalPattern | null;
-  monthlyDetailedData: Record<string, MonthlyStatistics>;
-  error: string | null;
-  currency?: string; // Added currency field
-}
-
-// Pattern Correlation types
-export interface PatternCorrelationData {
-  coefficient: number;
-  strength: string;
-  reliabilityScore: number;
-  chartData: {
-    labels: string[];
-    datasets: Array<{
-      data: number[];
-      backgroundColor: string[];
-      borderWidth: number;
-      cutout: string;
-    }>;
-  };
-  currency?: string; // Added currency field
-}
-
-// Report Insights types
-export interface InsightsData {
-  symbol: string;
-  instrumentInfo: {
-    technicalEvents: {
-      provider: string;
-      sector: string;
-      shortTermOutlook: {
-        stateDescription: string;
-        direction: string;
-        score: number;
-        scoreDescription: string;
-        sectorDirection: string;
-        sectorScore: number;
-        sectorScoreDescription: string;
-        indexDirection: string;
-        indexScore: number;
-        indexScoreDescription: string;
-      };
-      intermediateTermOutlook: {
-        stateDescription: string;
-        direction: string;
-        score: number;
-        scoreDescription: string;
-        sectorDirection: string;
-        sectorScore: number;
-        sectorScoreDescription: string;
-        indexDirection: string;
-        indexScore: number;
-        indexScoreDescription: string;
-      };
-      longTermOutlook: {
-        stateDescription: string;
-        direction: string;
-        score: number;
-        scoreDescription: string;
-        sectorDirection: string;
-        sectorScore: number;
-        sectorScoreDescription: string;
-        indexDirection: string;
-        indexScore: number;
-        indexScoreDescription: string;
-      };
-    };
-    keyTechnicals: {
-      provider: string;
-      support: number;
-      resistance: number;
-      stopLoss: number;
-    };
-    valuation: {
-      color: number;
-      description: string;
-      discount: string;
-      relativeValue: string;
-      provider: string;
-    };
-  };
-  companySnapshot: {
-    sectorInfo: string;
-    company: {
-      innovativeness: number;
-      hiring: number;
-      sustainability: number;
-      insiderSentiments: number;
-      earningsReports: number;
-      dividends: number;
-    };
-    sector: {
-      innovativeness: number;
-      hiring: number;
-      sustainability: number;
-      insiderSentiments: number;
-      earningsReports: number;
-      dividends: number;
-    };
-  };
-  recommendation: {
-    targetPrice: number;
-    provider: string;
-    rating: string;
-  };
-  upsell: {
-    msBullishSummary: string[];
-    msBearishSummary: string[];
-    companyName: string;
-    msBullishBearishSummariesPublishDate: string;
-    upsellReportType: string;
-  };
-  events: Array<{
-    eventType: string;
-    pricePeriod: string;
-    tradingHorizon: string;
-    tradeType: string;
-    imageUrl: string;
-    startDate: string;
-    endDate: string;
-  }>;
-  reports: Array<{
-    id: string;
-    headHtml: string;
-    provider: string;
-    reportDate: string;
-    reportTitle: string;
-    reportType: string;
-    targetPrice?: number;
-    targetPriceStatus?: string;
-    investmentRating?: string;
-    tickers: string[];
-    title: string;
-  }>;
-  sigDevs: Array<{
-    headline: string;
-    date: string;
-  }>;
-  secReports: Array<{
-    id: string;
-    type: string;
-    title: string;
-    description: string;
-    filingDate: string;
-    snapshotUrl: string;
-    formType: string;
-  }>;
-}
-
-// Wyckoff Indicator types
-export interface WyckoffIndicatorDataPoint {
-  period: string;
-  value: number;
-}
-
-export interface WyckoffIndicatorData {
-  labels: string[];
-  indicators: number[];
-  currency?: string; // Added currency field
-}
-
-// Price Volume Chart types
-export interface PriceVolumeData {
-  price: {
-    dates: string[];
-    values: number[];
-  };
-  volume: {
-    dates: string[];
-    values: number[];
-  };
-  priceChange: number;
-  percentChange: number;
-  minPrice: number;
-  maxPrice: number;
-  avgVolume: number;
-  volumeChange: number;
-  currency?: string; // Added currency field
-}
 
 // =============================================================================
 // UTILITY FUNCTIONS
@@ -2657,18 +2343,6 @@ function getIntervalForPeriod(period: string): string {
 }
 
 // =============================================================================
-// ANALYSIS DATA TYPES
-// =============================================================================
-
-export interface AnalysisData {
-  recommendationTrend?: any;
-  earningsHistory?: any;
-  earningsTrend?: any;
-  calendarEvents?: any;
-  [key: string]: any;
-}
-
-// =============================================================================
 // FUNDAMENTAL ANALYSIS FUNCTIONS
 // =============================================================================
 
@@ -2695,18 +2369,6 @@ export async function fetchAnalysisData(
     console.error('Error fetching analysis data:', error);
     throw error;
   }
-}
-
-
-// =============================================================================
-// STOCK DASHBOARD DATA TYPES
-// =============================================================================
-
-export interface QuoteSummaryData {
-  price?: any;
-  summaryDetail?: any;
-  defaultKeyStatistics?: any;
-  [key: string]: any;
 }
 
 // =============================================================================
@@ -2739,24 +2401,6 @@ export async function fetchStockDashboardData(
 }
 
 // =============================================================================
-// COMPANY PROFILE DATA TYPES
-// =============================================================================
-
-export interface CompanyProfile {
-  address1?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
-  phone?: string;
-  website?: string;
-  industry?: string;
-  sector?: string;
-  longBusinessSummary?: string;
-  fullTimeEmployees?: number;
-}
-
-// =============================================================================
 // COMPANY PROFILE FUNCTIONS
 // =============================================================================
 
@@ -2780,16 +2424,6 @@ export async function fetchCompanyProfile(symbol: string): Promise<CompanyProfil
     console.error('Error fetching company profile:', error);
     throw error;
   }
-}
-
-// =============================================================================
-// SEARCH DATA TYPES
-// =============================================================================
-
-export interface SearchResult {
-  symbol: string;
-  shortName?: string;
-  exchange?: string;
 }
 
 // =============================================================================
@@ -2833,56 +2467,6 @@ export async function searchSymbols(
     return [];
   }
 }
-
-// =============================================================================
-// INSIDER AND INSTITUTIONAL OWNERSHIP DATA TYPES
-// =============================================================================
-
-export interface InsiderHolder {
-  maxAge: number;
-  name: string;
-  relation: string;
-  url: string;
-  transactionDescription: string;
-  latestTransDate: Date;
-  positionDirect: number;
-  positionDirectDate: Date;
-}
-
-export interface InsiderTransaction {
-  [x: string]: any;
-  maxAge: number;
-  shares: number;
-  value: number;
-  filerUrl: string;
-  transactionText: string;
-  filerName: string;
-  filerRelation: string;
-  moneyText: string;
-  startDate: Date;
-  ownership: string;
-}
-
-export interface InstitutionalOwner {
-  maxAge: number;
-  reportDate: Date;
-  organization: string;
-  pctHeld: number;
-  position: number;
-  value: number;
-}
-
-export interface InsiderOwnershipData {
-  insiderHolders: InsiderHolder[];
-  insiderTransactions: InsiderTransaction[];
-  institutionalOwners: InstitutionalOwner[];
-  error: string | null;
-  currency: string;
-}
-
-// =============================================================================
-// INSIDER AND INSTITUTIONAL OWNERSHIP FUNCTIONS
-// =============================================================================
 
 /**
  * Fetches insider and institutional ownership data for a given symbol
@@ -2977,15 +2561,6 @@ export async function fetchInsiderAndInstitutionalData(
       currency: 'USD' // Default currency if error
     };
   }
-}
-
-// =============================================================================
-// FUNDAMENTALS TIME SERIES DATA TYPES
-// =============================================================================
-
-export interface FundamentalsTimeSeriesDataPoint {
-  date: string;
-  [key: string]: any; // For all possible financial metrics
 }
 
 // =============================================================================
