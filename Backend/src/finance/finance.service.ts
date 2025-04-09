@@ -262,23 +262,48 @@ export class FinanceService implements OnModuleInit {
     try {
       // If no modules specified, use defaults
       if (!options.modules || options.modules.length === 0) {
-        options.modules = ['price', 'summaryDetail'];
+        options.modules = ['summaryProfile'];
       }
       
-      return await this.retryOperation(
-        () => yahooFinance.quoteSummary(symbol, { modules: options.modules } as any),
-        3,
-        1000,
-        `getQuoteSummary for ${symbol}`
-      );
+      return await yahooFinance.quoteSummary(symbol, { modules: options.modules } as any);
     } catch (error) {
       this.logger.error(`Failed to fetch quote summary for ${symbol}`, error);
       
       // Return empty object with structure that won't break consumers
-      return { 
-        price: { regularMarketPrice: null },
+      return {
+        price: {},
         summaryDetail: {},
-        defaultKeyStatistics: {}
+        assetProfile: {},
+        balanceSheetHistory: {},
+        balanceSheetHistoryQuarterly: {},
+        calendarEvents: {},
+        cashflowStatementHistory: {},
+        cashflowStatementHistoryQuarterly: {},
+        defaultKeyStatistics: {},
+        earnings: {},
+        earningsHistory: {},
+        earningsTrend: {},
+        financialData: {},
+        fundOwnership: {},
+        fundPerformance: {},
+        fundProfile: {},
+        incomeStatementHistory: {},
+        incomeStatementHistoryQuarterly: {},
+        indexTrend: {},
+        industryTrend: {},
+        insiderHolders: {},
+        insiderTransactions: {},        
+        institutionOwnership: {},
+        majorDirectHolders: {},
+        majorHoldersBreakdown: {},
+        netSharePurchaseActivity: {},        
+        quoteType: {},
+        recommendationTrend: {},
+        secFilings: {},
+        sectorTrend: {},
+        summaryProfile: {},
+        topHoldings: {},
+        upgradeDowngradeHistory: {}
       };
     }
   }
