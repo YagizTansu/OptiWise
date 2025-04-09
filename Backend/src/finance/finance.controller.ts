@@ -246,18 +246,30 @@ export class FinanceController {
   }
 
   /**
+   * Get historical data with more limited options than chart
+   * Only supports daily, weekly, or monthly intervals
+   */
+  @Get('historical')
+  async getHistoricalData(
+    @Query('symbol', new DefaultValuePipe('AAPL')) symbol: string,
+    @Query('from', ParseDatePipe) from: Date,
+    @Query('to', new DefaultValuePipe(new Date().toISOString()), ParseDatePipe) to: Date,
+    @Query('interval', new DefaultValuePipe('1d'), new HistoricalIntervalValidationPipe()) interval: '1d' | '1wk' | '1mo',
+  ) {
+    return this.financeService.getHistoricalData(symbol, from, to, interval);
+  }
+
+  /**
    * Get detailed quote summary data for a symbol
    */
   @Get('quoteSummary')
   async getQuoteSummary(
     @Query('symbol', new DefaultValuePipe('AAPL')) symbol: string,
-    @Query('modules', new ParseArrayPipe()) modules: string[]
+    @Query('modules', new ParseArrayPipe(), new QuoteSummaryModulesValidationPipe()) modules: string[]
   ): Promise<any> {
     const options = {
       modules
     };
-
-    
     
     return this.financeService.getQuoteSummary(symbol, options);
   }
@@ -323,6 +335,30 @@ export class FinanceController {
   ) {
     return this.financeService.getDailyGainers({ count, lang, region });
   }
+
+  /**
+   * Get daily losers - stocks with biggest percentage losses
+   */
+  // @Get('daily-losers')
+  // async getDailyLosers(
+  //   @Query('count', new DefaultValuePipe(5), ParseIntPipe) count: number,
+  //   @Query('lang', new DefaultValuePipe('en-US')) lang: string,
+  //   @Query('region', new DefaultValuePipe('US')) region: string,
+  // ) {
+  //   return this.financeService.getDailyLosers({ count, lang, region });
+  // }
+
+  // /**
+  //  * Get most active stocks by volume
+  //  */
+  // @Get('most-actives')
+  // async getMostActives(
+  //   @Query('count', new DefaultValuePipe(5), ParseIntPipe) count: number,
+  //   @Query('lang', new DefaultValuePipe('en-US')) lang: string,
+  //   @Query('region', new DefaultValuePipe('US')) region: string,
+  // ) {
+  //   return this.financeService.getMostActives({ count, lang, region });
+  // }
 }
 
 /* 

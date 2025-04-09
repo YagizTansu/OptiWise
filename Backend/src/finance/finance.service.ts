@@ -37,25 +37,6 @@ interface QuoteOptions {
   return?: 'array' | 'map' | 'object';
 }
 
-// Define the valid quoteSummary module names as a union type
-// Note: Removed "symbol" which is causing the type error
-type QuoteSummaryModule = 
-  | 'assetProfile' | 'balanceSheetHistory' | 'balanceSheetHistoryQuarterly'
-  | 'calendarEvents' | 'cashflowStatementHistory' | 'cashflowStatementHistoryQuarterly'
-  | 'defaultKeyStatistics' | 'earnings' | 'earningsHistory' | 'earningsTrend'
-  | 'financialData' | 'fundOwnership' | 'fundPerformance' | 'fundProfile'
-  | 'incomeStatementHistory' | 'incomeStatementHistoryQuarterly' | 'indexTrend'
-  | 'industryTrend' | 'insiderHolders' | 'insiderTransactions' | 'institutionOwnership'
-  | 'majorDirectHolders' | 'majorHoldersBreakdown' | 'netSharePurchaseActivity'
-  | 'price' | 'quoteType' | 'recommendationTrend' | 'secFilings' | 'sectorTrend'
-  | 'summaryDetail' | 'summaryProfile' | 'symbol' | 'topHoldings' | 'upgradeDowngradeHistory';
-
-// Interface for Yahoo Finance quoteSummary options with proper typing
-interface QuoteSummaryOptions {
-  modules?: QuoteSummaryModule[] | 'all';
-  formatted?: boolean;
-}
-
 /**
  * Historical interval options are more limited than chart intervals
  */
@@ -221,11 +202,16 @@ export class FinanceService implements OnModuleInit {
    */
   async getTrending(region = 'US') {
     try {
-      const result = await yahooFinance.trendingSymbols(region);
+      const result = await this.retryOperation(
+        () => yahooFinance.trendingSymbols(region),
+        3,
+        1000,
+        `getTrending for ${region}`
+      );
       return result.quotes;
     } catch (error) {
       this.logger.error(`Failed to fetch trending symbols for ${region}`, error);
-      throw error;
+      return []; // Return empty array instead of throwing
     }
   }
 
@@ -234,10 +220,15 @@ export class FinanceService implements OnModuleInit {
    */
   async getChartData(symbol: string, options: ChartOptions) {
     try {
-      return await yahooFinance.chart(symbol, options);
+      return await this.retryOperation(
+        () => yahooFinance.chart(symbol, options),
+        3,
+        1000,
+        `getChartData for ${symbol}`
+      );
     } catch (error) {
       this.logger.error(`Failed to fetch chart data for ${symbol}`, error);
-      throw error;
+      return { chart: { result: [] } }; // Return empty data structure
     }
   }
 
@@ -369,10 +360,21 @@ export class FinanceService implements OnModuleInit {
         region: options.region || 'US'
       };
 
-      return await yahooFinance.insights(symbol, queryOptions);
+      return await this.retryOperation(
+        () => yahooFinance.insights(symbol, queryOptions),
+        3,
+        1000,
+        `getInsights for ${symbol}`
+      );
     } catch (error) {
       this.logger.error(`Failed to fetch insights for ${symbol}`, error);
-      throw error;
+      return { 
+        technicalEvents: {}, 
+        companySnapshot: {}, 
+        recommendation: {}, 
+        events: [], 
+        reports: [] 
+      }; // Return empty structure
     }
   }
 
@@ -381,10 +383,49 @@ export class FinanceService implements OnModuleInit {
    */
   async getDailyGainers(options: TrendingQueryOptions = {}) {
     try {
-      return await yahooFinance.dailyGainers(options);
+      return await this.retryOperation(
+        () => yahooFinance.dailyGainers(options),
+        3,
+        1000,
+        `getDailyGainers`
+      );
     } catch (error) {
       this.logger.error('Failed to fetch daily gainers', error);
-      throw error;
+      return { finance: { result: [] } }; // Return empty structure
     }
   }
+
+  /**
+   * Get daily losers - stocks with biggest percentage losses
+   */
+  // async getDailyLosers(options: TrendingQueryOptions = {}) {
+  //   try {
+  //     return await this.retryOperation(
+  //       () => yahooFinance.dailyLosers(options),
+  //       3,
+  //       1000,
+  //       `getDailyLosers`
+  //     );
+  //   } catch (error) {
+  //     this.logger.error('Failed to fetch daily losers', error);
+  //     return { finance: { result: [] } }; // Return empty structure
+  //   }
+  // }
+
+  // /**
+  //  * Get most active stocks by volume
+  //  */
+  // async getMostActives(options: TrendingQueryOptions = {}) {
+  //   try {
+  //     return await this.retryOperation(
+  //       () => yahooFinance.mostActives(options),
+  //       3,
+  //       1000,
+  //       `getMostActives`
+  //     );
+  //   } catch (error) {
+  //     this.logger.error('Failed to fetch most actives', error);
+  //     return { finance: { result: [] } }; // Return empty structure
+  //   }
+  // }
 }
