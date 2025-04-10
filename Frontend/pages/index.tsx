@@ -14,29 +14,62 @@ import {
   FaArrowRight,
   FaDesktop,
   FaUsers,
-  FaCheckCircle
+  FaCheckCircle,
+  FaChevronLeft,
+  FaChevronRight,
+  FaCircle
 } from 'react-icons/fa'
 
 export default function Home() {
-  // Define chart images for the carousel
-  const chartImages = [
-    "/images/chart1.png",
-    "/images/chart2.png",
-    "/images/chart3.png",
-    "/images/chart4.png",
-    "/images/chart5.png",
+  // Define chart images and titles for the showcase
+  const chartData = [
+    { 
+      src: "/images/chart1.png", 
+      title: "Market Trend Analysis", 
+      type: "STOCK"
+    },
+    { 
+      src: "/images/chart2.png", 
+      title: "Forex Market Prediction", 
+      type: "FOREX"
+    },
+    { 
+      src: "/images/chart3.png", 
+      title: "Volatility Indicators", 
+      type: "CRYPTO"
+    },
+    { 
+      src: "/images/chart4.png", 
+      title: "Investment Portfolio", 
+      type: "ETF"
+    },
+    { 
+      src: "/images/chart5.png", 
+      title: "Commodity Forecasting", 
+      type: "COMMODITY"
+    },
   ];
   
-  const [currentChart, setCurrentChart] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   
-  // Rotate through charts automatically
+  // Navigate to previous image
+  const prevImage = () => {
+    setCurrentIndex(prev => (prev === 0 ? chartData.length - 1 : prev - 1));
+  };
+  
+  // Navigate to next image
+  const nextImage = () => {
+    setCurrentIndex(prev => (prev + 1) % chartData.length);
+  };
+  
+  // Rotate through images automatically
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentChart(prevChart => (prevChart + 1) % chartImages.length);
-    }, 3000); // Change chart every 3 seconds
+      nextImage();
+    }, 5000);
     
     return () => clearInterval(interval);
-  }, [chartImages.length]);
+  }, []);
 
   return (
     <Layout title="OptiWise - Intelligent Financial Analysis Platform">
@@ -72,34 +105,59 @@ export default function Home() {
             </div>
           </div>
           <div className={styles.heroImage}>
-            {/* Chart carousel display */}
-            <div className={styles.chartCarousel}>
-              {chartImages.map((src, index) => (
-                <div 
-                  key={index}
-                  className={`${styles.chartSlide} ${index === currentChart ? styles.activeChart : ''}`}
-                >
-                  <Image 
-                    src={src} 
-                    alt={`OptiWise chart example ${index + 1}`}
-                    width={800}
-                    height={450}
-                    priority={index === currentChart}
-                    style={{ 
-                      objectFit: 'cover',
-                      objectPosition: 'center',
-                    }}
-                  />
-                </div>
-              ))}
-              <div className={styles.chartIndicators}>
-                {chartImages.map((_, index) => (
-                  <span 
+            {/* Modern Image Showcase */}
+            <div className={styles.imageShowcase}>
+              <div className={styles.showcaseHeader}>
+                <h3 className={styles.showcaseTitle}>{chartData[currentIndex].title}</h3>
+                <span className={styles.showcaseBadge}>{chartData[currentIndex].type}</span>
+              </div>
+              
+              <div className={styles.showcaseContent}>
+                {chartData.map((chart, index) => (
+                  <div 
                     key={index}
-                    className={`${styles.indicator} ${index === currentChart ? styles.activeIndicator : ''}`}
-                    onClick={() => setCurrentChart(index)}
-                  />
+                    className={`${styles.imageFrame} ${index === currentIndex ? styles.activeFrame : ''}`}
+                  >
+                    <Image 
+                      src={chart.src} 
+                      alt={chart.title}
+                      fill={true}
+                      sizes="(max-width: 768px) 100vw, 900px"
+                      priority={index === currentIndex}
+                      className={styles.showcaseImage}
+                    />
+                    <div className={styles.frameOverlay}></div>
+                  </div>
                 ))}
+                
+                {/* New modern carousel controls */}
+                <div className={styles.navButtons}>
+                  <button 
+                    className={styles.navButton} 
+                    onClick={prevImage} 
+                    aria-label="Previous image"
+                  >
+                    <FaChevronLeft />
+                  </button>
+                  <button 
+                    className={styles.navButton} 
+                    onClick={nextImage}
+                    aria-label="Next image"
+                  >
+                    <FaChevronRight />
+                  </button>
+                </div>
+                
+                <div className={styles.carouselControls}>
+                  {chartData.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`${styles.carouselDot} ${index === currentIndex ? styles.activeDot : ''}`}
+                      onClick={() => setCurrentIndex(index)}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
