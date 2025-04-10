@@ -98,7 +98,7 @@ const VALID_QUOTE_SUMMARY_MODULES = [
 export class QuoteSummaryModulesValidationPipe implements PipeTransform {
   transform(values: string[]): string[] {
     if (!values || values.length === 0) {
-      return ['price', 'summaryDetail']; // Default modules
+      return ['price', 'summaryDetail','summaryProfile']; // Default modules
     }
     
     const invalidModules = values.filter(module => !VALID_QUOTE_SUMMARY_MODULES.includes(module));
