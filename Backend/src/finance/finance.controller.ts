@@ -264,7 +264,7 @@ export class FinanceController {
     const options = {
       modules
     };
-    debugger
+    
     return this.financeService.getQuoteSummary(symbol, options);
   }
 

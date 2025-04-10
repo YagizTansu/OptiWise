@@ -464,7 +464,6 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
           className={styles.modernRetryButton}
           onClick={() => {
             setLoading(true);
-            fetchData();
           }}
         >
           Try Again
@@ -491,7 +490,6 @@ const ValuationModels: React.FC<ValuationModelsProps> = ({ symbol }) => {
             className={styles.modernRetryButton}
             onClick={() => {
               setLoading(true);
-              fetchData();
             }}
           >
             Try Again

@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import styles from '../../../styles/OverboughtOversold/PriceVolumeChart.module.css';
 import { FaChartLine, FaChartBar, FaEyeSlash, FaInfoCircle, FaArrowLeft, FaArrowRight, FaSyncAlt, FaDownload, FaExpand, FaQuestion, FaTimes } from 'react-icons/fa';
 import { Chart, ChartDataset } from 'chart.js';
-import { fetchPriceVolumeData, PriceVolumeData } from '../../../services/api/finance';
+import { fetchPriceVolumeData} from '../../../services/api/finance';
 
 // Define proper chart dataset types
 interface PriceDataset extends ChartDataset<'line'> {

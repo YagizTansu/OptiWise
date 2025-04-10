@@ -191,12 +191,14 @@ const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ symbol }) => {
             <div className={styles.eventHeader}>
               <div className={styles.eventTypeAndDate}>
                 <span className={styles.eventType}>{event.type}</span>
-                <span className={styles.eventDate}>{event.formatted}</span>
-                <span className={styles.daysRemaining}>
-                  ({event.daysRemaining === 0 ? 'Today' : 
-                   event.daysRemaining === 1 ? 'Tomorrow' : 
-                   `${event.daysRemaining} days`})
-                </span>
+                <div>
+                  <span className={styles.eventDate}>{event.formatted}</span>
+                  <span className={styles.daysRemaining}>
+                    {" "}({event.daysRemaining === 0 ? 'Today' : 
+                    event.daysRemaining === 1 ? 'Tomorrow' : 
+                    `${event.daysRemaining} days`})
+                  </span>
+                </div>
               </div>
               {event.daysRemaining <= 7 && (
                 <span className={styles.upcomingTag}>Soon</span>

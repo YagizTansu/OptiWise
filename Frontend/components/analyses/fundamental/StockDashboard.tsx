@@ -19,6 +19,7 @@ const StockDashboard = ({ symbol }: StockDashboardProps) => {
       try {
         setLoading(true);
         const response = await fetchStockDashboardData(symbol);
+        
         setData(response);
         setLoading(false);
       } catch (err) {

@@ -82,7 +82,7 @@ export async function fetchChartData(
     const data = await makeApiRequest<any>('chart', params);
     
     // Extract currency information
-    const currency = data?.meta?.currency || 'USD';
+    const currency = data?.meta?.currency || '';
         
     // Process the response data based on its format
     if (data && data.meta && data.quotes && Array.isArray(data.quotes)) {

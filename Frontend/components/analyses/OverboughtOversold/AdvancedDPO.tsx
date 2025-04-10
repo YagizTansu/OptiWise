@@ -20,6 +20,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [activePeriod, setActivePeriod] = useState<string>('1y');
   const [showInfo, setShowInfo] = useState(false);
+  const [currency, setCurrency] = useState<string>('');
   const priceChartRef = useRef<HTMLCanvasElement>(null);
   const dpoChartRef = useRef<HTMLCanvasElement>(null);
   const priceChartInstance = useRef<Chart | null>(null);
@@ -65,6 +66,11 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
           endDate.toISOString(),
           '1d'
         );
+
+        // Set the currency from the first data point
+        if (data.length > 0 && data[0].currency) {
+          setCurrency(data[0].currency);
+        }
 
         let tenYearData = data;
         if (activePeriod !== '10y') {
@@ -302,7 +308,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
                       return `${label}: ${value.toLocaleString(undefined, {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
-                      })}`;
+                      })} ${currency}`;
                     } else if (label === 'Volume') {
                       if (Number(value) >= 1000000000) {
                         return `${label}: ${(value / 1000000000).toFixed(2)}B`;
@@ -617,7 +623,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
     <>
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2>Price/Volume chart - {symbol}</h2>
+          <h2>Price/Volume chart - {symbol} {currency && `(${currency})`}</h2>
           <div className={styles.chartControls}>
             <div className={styles.periodSelector}>
               {['6m', '1y', '2y', '5y', '10y'].map(period => (
@@ -680,7 +686,7 @@ const AdvancedDPO: React.FC<AdvancedDPOProps> = ({ symbol }) => {
 
       <div className={styles.chartCard}>
         <div className={styles.chartHeader}>
-          <h2>Advanced DPO Indicator - {symbol}</h2>
+          <h2>Advanced DPO Indicator - {symbol} {currency && `(${currency})`}</h2>
         </div>
 
         <div className={styles.indicatorContainer}>
