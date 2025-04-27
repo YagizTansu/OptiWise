@@ -22,6 +22,6 @@ async function bootstrap() {
   // Add API prefix
   app.setGlobalPrefix('api');
   
-  await app.listen(3001);
+  await app.listen(process.env.PORT || 3001); // <<< BURASI ÖNEMLİ
 }
 bootstrap();
