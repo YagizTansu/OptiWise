@@ -191,7 +191,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin
+          // Vercel'de deploy edildiğinde doğru URL'e yönlendirme yapmak için 
+          // window.location.origin yerine NEXT_PUBLIC_APP_URL kullanıyoruz
+          redirectTo: process.env.NEXT_PUBLIC_APP_URL || window.location.origin
         }
       });
       
