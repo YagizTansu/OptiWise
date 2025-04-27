@@ -582,13 +582,11 @@ const SeasonalityAnalysis: React.FC<SeasonalityAnalysisProps> = ({ symbol }) => 
               {viewMode === 'line' ? (
                 <Line 
                   data={showPriceChart ? getCurrentPriceData() : getCurrentSeasonalityData()}
-                  options={showPriceChart ? priceChartOptions : seasonalityChartOptions}
                   height={isFullscreen ? 600 : 300}
                 />
               ) : (
                 <Bar
                   data={showPriceChart ? getCurrentPriceData() : getCurrentSeasonalityData()}
-                  options={showPriceChart ? priceChartOptions : seasonalityChartOptions}
                   height={isFullscreen ? 600 : 300}
                 />
               )}

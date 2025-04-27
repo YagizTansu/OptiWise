@@ -84,7 +84,7 @@ const EventsAndDevelopments: React.FC<EventsAndDevelopmentsProps> = ({ symbol })
           className={styles.modernRetryButton}
           onClick={() => {
             setLoading(true);
-            loadInsights();
+            // loadInsights();
           }}
         >
           Try Again

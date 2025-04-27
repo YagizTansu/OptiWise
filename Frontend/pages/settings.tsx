@@ -65,7 +65,7 @@ export default function Settings() {
       setMessage({ text: 'Profile updated successfully', type: 'success' });
     } catch (error) {
       console.error('Error updating profile:', error);
-      setMessage({ text: error.message || 'Error updating profile', type: 'error' });
+      setMessage({ text: error instanceof Error ? error.message : 'Error updating profile', type: 'error' });
     } finally {
       setUpdating(false);
     }
@@ -91,7 +91,10 @@ export default function Settings() {
       setMessage({ text: 'Appearance settings updated successfully', type: 'success' });
     } catch (error) {
       console.error('Error updating appearance:', error);
-      setMessage({ text: error.message || 'Error updating appearance settings', type: 'error' });
+      setMessage({ 
+        text: error instanceof Error ? error.message : 'Error updating appearance settings', 
+        type: 'error' 
+      });
     } finally {
       setUpdating(false);
     }
@@ -108,7 +111,7 @@ export default function Settings() {
       setMessage({ text: 'Password reset email sent. Please check your inbox.', type: 'success' });
     } catch (error) {
       console.error('Error resetting password:', error);
-      setMessage({ text: error.message || 'Error resetting password. Please try again.', type: 'error' });
+      setMessage({ text: error instanceof Error ? error.message : 'Error resetting password. Please try again.', type: 'error' });
     }
   };
 

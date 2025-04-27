@@ -84,7 +84,7 @@ const AnalystReports: React.FC<AnalystReportsProps> = ({ symbol }) => {
           className={styles.modernRetryButton}
           onClick={() => {
             setLoading(true);
-            loadInsights();
+            // loadInsights();
           }}
         >
           Try Again

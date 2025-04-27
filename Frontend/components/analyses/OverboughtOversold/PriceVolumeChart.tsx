@@ -44,7 +44,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
     dpoLowerBand1?: number[];
     dpoUpperBand2?: number[];
     dpoLowerBand2?: number[];
-    dpoZones?: string[];
+    dpoZones?: (string | null)[];
   }>({ labels: [], prices: [], volumes: [] });
   
   // Add state to store complete dataset
@@ -57,7 +57,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
     dpoLowerBand1?: number[];
     dpoUpperBand2?: number[];
     dpoLowerBand2?: number[];
-    dpoZones?: string[];
+    dpoZones?: (string | null)[];
   } | null>(null);
   
   const priceChartRef = useRef<HTMLCanvasElement>(null);
@@ -249,7 +249,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
     // DPO Hesaplama (Kayma düzeltildi: t - (N/2))
     const halfPeriod = Math.floor(period / 2);
     const dpo = prices.slice(halfPeriod, prices.length - halfPeriod)
-        .map((price: number, i: string | number) => price - sma[i]);
+        .map((price: number, i: number) => price - sma[i]);
 
     if (dpo.length < lookbackPeriod) return null;
 
@@ -354,7 +354,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
     // Add Advanced DPO dataset if enabled and available
     if (showDPO && data.dpo) {
       // Create an array of background colors based on zones
-      const pointBackgroundColors = data.dpo.map((_, index) => {
+      const pointBackgroundColors = data.dpo.map((_: any, index: number) => {
         if (!data.dpoZones || index >= data.dpoZones.length || !data.dpoZones[index]) {
           return 'rgba(128, 128, 128, 0.7)'; // Default gray
         }
@@ -387,7 +387,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
       datasets.push(dpoDataset);
       
       // Add Bollinger Bands (1 SD)
-      const upperBand1Dataset: ChartDataset = {
+      const upperBand1Dataset: DPODataset = {
         type: 'line',
         label: 'Upper Band (1 SD)',
         data: data.dpoUpperBand1,
@@ -401,7 +401,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
       };
       datasets.push(upperBand1Dataset);
       
-      const lowerBand1Dataset: ChartDataset = {
+      const lowerBand1Dataset: DPODataset = {
         type: 'line',
         label: 'Lower Band (1 SD)',
         data: data.dpoLowerBand1,
@@ -416,7 +416,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
       datasets.push(lowerBand1Dataset);
       
       // Add Bollinger Bands (2 SD)
-      const upperBand2Dataset: ChartDataset = {
+      const upperBand2Dataset: DPODataset = {
         type: 'line',
         label: 'Upper Band (2 SD)',
         data: data.dpoUpperBand2,
@@ -430,7 +430,7 @@ const PriceVolumeChart: React.FC<PriceVolumeChartProps> = ({ symbol }) => {
       };
       datasets.push(upperBand2Dataset);
       
-      const lowerBand2Dataset: ChartDataset = {
+      const lowerBand2Dataset: DPODataset = {
         type: 'line',
         label: 'Lower Band (2 SD)',
         data: data.dpoLowerBand2,

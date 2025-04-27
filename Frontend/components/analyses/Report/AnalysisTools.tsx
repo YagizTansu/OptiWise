@@ -501,7 +501,7 @@ const AnalysisTools = ({ symbol }: AnalysisToolsProps) => {
     if (!data.earningsTrend || 
         !data.earningsTrend.trend || 
         data.earningsTrend.trend.length === 0 ||
-        data.earningsTrend.trend.every(trend => !trend.earningsEstimate || !trend.earningsEstimate.avg)) {
+        data.earningsTrend.trend.every((trend: { earningsEstimate: { avg: any; }; }) => !trend.earningsEstimate || !trend.earningsEstimate.avg)) {
       return (
         <div className={styles.enhancedNoDataMessage}>
           <FaExclamationTriangle className={styles.noDataIcon} />

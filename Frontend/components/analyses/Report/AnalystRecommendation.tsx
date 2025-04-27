@@ -75,7 +75,7 @@ const AnalystRecommendation: React.FC<AnalystRecommendationProps> = ({ symbol })
           className={styles.modernRetryButton}
           onClick={() => {
             setLoading(true);
-            loadInsights();
+            // loadInsights();
           }}
         >
           Try Again

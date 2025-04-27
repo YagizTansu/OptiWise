@@ -18,6 +18,13 @@ const statementDescriptions = {
   cashFlowStatement: "Tracks how cash moved in and out of the business over a period, showing operational efficiency, investment activities, and financing decisions."
 };
 
+// Mapping from activeTab values to statement description keys
+const tabToStatementMap: Record<string, keyof typeof statementDescriptions> = {
+  'income': 'incomeStatement',
+  'balance': 'balanceSheet',
+  'cash': 'cashFlowStatement'
+};
+
 // Format large numbers as k, M, B with commas for thousands
 const formatValue = (value: number | string): string => {
   if (value === '-' || value === undefined) return '-';
@@ -181,11 +188,11 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
       const mappings = fieldMappings[statement as keyof typeof fieldMappings];
       
       for (const [displayName, fieldName] of Object.entries(mappings)) {
-        processedData[statement as keyof FinancialStatementData][displayName] = {};
+        processedData[statement as 'incomeStatement' | 'balanceSheet' | 'cashFlowStatement'][displayName] = {};
         
         // Initialize with '-' for each year
         years.forEach(year => {
-          processedData[statement as keyof FinancialStatementData][displayName][year] = '-';
+          processedData[statement as 'incomeStatement' | 'balanceSheet' | 'cashFlowStatement'][displayName][year] = '-';
         });
       }
     }
@@ -200,7 +207,7 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
         
         for (const [displayName, fieldName] of Object.entries(mappings)) {
           if (yearData[fieldName] !== undefined) {
-            processedData[statement as keyof FinancialStatementData][displayName][year] = yearData[fieldName];
+            processedData[statement as 'incomeStatement' | 'balanceSheet' | 'cashFlowStatement'][displayName][year] = yearData[fieldName];
           }
         }
       }
@@ -346,7 +353,7 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
           {title}
           <span 
             className={styles.infoButtonContainer}
-            onMouseEnter={(e) => handleInfoIconHover(e, statementDescriptions[activeTab])}
+            onMouseEnter={(e) => handleInfoIconHover(e, statementDescriptions[tabToStatementMap[activeTab]])}
             onMouseLeave={handleInfoIconLeave}
           >
           </span>
@@ -415,7 +422,7 @@ const FinancialStatements: React.FC<FinancialStatementsProps> = ({ symbol = 'AAP
               </tr>
             </thead>
             <tbody>
-              {Object.entries(currentData).map(([lineItem, yearData]) => (
+              {Object.entries(currentData).map(([lineItem, yearData]: [string, Record<string, string | number>]) => (
                 <tr 
                   key={lineItem} 
                   className={

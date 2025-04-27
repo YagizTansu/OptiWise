@@ -45,6 +45,18 @@ interface StockPerformance {
   breakEvenIndex: number;
 }
 
+// Define interface for search results
+interface SearchResult {
+  symbol: string;
+  shortName?: string;
+  longName?: string;
+  exchange?: string;
+  country?: string;
+  sector?: string;
+  industry?: string;
+  marketCap?: number;
+}
+
 // Success stories data
 const successStories = [
   {
@@ -80,7 +92,7 @@ export default function Breakeven() {
   const [error, setError] = useState<string | null>(null);
   const [sectors, setSectors] = useState<string[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   
   // State for sorting
@@ -102,8 +114,8 @@ export default function Breakeven() {
         setBreakenStocks(stocks);
         
         // Extract unique sectors and countries
-        const uniqueSectors = [...new Set(stocks.map(stock => stock.sector))];
-        const uniqueCountries = [...new Set(stocks.map(stock => stock.country))];
+        const uniqueSectors = Array.from(new Set(stocks.map(stock => stock.sector)));
+        const uniqueCountries = Array.from(new Set(stocks.map(stock => stock.country)));
         setSectors(uniqueSectors);
         setCountries(uniqueCountries);
       } catch (err) {
@@ -129,7 +141,7 @@ export default function Breakeven() {
       setIsSearching(true);
       try {
         const results = await searchSymbols(searchTerm);
-        setSearchResults(results);
+        setSearchResults(results as SearchResult[]);
       } catch (err) {
         console.error('Error searching symbols:', err);
       } finally {
@@ -249,6 +261,7 @@ export default function Breakeven() {
           if (foundBreakeven && previousProfitQuarter) {
             // Fetch additional company info
             const companyInfo = await searchSymbols(symbol, 1);
+            const companyData = companyInfo[0] as SearchResult;
             
             // Fetch quote data for market cap
             const quoteData = await fetchQuoteData(symbol, 'shortName,longName,regularMarketPrice,marketCap');
@@ -289,10 +302,10 @@ export default function Breakeven() {
             breakenStocks.push({
               id: breakenStocks.length + 1,
               symbol: symbol,
-              name: quoteData.shortName || companyInfo[0]?.shortName || symbol,
-              country: companyInfo[0]?.country || 'United States',  // Default country
-              sector: companyInfo[0]?.sector || 'Technology', // Default sector
-              industry: companyInfo[0]?.industry || 'Software',
+              name: quoteData.shortName || companyData?.shortName || symbol,
+              country: companyData?.country || 'United States',  // Default country
+              sector: companyData?.sector || 'Technology', // Default sector
+              industry: companyData?.industry || 'Software',
               marketCap: marketCap,
               marketCapValue: quoteData.marketCap || 0,
               lastQuarterProfit: profit,
@@ -329,10 +342,10 @@ export default function Breakeven() {
           const newStocks = [...prevStocks, ...stocks];
           
           // Update sectors and countries
-          const uniqueSectors = [...new Set(newStocks.map(stock => stock.sector))];
+          const uniqueSectors = Array.from(new Set(newStocks.map(stock => stock.sector)));
           setSectors(uniqueSectors);
           
-          const uniqueCountries = [...new Set(newStocks.map(stock => stock.country))];
+          const uniqueCountries = Array.from(new Set(newStocks.map(stock => stock.country)));
           setCountries(uniqueCountries);
           
           return newStocks;
@@ -784,10 +797,6 @@ export default function Breakeven() {
                       ) : successChartsData[story.symbol] ? (
                         <Line 
                           data={getSuccessChartData(story.symbol)!} 
-                          options={{
-                            ...lineChartOptions,
-                            ...getBreakevenAnnotation(story.symbol)
-                          }}
                           height={150}
                         />
                       ) : (

@@ -343,8 +343,9 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
             color: 'rgba(200, 200, 200, 0.1)'
           },
           ticks: {
-            callback: function(value: number) {
-              return formatPrice(value as number);
+            callback: function(tickValue: string | number) {
+              const value = typeof tickValue === 'string' ? parseFloat(tickValue) : tickValue;
+              return formatPrice(value);
             },
             // Hide y-axis labels on mobile
             display: !isMobile,
@@ -379,7 +380,7 @@ const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ symbol }) => 
           padding: 12,
           titleFont: {
             size: 14,
-            weight: '700' // Change 'bold' to '700' to match Chart.js expected format
+            weight: 700 // Changed from '700' (string) to 700 (number)
           },
           bodyFont: {
             size: 13

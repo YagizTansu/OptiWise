@@ -138,7 +138,7 @@ const mockTopics: TopicData[] = [
 ];
 
 // Array of available categories for filtering
-const categories = [...new Set(mockTopics.map(topic => topic.category))];
+const categories = Array.from(new Set(mockTopics.map(topic => topic.category)));
 
 export default function HotTopics() {
   const [topics, setTopics] = useState<TopicData[]>(mockTopics);
