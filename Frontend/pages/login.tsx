@@ -8,6 +8,10 @@ import { FcGoogle } from 'react-icons/fc';
 import styles from '../styles/Login.module.css';
 import { useAuth } from '../contexts/AuthContext';
 
+// Ortam değişkeni ile URL'yi belirleyelim
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 
+                (typeof window !== 'undefined' ? window.location.origin : '');
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +27,11 @@ const Login = () => {
     }
   }, [router.query]);
 
-  const returnUrl = router.query.returnUrl as string || '/';
+  // Mutlak URL kullanarak yönlendirmelerin doğru çalışmasını sağlayalım
+  const returnUrl = (router.query.returnUrl as string) || '/';
+  const absoluteReturnUrl = returnUrl.startsWith('http') 
+    ? returnUrl 
+    : `${BASE_URL}${returnUrl.startsWith('/') ? returnUrl : `/${returnUrl}`}`;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -39,7 +47,8 @@ const Login = () => {
         return;
       }
 
-      router.push(returnUrl);
+      // Doğru bir şekilde yönlendirme yapalım
+      window.location.href = absoluteReturnUrl;
     } catch (err) {
       setError('An unexpected error occurred');
       setIsLoading(false);
@@ -51,6 +60,7 @@ const Login = () => {
     setError(null);
 
     try {
+      // Google sign-in işlemini başlatalım
       const { error } = await signInWithGoogle();
       
       if (error) {
