@@ -1,4 +1,4 @@
-import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl, FaSearchDollar, FaBalanceScale, FaChartArea, FaTimes } from 'react-icons/fa';
+import { FaBars, FaUser, FaChartLine, FaTools, FaLightbulb, FaRobot, FaChartBar, FaFire, FaRocket, FaGlobe, FaFlag, FaMoneyBillWave, FaListOl, FaSearchDollar, FaBalanceScale, FaChartArea, FaTimes, FaTerminal } from 'react-icons/fa';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
@@ -122,6 +122,16 @@ export default function Navbar() {
                   <div className={styles.categorySection}>
                     <div className={styles.categoryTitle}>Market Intelligence</div>
                     <div className={styles.dropdownGrid}>
+
+                    <Link href="/terminal" className={styles.dropdownGridItem}>
+                        <div className={styles.dropdownItemIconWrap}>
+                          <FaTerminal className={styles.dropdownItemIcon} />
+                        </div>
+                        <div>
+                          <span className={styles.dropdownItemTitle}>Terminal</span>
+                          <p className={styles.dropdownItemDesc}>Real-time market analysis</p>
+                        </div>
+                      </Link>
                       
                       <Link href="/rankings" className={styles.dropdownGridItem}>
                         <div className={styles.dropdownItemIconWrap}>
