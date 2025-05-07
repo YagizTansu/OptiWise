@@ -1,74 +1,65 @@
-import Anthropic from '@anthropic-ai/sdk';
-
-// Constants for supported Claude models
-const CLAUDE_MODELS = {
-  SONNET: 'claude-3-7-sonnet-20250219', // deprecated
-  OPUS: 'claude-3-opus-20240229',     // deprecated
-  SONNET_LATEST: 'claude-3-7-sonnet-20250219', // current recommended
-  HAIKU_LATEST: 'claude-3-7-sonnet-20250219',   // current recommended
-  OPUS_LATEST: 'claude-3-7-sonnet-20250219',     // current recommended
-};
-
-// Map deprecated models to their current versions
-const MODEL_REPLACEMENTS = {
-  [CLAUDE_MODELS.SONNET]: CLAUDE_MODELS.SONNET_LATEST,
-  [CLAUDE_MODELS.OPUS]: CLAUDE_MODELS.OPUS_LATEST,
+// Constants for supported OpenRouter models
+const OPENROUTER_MODELS = {
+  DEFAULT: 'microsoft/phi-4-reasoning-plus:free',
 };
 
 /**
- * Service for interacting with Anthropic's Claude AI models
+ * Message type for OpenRouter API
+ */
+type Message = {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+};
+
+/**
+ * Service for interacting with OpenRouter AI models
  */
 export class AIService {
-  private client: Anthropic | null = null;
-  private isServerSide: boolean;
+  private apiKey: string | undefined;
 
   constructor(apiKey?: string) {
-    // Check if we're running on the server or client
-    this.isServerSide = typeof window === 'undefined';
-    
-    // Only instantiate Anthropic client on server-side
-    if (this.isServerSide) {
-      this.client = new Anthropic({
-        apiKey: apiKey || process.env.ANTHROPIC_API_KEY,
-      });
-    }
+    this.apiKey = apiKey || process.env.OPENROUTER_API_KEY;
   }
 
   /**
-   * Ensures that a supported model is used, replacing deprecated models
-   * with their current equivalents
+   * Get headers for OpenRouter API requests
    */
-  private ensureSupportedModel(model: string): string {
-    if (model in MODEL_REPLACEMENTS) {
-      console.warn(`Model "${model}" is deprecated. Using "${MODEL_REPLACEMENTS[model]}" instead.`);
-      return MODEL_REPLACEMENTS[model];
-    }
-    return model;
+  private getHeaders(): Record<string, string> {
+    return {
+      'Authorization': `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json',
+    };
   }
 
   /**
-   * Create a message with Claude and get a complete response
+   * Create a message with AI and get a complete response
    */
   async createMessage(
     prompt: string, 
-    model: string = CLAUDE_MODELS.SONNET_LATEST,
     maxTokens: number = 1024
   ): Promise<string> {
-    // Ensure we're using a supported model
-    const safeModel = this.ensureSupportedModel(model);
-    
-    if (this.isServerSide && this.client) {
-      // Server-side: Use Anthropic client directly
-      const message = await this.client.messages.create({
-        max_tokens: maxTokens,
-        messages: [{ role: 'user', content: prompt }],
-        model: safeModel,
-      });
-      
-      if (message.content[0].type === 'text') {
-        return message.content[0].text;
-      } else {
-        throw new Error('Unexpected non-text response from Claude API');
+    if (this.apiKey) {
+      // Server-side: Call OpenRouter API directly
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: this.getHeaders(),
+          body: JSON.stringify({
+            model: OPENROUTER_MODELS.DEFAULT,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: maxTokens,
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`OpenRouter API request failed with status ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.choices[0].message.content;
+      } catch (error) {
+        console.error('Error calling OpenRouter API:', error);
+        throw error;
       }
     } else {
       // Client-side: Call backend API
@@ -80,7 +71,7 @@ export class AIService {
           },
           body: JSON.stringify({
             prompt,
-            model: safeModel,
+            model: OPENROUTER_MODELS.DEFAULT,
             maxTokens,
           }),
         });
@@ -99,27 +90,31 @@ export class AIService {
   }
 
   /**
-   * Create a message stream with Claude for real-time responses
+   * Create a message stream with OpenRouter for real-time responses
    */
   async createMessageStream(
     prompt: string,
-    model: string = CLAUDE_MODELS.SONNET_LATEST,
     maxTokens: number = 1024
   ) {
-    // Ensure we're using a supported model
-    const safeModel = this.ensureSupportedModel(model);
-    
-    if (this.isServerSide && this.client) {
-      // Server-side: Use Anthropic client directly
-      return this.client.messages.create({
-        max_tokens: maxTokens,
-        messages: [{ role: 'user', content: prompt }],
-        model: safeModel,
-        stream: true,
-      });
+    if (this.apiKey) {
+      // Server-side: Call OpenRouter API directly with streaming
+      try {
+        return fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: this.getHeaders(),
+          body: JSON.stringify({
+            model: OPENROUTER_MODELS.DEFAULT,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: maxTokens,
+            stream: true,
+          }),
+        });
+      } catch (error) {
+        console.error('Error creating OpenRouter stream:', error);
+        throw error;
+      }
     } else {
       // Client-side: Call backend API with streaming
-      // This uses fetch with ReadableStream for streaming
       const response = await fetch('/api/ai/stream', {
         method: 'POST',
         headers: {
@@ -127,7 +122,7 @@ export class AIService {
         },
         body: JSON.stringify({
           prompt,
-          model: safeModel,
+          model: OPENROUTER_MODELS.DEFAULT,
           maxTokens,
         }),
       });
@@ -144,26 +139,56 @@ export class AIService {
    * Process a message stream and collect the complete response
    */
   async processMessageStream(
-    stream: any,
+    stream: Response | ReadableStream<Uint8Array>,
     onChunk?: (chunk: string) => void
   ): Promise<string> {
-    // For server-side Anthropic stream
-    if (this.isServerSide && stream && typeof stream[Symbol.asyncIterator] === 'function') {
+    // For server-side OpenRouter stream
+    if (stream instanceof Response) {
+      if (!stream.body) {
+        throw new Error('Stream body is null');
+      }
+
+      const reader = stream.body.getReader();
+      const decoder = new TextDecoder();
       let responseText = '';
       
-      for await (const chunk of stream) {
-        if (chunk.type === 'content_block_delta' && chunk.delta.text) {
-          responseText += chunk.delta.text;
-          if (onChunk) {
-            onChunk(chunk.delta.text);
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value, { stream: true });
+          // Parse SSE format
+          const lines = chunk.split('\n').filter(line => line.trim() !== '');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') continue;
+              
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.choices && parsed.choices[0]?.delta?.content) {
+                  const textChunk = parsed.choices[0].delta.content;
+                  responseText += textChunk;
+                  if (onChunk) {
+                    onChunk(textChunk);
+                  }
+                }
+              } catch (e) {
+                console.error('Error parsing SSE data:', e);
+              }
+            }
           }
         }
+        
+        return responseText;
+      } finally {
+        reader.releaseLock();
       }
-      
-      return responseText;
     } 
     // For client-side fetch API stream
-    else if (!this.isServerSide && stream instanceof ReadableStream) {
+    else if (stream instanceof ReadableStream) {
       let responseText = '';
       const reader = stream.getReader();
       const decoder = new TextDecoder();
@@ -207,28 +232,35 @@ export class AIService {
   }
 
   /**
-   * Send a conversation history to Claude and get a response
+   * Send a conversation history to AI and get a response
    */
   async continueConversation(
-    messages: Anthropic.MessageParam[],
-    model: string = CLAUDE_MODELS.SONNET_LATEST,
+    messages: Message[],
+    model: string = OPENROUTER_MODELS.DEFAULT,
     maxTokens: number = 1024
   ): Promise<string> {
-    // Ensure we're using a supported model
-    const safeModel = this.ensureSupportedModel(model);
-    
-    if (this.isServerSide && this.client) {
-      // Server-side: Use Anthropic client directly
-      const message = await this.client.messages.create({
-        max_tokens: maxTokens,
-        messages,
-        model: safeModel,
-      });
-      
-      if (message.content[0].type === 'text') {
-        return message.content[0].text;
-      } else {
-        throw new Error('Unexpected non-text response from Claude API');
+    if (this.apiKey) {
+      // Server-side: Call OpenRouter API directly
+      try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: this.getHeaders(),
+          body: JSON.stringify({
+            model: model,
+            messages,
+            max_tokens: maxTokens,
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`OpenRouter API request failed with status ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.choices[0].message.content;
+      } catch (error) {
+        console.error('Error calling OpenRouter API:', error);
+        throw error;
       }
     } else {
       // Client-side: Call backend API
@@ -240,7 +272,7 @@ export class AIService {
           },
           body: JSON.stringify({
             messages,
-            model: safeModel,
+            model: model,
             maxTokens,
           }),
         });

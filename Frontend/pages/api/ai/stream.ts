@@ -1,10 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import Anthropic from '@anthropic-ai/sdk';
 
-// Initialize Anthropic client
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+// Default model from OpenRouter
+const DEFAULT_MODEL = 'microsoft/phi-4-reasoning-plus:free';
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,25 +25,90 @@ export default async function handler(
       'Connection': 'keep-alive',
     });
 
-    // Create a streaming request to Anthropic
-    const stream = await anthropic.messages.create({
-      max_tokens: maxTokens || 1024,
-      messages: [{ role: 'user', content: prompt }],
-      model: model || 'claude-3-5-sonnet-latest',
-      stream: true,
-    });
-
-    // Stream the response
-    for await (const chunk of stream) {
-      if (chunk.type === 'content_block_delta' && 'text' in chunk.delta && chunk.delta.text) {
-        // Send each text chunk as an SSE event
-        res.write(`data: ${JSON.stringify({ text: chunk.delta.text })}\n\n`);
-      }
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) {
+      console.error('OPENROUTER_API_KEY environment variable is not set');
+      res.write(`data: ${JSON.stringify({ 
+        error: 'API configuration error: OpenRouter API key is not configured'
+      })}\n\n`);
+      res.end();
+      return;
     }
 
-    // Signal the end of the stream
-    res.write('data: [DONE]\n\n');
-    res.end();
+    // Create headers for OpenRouter request
+    const headers = {
+      'Authorization': `Bearer ${apiKey}`,
+      'HTTP-Referer': process.env.SITE_URL || 'https://optiwise.app',
+      'X-Title': 'OptiWise',
+      'Content-Type': 'application/json',
+    };
+
+    console.log('Starting stream request to OpenRouter API with model:', model || DEFAULT_MODEL);
+
+    // Create a streaming request to OpenRouter
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        model: model || DEFAULT_MODEL,
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: maxTokens || 1024,
+        stream: true,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`OpenRouter API error response (${response.status}):`, errorText);
+      res.write(`data: ${JSON.stringify({ 
+        error: `OpenRouter API error: ${response.status} ${errorText}`
+      })}\n\n`);
+      res.end();
+      return;
+    }
+
+    if (!response.body) {
+      throw new Error('Response body is null');
+    }
+
+    // Stream the response from OpenRouter
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        const chunk = decoder.decode(value, { stream: true });
+        // Parse SSE format
+        const lines = chunk.split('\n').filter(line => line.trim() !== '');
+        
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') {
+              // Forward DONE marker
+              res.write('data: [DONE]\n\n');
+              continue;
+            }
+            
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.choices && parsed.choices[0]?.delta?.content) {
+                // Send each text chunk as an SSE event in our expected format
+                res.write(`data: ${JSON.stringify({ text: parsed.choices[0].delta.content })}\n\n`);
+              }
+            } catch (e) {
+              console.error('Error parsing SSE data:', e);
+            }
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+      res.end();
+    }
   } catch (error: any) {
     console.error('Error in AI stream:', error);
     res.write(`data: ${JSON.stringify({ error: error.message })}\n\n`);

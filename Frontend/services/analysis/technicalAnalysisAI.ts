@@ -109,7 +109,7 @@ class TechnicalAnalysisAI {
       );
       
       // Step 3: Send to Claude for analysis
-      const response = await aiService.createMessage(prompt, 'claude-3-7-sonnet-20250219', 4000);
+      const response = await aiService.createMessage(prompt,4000);
 
       // Step 4: Parse and structure Claude's response - Pass symbol as parameter
       return this.parseAIResponse(response, currentPrice, shortTermData, symbol);
@@ -153,7 +153,7 @@ Please provide a concise, expert answer to this question about ${symbol}. Use sp
 `;
 
       // Send to Claude for analysis
-      const response = await aiService.createMessage(prompt, 'claude-3-7-sonnet-20250219', 1500);
+      const response = await aiService.createMessage(prompt,  1500);
       return response;
     } catch (error) {
       console.error('Error answering stock question:', error);
@@ -182,7 +182,14 @@ Include key technical indicators, price patterns, support/resistance levels, and
 `;
 
       // Create stream
-      const stream = await aiService.createMessageStream(prompt, 'claude-3-7-sonnet-20250219', 1000);
+      const stream = await aiService.createMessageStream(prompt,1000);
+      
+      // Check if stream is null before processing
+      if (!stream) {
+        const errorMessage = 'Failed to create message stream';
+        if (onUpdate) onUpdate(errorMessage);
+        return errorMessage;
+      }
       
       // Process stream
       return await aiService.processMessageStream(stream, onUpdate);
