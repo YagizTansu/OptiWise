@@ -187,23 +187,23 @@ const ForecastAI: React.FC<ForecastAIProps> = ({ symbol }) => {
       />
 
       {/* 4. Detailed Analysis Rationale */}
-      <AnalysisRationale 
+      {/* <AnalysisRationale 
         technicalFactors={technicalFactors}
         sentimentData={sentimentData}
       />
-      
+       */}
       {/* 5. Interactive Features - Now managing its own state */}
       <InteractiveFeatures symbol={symbol} />
       
       {/* 3. Multi-Timeframe Predictions */}
-      <MultiTimeframePredictions 
+      {/* <MultiTimeframePredictions 
         chartData={chartData}
         timeframe={timeframe}
         setTimeframe={setTimeframe}
         prediction={prediction}
         probabilityData={probabilityData}
         analysisResult={analysisResult}
-      />
+      /> */}
       
       
       {/* 6. Historical Prediction Accuracy */}
